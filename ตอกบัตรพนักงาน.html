@@ -52,12 +52,6 @@
   </div>
 
   <script>
-    /* ----------------------------- CONFIG ----------------------------- */
-    const SHOP_DEVICE_ID = "DEVICE-XYZ-ONLY"; // ใส่รหัสเครื่องร้าน
-    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE"; // ใส่ลิงก์ Apps Script
-    const SHOP_LAT = 13.7563; // ละติจูดร้าน
-    const SHOP_LNG = 100.5018; // ลองจิจูดร้าน
-    const ALLOW_DISTANCE = 120; // ระยะที่อนุญาต (เมตร)
     let currentEmp = null;
 
     function openEmployee(name) {
@@ -85,54 +79,6 @@
       saveRecord(currentEmp, 'ออก');
       alert('บันทึกเวลาออกงานสำเร็จ');
       backHome();
-    }
-
-   /* ----------------------------- ตรวจสอบอุปกรณ์ร้าน ----------------------------- */
-    function validateDevice() {
-      const deviceId = localStorage.getItem("shopDeviceId");
-      return deviceId === SHOP_DEVICE_ID;
-    }
-
-    /* ให้เจ้าของร้านตั้งค่าเครื่องร้าน */
-    function markThisAsShop() {
-      localStorage.setItem("shopDeviceId", SHOP_DEVICE_ID);
-      alert("ตั้งอุปกรณ์นี้เป็นเครื่องร้านเรียบร้อย!");
-    }
-
-    /* ----------------------------- ตรวจ GPS ----------------------------- */
-    function validateGPS(type) {
-      if (!navigator.geolocation) {
-        alert("อุปกรณ์ไม่รองรับ GPS");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(success => {
-        const lat = success.coords.latitude;
-        const lng = success.coords.longitude;
-
-        const dist = getDistance(lat, lng, SHOP_LAT, SHOP_LNG);
-        if (dist > ALLOW_DISTANCE) {
-          alert("คุณไม่ได้อยู่ในบริเวณร้าน จึงไม่สามารถลงชื่อได้");
-          return;
-        }
-
-        sendToSheet(currentEmp, type, lat, lng);
-
-      }, err => {
-        alert("เปิด GPS ก่อนทำรายการค่ะ");
-      });
-    }
-
-    function getDistance(lat1, lon1, lat2, lon2) {
-      const R = 6371e3;
-      const x1 = lat1 * Math.PI/180;
-      const x2 = lat2 * Math.PI/180;
-      const dx = (lat2-lat1) * Math.PI/180;
-      const dy = (lon2-lon1) * Math.PI/180;
-
-      const a = Math.sin(dx/2)**2 + Math.cos(x1) * Math.cos(x2) * Math.sin(dy/2)**2;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      return R * c;
     }
 
     function saveRecord(name, type) {
