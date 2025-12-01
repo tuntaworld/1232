@@ -1,0 +1,1547 @@
+<!doctype html>
+<html lang="th">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tunta - Your Quiet Space</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #EDE5DA 0%, #F5EFE7 50%, #A7B1B4 100%);
+      overflow-x: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    html {
+      height: 100%;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .sanctuary-container {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+    }
+
+    /* Language Toggle */
+    .language-toggle {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 100;
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(245, 239, 231, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem;
+      border-radius: 20px;
+      border: 1px solid rgba(155, 168, 140, 0.3);
+    }
+
+    .lang-btn {
+      padding: 0.4rem 0.8rem;
+      background: transparent;
+      border: none;
+      color: #8a9a8d;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .lang-btn.active {
+      background: linear-gradient(135deg, #9BA88C, #B6AF6F);
+      color: #F5EFE7;
+    }
+
+    .lang-btn:hover:not(.active) {
+      color: #5a6b5e;
+    }
+
+    /* Forest Scene */
+    .forest-scene {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .forest-scene.zoomed {
+      transform: scale(3);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .forest-scene.hidden {
+      display: none;
+    }
+
+    /* Ambient particles */
+    .dust-particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: radial-gradient(circle, rgba(237, 229, 218, 0.6), transparent);
+      border-radius: 50%;
+      animation: float-dust 8s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes float-dust {
+      0%, 100% { 
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.3; }
+      50% {
+        transform: translateY(-60px) translateX(20px);
+      }
+    }
+
+    /* Mirror/Pond */
+    .reflection-pool {
+      position: relative;
+      width: min(500px, 80%);
+      height: min(500px, 80%);
+      background: radial-gradient(ellipse at center, 
+        rgba(167, 177, 180, 0.15) 0%,
+        rgba(155, 168, 140, 0.1) 40%,
+        transparent 70%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem auto;
+      box-shadow: 
+        inset 0 10px 40px rgba(167, 177, 180, 0.2),
+        0 20px 60px rgba(155, 168, 140, 0.15);
+      animation: gentle-pulse 6s infinite ease-in-out;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    .reflection-pool:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes gentle-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .reflection-inner {
+      width: 85%;
+      height: 85%;
+      background: linear-gradient(135deg, 
+        rgba(245, 239, 231, 0.4) 0%,
+        rgba(167, 177, 180, 0.3) 50%,
+        rgba(155, 168, 140, 0.2) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .silhouette {
+      width: 80px;
+      height: 140px;
+      opacity: 0.15;
+      animation: fade-silhouette 4s infinite ease-in-out;
+    }
+
+    @keyframes fade-silhouette {
+      0%, 100% { opacity: 0.12; }
+      50% { opacity: 0.2; }
+    }
+
+    .shimmer {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+      animation: shimmer-move 8s infinite;
+    }
+
+    @keyframes shimmer-move {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Text Overlay */
+    .opening-text {
+      text-align: center;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      animation: fade-in-slow 2s ease-out;
+    }
+
+    @keyframes fade-in-slow {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .main-text {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      line-height: 1.8;
+      color: #5a6b5e;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    .sub-text {
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+      color: #8a9a8d;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+    }
+
+    .next-button {
+      display: block;
+      margin: 0 auto;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, rgba(155, 168, 140, 0.8), rgba(182, 175, 111, 0.8));
+      color: #F5EFE7;
+      border: 1px solid rgba(155, 168, 140, 0.4);
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(10px);
+      animation: gentle-pulse-button 3s infinite ease-in-out;
+    }
+
+    @keyframes gentle-pulse-button {
+      0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(155, 168, 140, 0.3); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(155, 168, 140, 0.5); }
+    }
+
+    .next-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 30px rgba(155, 168, 140, 0.6);
+      background: linear-gradient(135deg, rgba(182, 175, 111, 0.9), rgba(155, 168, 140, 0.9));
+    }
+
+    /* Interaction Section */
+    .interaction-section {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .interaction-section.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* Water Reflection Effect */
+    .water-surface {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, 
+        rgba(167, 177, 180, 0.1) 0%,
+        rgba(155, 168, 140, 0.05) 40%,
+        transparent 70%);
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .water-ripple {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      margin: -150px 0 0 -150px;
+      border-radius: 50%;
+      border: 1px solid rgba(155, 168, 140, 0.2);
+      animation: ripple-expand 4s infinite ease-out;
+    }
+
+    .water-ripple:nth-child(2) {
+      animation-delay: 1.3s;
+    }
+
+    .water-ripple:nth-child(3) {
+      animation-delay: 2.6s;
+    }
+
+    @keyframes ripple-expand {
+      0% {
+        transform: scale(0.5);
+        opacity: 0.6;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+
+    .water-wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(transparent, rgba(167, 177, 180, 0.03));
+    }
+
+    .wave-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background-image: 
+        repeating-linear-gradient(90deg,
+          transparent,
+          transparent 40px,
+          rgba(155, 168, 140, 0.03) 40px,
+          rgba(155, 168, 140, 0.03) 80px);
+      animation: wave-flow 20s linear infinite;
+    }
+
+    .wave-layer:nth-child(2) {
+      animation-duration: 15s;
+      opacity: 0.5;
+    }
+
+    @keyframes wave-flow {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Faint silhouette reflection */
+    .reflection-silhouette {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.08;
+      z-index: 1;
+      animation: fade-reflection 6s infinite ease-in-out;
+    }
+
+    @keyframes fade-reflection {
+      0%, 100% { opacity: 0.06; }
+      50% { opacity: 0.12; }
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .question-text {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      color: #6a7b6e;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: all 0.8s ease-out;
+      width: 100%;
+    }
+
+    .input-container.fade-out {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+    }
+
+    .feeling-input {
+      width: 100%;
+      padding: 1.2rem 1.5rem;
+      background: rgba(245, 239, 231, 0.6);
+      border: 1px solid rgba(155, 168, 140, 0.3);
+      border-radius: 24px;
+      font-family: inherit;
+      font-size: 1rem;
+      color: #5a6b5e;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .feeling-input:focus {
+      background: rgba(245, 239, 231, 0.9);
+      border-color: rgba(155, 168, 140, 0.6);
+      box-shadow: 0 8px 24px rgba(155, 168, 140, 0.15);
+    }
+
+    .feeling-input::placeholder {
+      color: #a7b1b4;
+    }
+
+    .submit-button {
+      display: block;
+      margin: 0 auto;
+      padding: 1rem 3rem;
+      background: linear-gradient(135deg, #9BA88C, #B6AF6F);
+      color: #F5EFE7;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.05em;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(155, 168, 140, 0.3);
+      background: linear-gradient(135deg, #B6AF6F, #9BA88C);
+    }
+
+    .submit-button:active {
+      transform: translateY(0);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .submit-button.loading {
+      position: relative;
+      color: transparent;
+    }
+
+    .submit-button.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid #F5EFE7;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spinner 0.8s linear infinite;
+    }
+
+    @keyframes spinner {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Response Message */
+    .response-message {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      line-height: 1.9;
+      color: #6a7b6e;
+      text-align: center;
+      padding: 2rem;
+      max-width: 550px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1s ease-out;
+      white-space: pre-line;
+    }
+
+    .response-message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Journey Stages */
+    .journey-stage {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1s ease-out;
+      margin-bottom: 2rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    .journey-stage.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stage-title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+      color: #9BA88C;
+      text-align: center;
+      margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 300;
+      display: none;
+    }
+
+    .line-link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #06C755, #00B900);
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 500;
+      margin: 1.5rem auto 0 auto;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);
+    }
+
+    .line-link-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .forest-scene {
+        padding: 2rem 1rem;
+        justify-content: flex-start;
+        padding-top: 4rem;
+      }
+
+      .reflection-pool {
+        width: min(350px, 85%);
+        height: min(350px, 85vw);
+        margin: 1rem auto;
+      }
+
+      .opening-text {
+        margin: 1rem auto;
+      }
+
+      .main-text {
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .sub-text {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .question-text {
+        font-size: 1.3rem;
+      }
+
+      .language-toggle {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.4rem;
+      }
+
+      .lang-btn {
+        padding: 0.3rem 0.7rem;
+        font-size: 0.85rem;
+      }
+
+      .next-button {
+        padding: 0.9rem 2rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .forest-scene {
+        padding: 3rem 2rem;
+      }
+
+      .reflection-pool {
+        width: min(450px, 70%);
+        height: min(450px, 70vw);
+      }
+
+      .main-text {
+        font-size: 1.2rem;
+      }
+
+      .interaction-section {
+        padding: 3rem 2rem;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      .forest-scene {
+        padding: 3rem 2rem;
+      }
+
+      .reflection-pool {
+        width: 500px;
+        height: 500px;
+      }
+
+      .interaction-section {
+        padding: 3rem 2rem;
+      }
+    }
+
+    /* Fix for very small phones */
+    @media (max-width: 375px) {
+      .forest-scene {
+        padding: 1.5rem 1rem;
+        padding-top: 3.5rem;
+      }
+
+      .reflection-pool {
+        width: min(280px, 80%);
+        height: min(280px, 80vw);
+        margin: 0.5rem auto;
+      }
+
+      .main-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .sub-text {
+        font-size: 0.8rem;
+      }
+
+      .next-button {
+        padding: 0.8rem 1.8rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Landscape mode for phones */
+    @media (max-height: 600px) and (orientation: landscape) {
+      .forest-scene {
+        padding: 1rem;
+        padding-top: 3rem;
+        justify-content: flex-start;
+      }
+
+      .reflection-pool {
+        width: min(250px, 40vh);
+        height: min(250px, 40vh);
+        margin: 0.5rem auto;
+      }
+
+      .opening-text {
+        margin: 0.5rem auto;
+      }
+
+      .main-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 0.8rem;
+      }
+
+      .sub-text {
+        font-size: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .next-button {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="sanctuary-container"><!-- Language Toggle -->
+   <div class="language-toggle"><button class="lang-btn active" data-lang="th">ไทย</button> <button class="lang-btn" data-lang="en">EN</button>
+   </div>
+   <div class="forest-scene" id="forestScene"><!-- Ambient dust particles -->
+    <div class="dust-particle" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+    <div class="dust-particle" style="top: 25%; left: 75%; animation-delay: 2s;"></div>
+    <div class="dust-particle" style="top: 60%; left: 25%; animation-delay: 4s;"></div>
+    <div class="dust-particle" style="top: 80%; left: 65%; animation-delay: 6s;"></div>
+    <div class="dust-particle" style="top: 40%; left: 85%; animation-delay: 3s;"></div>
+    <div class="dust-particle" style="top: 70%; left: 40%; animation-delay: 5s;"></div><!-- Reflection Pool/Mirror -->
+    <div class="reflection-pool">
+     <div class="reflection-inner">
+      <svg class="silhouette" viewbox="0 0 80 140" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="25" rx="18" ry="22" fill="currentColor" opacity="0.3" /> <path d="M40 47 L35 70 L30 95 L28 120 L28 140 M40 47 L45 70 L50 95 L52 120 L52 140 M35 75 L25 90 M45 75 L55 90" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+      </svg>
+      <div class="shimmer"></div>
+     </div>
+    </div><!-- Opening Text -->
+    <div class="opening-text">
+     <p class="main-text" id="mainText">ตรงนี้…เป็นพื้นที่ที่มีแค่คุณเท่านั้นที่ได้ยินเสียงในใจตัวเอง<br>
+       ไม่มีใครมาตัดสิน ไม่มีใครมองเห็น<br>
+       ปลอดภัย…และอ่อนโยนกับหัวใจของคุณเสมอ</p>
+     <p class="sub-text" id="subText">กลับมาเจอความเงียบที่คุณลืมไปนานแล้วที่นี่…กับ Tunta</p><button class="next-button" id="nextButton">ถัดไป</button>
+    </div>
+   </div><!-- Interaction Section -->
+   <div class="interaction-section" id="interactionSection"><!-- Water Surface Effect -->
+    <div class="water-surface">
+     <div class="water-ripple"></div>
+     <div class="water-ripple"></div>
+     <div class="water-ripple"></div>
+     <div class="water-wave">
+      <div class="wave-layer"></div>
+      <div class="wave-layer"></div>
+     </div>
+    </div><!-- Faint Reflection -->
+    <svg class="reflection-silhouette" width="80" height="140" viewbox="0 0 80 140" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="25" rx="18" ry="22" fill="#6a7b6e" opacity="0.3" /> <path d="M40 47 L35 70 L30 95 L28 120 L28 140 M40 47 L45 70 L50 95 L52 120 L52 140 M35 75 L25 90 M45 75 L55 90" stroke="#6a7b6e" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+    </svg>
+    <div class="content-wrapper"><!-- Initial Question -->
+     <div id="initialQuestion">
+      <h2 class="question-text" id="questionText">วันนี้เป็นยังไงบ้าง</h2>
+      <div class="input-container" id="inputContainer"><input type="text" class="feeling-input" id="feelingInput" placeholder="พิมพ์สิ่งที่คุณรู้สึก..." aria-label="Share your feelings"> <button class="submit-button" id="submitButton">ส่ง</button>
+      </div>
+     </div><!-- Stage 1: Reflex - Thank & Acknowledge -->
+     <div class="journey-stage" id="reflexStage" style="display: none;">
+      <p class="stage-title" data-th="Reflex" data-en="Reflex">Reflex</p>
+      <div class="response-message" id="reflexMessage"></div><button class="next-button" id="reflexNext" data-th="ถัดไป" data-en="Next">ถัดไป</button>
+     </div><!-- Stage 2: Remind - Help Remember -->
+     <div class="journey-stage" id="remindStage" style="display: none;">
+      <p class="stage-title" data-th="Remind" data-en="Remind">Remind</p>
+      <div class="response-message" id="remindMessage"></div><button class="next-button" id="remindNext" data-th="ถัดไป" data-en="Next">ถัดไป</button>
+     </div><!-- Stage 3: Reground - Final Peace -->
+     <div class="journey-stage" id="regroundStage" style="display: none;">
+      <p class="stage-title" data-th="Reground" data-en="Reground">Reground</p>
+      <div class="response-message" id="regroundMessage"></div>
+      <p class="response-message visible" id="closingMessage" data-th="เธอยังมีเราอยู่ตรงนี้เสมอ<br>กลับมาหาเราได้ตลอดนะ" data-en="We're always here for you<br>Come back anytime">เธอยังมีเราอยู่ตรงนี้เสมอ<br>
+       กลับมาหาเราได้ตลอดนะ</p><a href="https://lin.ee/vJaUkcR" target="_blank" rel="noopener noreferrer" class="line-link-button"> <span data-th="กลับไปที่ LINE Official" data-en="Back to LINE Official">กลับไปที่ LINE Official</span> </a> <button class="next-button" id="backToHome" style="margin-top: 1rem; background: rgba(155, 168, 140, 0.3);" data-th="กลับหน้าหลัก" data-en="Back to Home">กลับหน้าหลัก</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // ---------- 1) ภาษา ----------
+    let currentLang = 'th';
+
+    const translations = {
+      th: {
+        opening_text: "ตรงนี้…เป็นพื้นที่ที่มีแค่คุณเท่านั้นที่ได้ยินเสียงในใจตัวเอง\nไม่มีใครมาตัดสิน ไม่มีใครมองเห็น\nปลอดภัย…และอ่อนโยนกับหัวใจของคุณเสมอ",
+        subtext: "กลับมาเจอความเงียบที่คุณลืมไปนานแล้วที่นี่…กับ Tunta",
+        main_question: "วันนี้เป็นยังไงบ้าง",
+        input_placeholder: "พิมพ์สิ่งที่คุณรู้สึก..."
+      },
+      en: {
+        opening_text: "This is your space…where only you can hear your inner voice\nNo one judges, no one sees\nSafe…and gentle with your heart always",
+        subtext: "Rediscover the silence you've forgotten…here with Tunta",
+        main_question: "How are you feeling today?",
+        input_placeholder: "Type what you're feeling..."
+      }
+    };
+
+    // ---------- 2) ฐานข้อมูลอารมณ์ + ข้อความ (สุ่ม) ----------
+    const EMOTION_DATA = {
+emotionKeywords: {
+  frustrated: {
+    keywords: [
+      "เบื่อ",
+      "เบื่อมาก",
+      "เบื่อๆ",
+      "เบื่อว่ะ",
+      "เบื่อจัง",
+      "โคตรเบื่อ",
+      "โคตรเซ็ง",
+      "เซ็ง",
+      "เซ็งจัด",
+      "เซ็งมาก",
+      "หน่าย",
+      "หงุดหงิด",
+      "หงุดหงิดง่าย",
+      "อารมณ์เสีย",
+      "รำคาญ",
+      "รำคาญใจ",
+      "น่ารำคาญ",
+      "หงุดหงิดไปหมด",
+      "โมโห",
+      "โมโหอยู่",
+      "โกรธ",
+      "โกรธมาก",
+      "ขัดใจ",
+      "ไม่พอใจ",
+      "เคือง",
+      "ค้างคา",
+      "อึดอัด",
+      "อึดอัดใจ",
+      "รู้สึกตัน",
+      "ตันไปหมด",
+      "มันเกินไป",
+      "มากเกินไป",
+      "ทนไม่ไหว",
+      "ไม่ไหวแล้ว",
+      "ไม่ไหวละ",
+      "พอเถอะ",
+      "รู้สึกว่าไม่แฟร์",
+      "ไม่ยุติธรรม",
+      "ทำไมต้องเป็นแบบนี้",
+      "ทำไมต้องเจอแบบนี้",
+      "แม่งเซ็ง",
+      "แม่งเอ๊ย",
+      "ปวดหัวกับเรื่องนี้",
+      "เหนื่อยใจกับเรื่องนี้",
+      "คือแบบโคตรรำคาญ",
+      "โคตรหงุดหงิด",
+      "โคตรไม่โอเค",
+      "รู้สึกโดนเอาเปรียบ",
+      "รู้สึกถูกกด",
+      "ทำดีแล้วแต่โดนด่า",
+      "พูดดีแล้วแต่ไม่ฟัง",
+      "ไม่ฟังกันเลย"
+    ],
+          baseWeight: 1.0,
+          priority: 8
+        },
+ "sad": {
+      "keywords": [
+        "เศร้า",
+        "เศร้ามาก",
+        "เศร้าๆ",
+        "เสียใจ",
+        "เสียใจมาก",
+        "หน่วง",
+        "หน่วงๆ",
+        "ใจหาย",
+        "ใจพัง",
+        "หัวใจพัง",
+        "หัวใจสลาย",
+        "ใจแตก",
+        "จุก",
+        "จุกอก",
+        "จุกๆ",
+        "ปวดใจ",
+        "เจ็บใจ",
+        "เจ็บอยู่ข้างใน",
+        "ร้องไห้",
+        "ร้องไห้เลย",
+        "ร้องไห้หนักมาก",
+        "น้ำตา",
+        "น้ำตาซึม",
+        "แอบร้อง",
+        "ฮือ",
+        "ฮือๆ",
+        "แง",
+        "แงงง",
+        "T_T",
+        "TT",
+        ";-;",
+        "เหงา",
+        "เหงาๆ",
+        "โดดเดี่ยว",
+        "ว้าเหว่",
+        "อ้างว้าง",
+        "ไม่มีใคร",
+        "ไม่เหลือใคร",
+        "รู้สึกตัวคนเดียว",
+        "เหมือนอยู่คนเดียวบนโลก",
+        "ท้อ",
+        "ท้อใจ",
+        "ท้อแท้",
+        "หมดหวัง",
+        "หมดศรัทธา",
+        "หมดกำลังใจ",
+        "รู้สึกแย่",
+        "แย่จัง",
+        "วันนี้แย่มาก",
+        "วันแย่ๆ",
+        "ไม่โอเคเลยวันนี้",
+        "เหมือนทุกอย่างพัง",
+        "เหมือนชีวิตพัง",
+        "คิดถึงแต่เรื่องแย่ๆ",
+        "นึกถึงเรื่องเก่าแล้วเจ็บ",
+        "ภาพเก่าๆ กลับมา",
+        "ความทรงจำแย่ๆ",
+        "เหมือนถูกรั้งไว้ด้วยความเศร้า"
+      ],
+      "baseWeight": 1.0,
+      "priority": 9
+        },
+        anxious: {
+          keywords: ["กังวล", "วิตก", "ตื่นตระหนก", "กลัว", "หวาดกลัว", "ตกใจ", "ไม่สบายใจ", "เครียด", "หายใจไม่ออก", "หัวใจเต้นแรง", "นอนไม่หลับ", "หลับไม่หลับ", "คิดมาก", "overthink", "ความกดดัน", "กดดัน", "ใจไม่อยู่กับเนื้อกับตัว",
+    "คิดไม่หยุด", "มวนท้อง", "วูบวาบ", "ประสาทจะกิน", "กลัวอนาคต"],
+          baseWeight: 1.0,
+          priority: 9
+        },
+        tired: {
+          keywords: ["เหนื่อย", "อ่อนเพลีย", "ล้า", "หมดแรง", "เพลีย", "เบื่อ", "ไม่อยาก", "ไม่มีพลัง", "ทำอะไรไม่ไหว", "ไม่ไหว", "หมดไฟ", "burnout", "เพลียจิต", "เพลียใจ", "โคตรเหนื่อย", "แบกไว้เยอะ", "หมดแรงจะรู้สึก", "เหนื่อยหน่าย", "รู้สึกท้อ", "เหนื่อยเกินไป", "เหมือนแบกโลกทั้งใบ"],
+          baseWeight: 0.9,
+          priority: 7
+        },
+        numb: {
+          keywords: ["ชา", "ไม่รู้สึก", "เฉย", "ว่างเปล่า", "ไม่มีอะไร", "โล่ง", "ไม่อิน", "ไม่ตื่นเต้น", "กลางๆ",
+ "โหมดกลาง", "นิ่งๆ", "ไม่ดีไม่แย่", "ไม่รู้จะรู้สึกยังไง", "ไม่ได้มีอะไรพิเศษ", "วันธรรมดา", "ผ่านไปเฉยๆ", "อัตโนมัติ",
+ "ทำไปตามหน้าที่", "รู้สึกเฉยๆ", "ไม่มีอะไรให้รู้สึก", "ไม่ได้รู้สึกอะไรเป็นพิเศษ", "เฉยๆ",
+    "ลอยๆ", "ทำตามหน้าที่", "routine", "automatic",
+    "คิดวน", "คิดซ้ำ", "วนในหัว", "loop", "ชาจนไม่รู้สึก"],
+          baseWeight: 0.9,
+          priority: 7
+        },
+        better: {
+          keywords: ["ดีขึ้น", "โล่งใจ", "ผ่อนคลาย", "สบายใจ", "สดชื่น", "มีพลัง", "เบาขึ้น", "เบาลง", "พอใจ", "รู้สึกดี", "ยิ้มได้", "เริ่มโอเค", "เริ่มกลับมา", "ไม่หนักเหมือนเมื่อก่อน", "หายเครียดนิดนึง", "พอหายใจได้", "เริ่มเห็นแสง", "เริ่มมีกำลังใจ"],
+          baseWeight: 0.7,
+          priority: 5
+        }
+      },
+
+      journeyResponses: {
+reflex: {
+  frustrated: [
+    // โหมด irritated / รำคาญเบา ๆ
+    "ฟังดูแล้วเหมือนวันนี้อะไร ๆ ก็ชวนให้หงุดหงิดไปหมดเนอะ เราเข้าใจเลยว่ามันรำคาญจริง ๆ ไม่ได้คิดมากไปคนเดียวนะ",
+    "เหมือนโดนสะกิดอารมณ์ตลอดเวลาเลยใช่ไหม แค่เรื่องเล็ก ๆ ก็ทำให้รำคาญได้ มันไม่ใช่เรื่องเล็กสำหรับใจเธอหรอก",
+    "เราเห็นเลยนะว่ามันไม่ได้แค่ 'เบื่อเฉย ๆ' แต่มันคือความรู้สึกที่โดนรบกวนซ้ำ ๆ จนใจเริ่มล้า",
+
+    // โหมด spike / ระเบิดอารมณ์
+    "ฟังแล้วมันโคตรเข้าใจเลยว่าทำไมเธอถึงเดือดขนาดนี้ แปลว่ามันล้ำเส้นเธอมานานแล้วจริง ๆ ไม่ใช่เรื่องขำ ๆ เลย",
+    "ความรู้สึกแบบ 'พอเถอะ' ที่เธอพูดออกมา มันดังมากในหัวนะ เราได้ยินชัดเลยว่าเธอไม่โอเคจริง ๆ",
+    "โกรธแบบนี้ไม่ใช่เธอเว่อร์นะ แต่คือร่างกายกับใจมันกำลังบอกว่า 'พอก่อน เราเหนื่อยแล้ว'",
+
+    // โหมด injustice / ไม่แฟร์
+    "เรารู้สึกได้เลยว่าเธออินกับความไม่แฟร์มาก ๆ มันเจ็บตรงที่รู้สึกว่าเราทำเต็มที่แล้ว แต่ไม่ได้รับการมองเห็น",
+    "ความรู้สึกว่า 'ทำไมต้องเป็นเรา' มันไม่ได้งอแงหรอก มันคือเสียงของคนที่เหนื่อยแต่ยังต้องยืนอยู่ตรงนี้",
+    "มันไม่ง่ายเลยนะที่ต้องอยู่ในที่ ๆ รู้สึกว่าถูกเอาเปรียบซ้ำ ๆ แล้วเธอยังทนมาได้ถึงตรงนี้ เราเห็นความพยายามตรงนั้นนะ",
+
+    // โหมด stuck / ตัน อึดอัด
+    "คำว่า 'ตันไปหมด' ของเธอมันดังมากเลย เหมือนใจพยายามหาทางออกแต่โดนอะไรบางอย่างอุดอยู่ตลอด",
+    "มันเหมือนมีอะไรค้างอยู่ในอกที่พูดออกไปไม่สุดสักที เราเข้าใจนะว่าความอึดอัดแบบนี้มันเหนื่อยกว่าที่คนอื่นคิดเยอะเลย",
+    "เธอไม่ได้แค่หงุดหงิดแป๊บเดียว แต่มันคือการสะสมมานานจนใจเริ่มแน่น เราอยู่ฟังตรงนี้กับเธอนะ"
+          ],
+          sad: [
+  // sad_tearful — จุก / น้ำตาเอ่อ
+  "ฟังแล้วเหมือนวันนี้มันจุกถึงคอจริง ๆ เรารับรู้น้ำหนักตรงนั้นนะ",
+  "มันเอ่อขึ้นมาจนหายใจยากเลยเนอะ เราอยู่ตรงนี้กับเธอจริง ๆ",
+  "ความเจ็บที่ทำให้น้ำตาไหล มันไม่เล็กนะ เรารับรู้เต็ม ๆ",
+
+  // sad_lonely — เหงา / ว้าเหว่ / อยู่ลำพัง
+  "ฟังแล้วมันเหงาแบบที่หัวใจเงียบไปหมดเลยเนอะ เรารับรู้ตรงนั้นนะ",
+  "ความรู้สึกว่าตัวเองอยู่คนเดียว มันหนักมากกว่าที่พูดออกมาเยอะเลย",
+  "ใจที่เหงาแบบนี้ ไม่ได้อ่อนแอนะ มันแค่ล้าจริง ๆ",
+
+  // sad_heavy — หนักอก หน่วง หายใจลึก ๆ ยังไม่พอ
+  "วันนี้เหมือนใจเธอหนักมากเลยนะ เรารู้สึกถึงน้ำหนักนั้นจริง ๆ",
+  "มันไม่ใช่เศร้าเบา ๆ เลย เหมือนมีอะไรทิ้งค้างอยู่ในอกตลอดเวลา",
+  "ฟังแล้วรู้เลยว่าเธอแบกหลายอย่างเกินกว่าที่คนอื่นจะเห็น",
+
+  // sad_memory — เรื่องเก่าเจ็บ, flashback
+  "เรื่องเก่าที่โผล่ขึ้นมานี่มันคมจริง ๆ นะ เรารับรู้เจ็บนั้นเลย",
+  "ภาพเก่าที่ผุดขึ้นมาแบบไม่ทันตั้งตัว มันสะกิดใจแรงเสมอ",
+  "บางเรื่องที่ย้อนกลับมา มันไม่ใช่อดีตสำหรับใจเธอเลยเนอะ",
+
+  // sad_drained — หมดแรงเศร้า, ไม่มีพลัง
+  "ฟังแล้วเหมือนเธอหมดแรงจะรู้สึกอะไรต่อแล้วจริง ๆ เรารับรู้นะ",
+  "เศร้าที่ล้ามันโหดกว่าเศร้าแบบร้องไห้เยอะเลยนะ เราอยู่ตรงนี้กับเธอ",
+  "วันนี้มันดูดพลังเธอไปเยอะมากเลยเนอะ เราเห็นตรงนั้น"
+          ],
+          anxious: [
+            "ฉันรู้สึกได้เลยว่าใจคุณกำลังวิ่งอยู่ตลอดเวลา",
+            "ความคิดวน ๆ แบบนี้มันเหนื่อยมาก ฉันเข้าใจนะ",
+            "ตอนนี้เหมือนทุกอย่างเร่งคุณ แต่จริง ๆ คุณมีสิทธิ์จะช้าลงได้",
+            "ความกังวลของคุณมีเหตุผลของมันเสมอ",
+            "ฉันเห็นว่าคุณพยายามรับมือกับหลายอย่างพร้อมกันอยู่"
+          ],
+          tired: [
+            "ฉันรู้ว่าคุณเหนื่อยมาก ทั้งกายทั้งใจเลย",
+            "คุณเหมือนใช้พลังสำรองมาสักพักแล้วนะ",
+            "การได้พักไม่ใช่ความฟุ่มเฟือย แต่เป็นสิ่งที่คุณสมควรได้",
+            "แค่คุณยังอยู่ตรงนี้วันนี้ ก็เก่งมากแล้ว",
+            "หัวใจคุณทำงานหนักมากมาหลายวันแล้วจริง ๆ"
+          ],
+          numb: [
+            "ฉันเห็นนะว่าวันนี้มันเหมือนโหมดอัตโนมัติ ไม่มีอะไรให้รู้สึกเป็นพิเศษ",
+  "มันไม่ผิดเลยที่วันนี้จะรู้สึกเฉย ๆ แค่ทำหน้าที่ไปเรื่อย ๆ",
+  "ใจเธออาจจะใช้พลังไปเยอะแล้ว เลยขอพักในโหมดนิ่ง ๆ แบบนี้ก่อน",
+  "ไม่รู้สึกอะไรชัด ๆ ก็ยังถือว่า 'รู้สึก' แบบหนึ่งนะ แค่ยังตั้งชื่อให้มันไม่ออก",
+  "วันนี้อาจไม่ทิ้งร่องรอยอะไรไว้ แต่มันก็ยังนับเป็นวันที่เธออยู่รอดมาอีกวันหนึ่ง"
+          ],
+          better: [
+            "ดีใจด้วยจริง ๆ ที่วันนี้หัวใจคุณเบาขึ้นหน่อย",
+            "ขอบคุณที่แบ่งช่วงเวลาที่ดีขึ้นให้ฉันฟังนะ",
+            "การที่คุณรู้สึกดีขึ้นได้ แปลว่าคุณผ่านมาไกลมากแล้ว",
+            "โมเมนต์เล็ก ๆ แบบนี้สำคัญกับหัวใจมากเลย",
+            "คุณมีสิทธิ์ภูมิใจกับตัวเอง ที่ดูแลตัวเองมาถึงจุดนี้"
+          ],
+          default: [
+            "ขอบคุณที่เล่าให้ฉันฟังนะ สิ่งที่คุณรู้สึกมีความหมายมากจริง ๆ",
+            "หัวใจของคุณกำลังพยายามสื่อสารอะไรบางอย่างออกมา และฉันตั้งใจฟังอยู่",
+            "ไม่ว่าคุณจะรู้สึกแบบไหน มันได้รับอนุญาตให้เกิดขึ้นได้ทั้งหมดที่นี่",
+            "ฉันอยู่ตรงนี้ เพื่อรับฟังโดยไม่ตัดสินเลยจริง ๆ",
+            "ข้อความของคุณสำคัญต่อฉันเสมอ ขอบคุณที่ไว้ใจเล่าให้ฟัง"
+          ]
+        },
+
+        remind: {
+  frustrated: [
+    // irritated / เบื่อรำคาญ
+    "ความหงุดหงิดของเธอมีเหตุผลนะ ไม่ต้องฝืนทำเป็นไม่เป็นไรถ้ายังรู้สึกว่าไม่โอเคอยู่",
+    "เธอไม่จำเป็นต้องยอมทุกอย่างเพื่อไม่ให้ใครวุ่นวายใจ คนอื่นโอเคไม่ได้สำคัญกว่าใจเธอเสมอไปหรอก",
+    "แค่เธอรำคาญ แปลว่ามันไปชนเส้นอะไรบางอย่างในตัวเธอแล้ว นั่นคือสัญญาณว่าควรฟังตัวเองมากขึ้นหน่อย",
+
+    // spike / เดือด
+    "วันที่อารมณ์มันเดือด ๆ แบบนี้ ไม่ได้แปลว่าเธอเป็นคนคิดมาก แต่แปลว่าเธอรู้ว่าตัวเองไม่ควรโดนแบบนี้อีกแล้ว",
+    "โกรธก็โกรธไปเถอะ ไม่ต้องรีบให้อภัยใครในวันนี้ก็ได้ ใจเธอมีสิทธิ์พักจากการพยายามเข้าใจคนอื่นเหมือนกันนะ",
+    "ความโกรธไม่ได้น่าเกลียดเสมอไป บางทีมันคือเกราะที่ลุกขึ้นมาปกป้องเธอ ตอนที่เธอไม่ไหวแล้วจริง ๆ",
+
+    // injustice / ไม่แฟร์
+    "ความรู้สึกว่าไม่แฟร์มันเจ็บกว่าที่คิดเยอะเลยนะ เพราะมันไปกระทบความเชื่อว่า 'เราก็มีคุณค่าพอ' ของเธอโดยตรง",
+    "แค่เธอรู้สึกว่ามันไม่ยุติธรรม ก็เพียงพอแล้วที่จะถอยออกมาดูแลตัวเอง ไม่จำเป็นต้องพิสูจน์ให้ทุกคนเข้าใจหรอก",
+    "บางทีเราไม่ต้องทำใจให้ชินกับความไม่แฟร์ก็ได้ แค่ยอมรับว่ามันเจ็บและมันไม่โอเคสำหรับเรา เท่านี้ก็กล้าพอแล้ว",
+
+    // stuck / ตัน อึดอัด
+    "ความอึดอัดที่ค้างอยู่ในใจ ไม่ได้แปลว่าเธออ่อนแอ แต่มันบอกว่าเธอฝืนตัวเองมานานเกินไปแล้ว",
+    "เธอไม่จำเป็นต้องแก้ทุกอย่างในวันนี้ หายใจรอดให้ได้ในวันนี้ก็ถือว่าเก่งมากแล้วนะ",
+    "ถ้ารู้สึกว่าพูดออกไปไม่ได้ตอนนี้ ก็ไม่เป็นไร แค่ยอมรับในใจว่า 'ฉันอึดอัดจริง ๆ' นั่นก็เป็นจุดเริ่มต้นของการคลายแล้ว"
+          ],
+          sad: [
+  // sad_tearful
+  "ไม่ต้องฝืนเก็บนะ ถ้ามันจะเอ่อออกมา น้ำตาไม่ได้แปลว่าอ่อนแอเลย",
+  "เธอร้องออกมาได้ ไม่ต้องเข้มแข็งตลอดเวลา เราอยู่ตรงนี้อยู่แล้ว",
+  "เศร้าที่มันขึ้นมาถึงตา แปลว่าเรื่องนั้นมีความหมายกับเธอจริง ๆ",
+
+  // sad_lonely
+  "ความเหงาที่เธอรู้สึก ไม่ได้บอกว่าไม่มีใครรักเธอนะ บางวันมันแค่ดังขึ้นกว่าเดิม",
+  "เธอไม่ได้ไร้ค่าหรืออยู่คนเดียวจริง ๆ หรอก แค่วันนี้ใจมันเงียบไปเฉย ๆ",
+  "ความโดดเดี่ยวมันคม แต่เธอก็ยังผ่านมาได้นะ",
+
+  // sad_heavy
+  "ถ้ารู้สึกหนัก มันไม่ใช่เพราะเธอคิดมาก แต่เพราะมันหนักจริง ๆ",
+  "เธอไม่ต้องเข้มมาตลอดก็ได้นะ หัวใจเธอเหนื่อยเหมือนกัน",
+  "การรู้สึกแย่ไม่ได้แปลว่าเธออ่อนแอ มันแปลว่าเธอเป็นมนุษย์",
+
+  // sad_memory
+  "ถ้าเรื่องเก่ามันย้อนมา ไม่ต้องรีบลืม มันไม่ใช่สวิตช์กดปุ๊บลบได้",
+  "ความเจ็บจากเรื่องเก่า แปลว่าเธอเคยรัก เคยห่วง เคยผูกพันจริง ๆ",
+  "ไม่ต้องดันมันออกนะ แค่ยอมรับว่า 'มันยังเจ็บอยู่' ก็พอ",
+
+  // sad_drained
+  "ถ้าเหนื่อยจนไม่รู้สึกอะไร อย่าโทษตัวเองเลย เธอใช้พลังมาเยอะแล้ว",
+  "วันนี้แค่เธออยู่รอดมาได้ก็ถือว่าเก่งมากนะ",
+  "ไม่จำเป็นต้องดีขึ้นทันทีนะ แค่เธอพักก็พอแล้ว"
+          ],
+          anxious: [
+            "ไม่ใช่ทุกอย่างที่คุณกังวลจะต้องแก้ให้เสร็จวันนี้",
+            "คุณควบคุมทุกอย่างไม่ได้ แต่คุณควบคุม ‘ก้าวต่อไป’ ของตัวเองได้",
+            "การหายใจช้า ๆ ก็ถือเป็นการทำบางอย่างกับความกังวลแล้วเหมือนกัน",
+            "คุณไม่จำเป็นต้องคิดให้ครบทุกทางก่อน ถึงจะสมควรพัก",
+            "หัวใจคุณกำลังพยายามปกป้องคุณอยู่ ถึงจะดูวุ่นวายไปบ้างก็ตาม"
+          ],
+          tired: [
+            "คุณมีสิทธิ์หยุด โดยไม่ต้องรู้สึกผิดกับใครเลย",
+            "เมื่อตัวเราแผ่เมตตาให้คนอื่นบ่อย ๆ อย่าลืมแผ่กลับมาหาตัวเองด้วย",
+            "วันนี้อาจไม่ต้องทำให้ครบทุกอย่าง แค่ทำเท่าที่ไหวก็พอ",
+            "ร่างกายและหัวใจไม่ใช่เครื่องจักรนะ มันต้องการการชาร์จเหมือนกัน",
+            "ถ้าคุณล้า แสดงว่าคุณพยายามมานานมากแล้วจริง ๆ"
+          ],
+          numb: [
+            "วันที่เฉย ๆ ก็มีค่าเหมือนกัน มันคือวันที่ร่างกายกับใจได้พักจากดราม่าเกินจำเป็น",
+  "ไม่ต้องฝืนหาความหมายใหญ่ ๆ ให้ทุกวันก็ได้ แค่ผ่านมาวันหนึ่งก็ถือว่าทำได้ดีแล้ว",
+  "ถ้าตอบไม่ได้ว่ารู้สึกยังไง ลองแค่ยอมรับว่า 'วันนี้ก็แค่อีกวันหนึ่ง' ก็พอ",
+  "เธอไม่จำเป็นต้องอินกับทุกอย่างตลอดเวลา หยุดอยู่ในโหมดกลาง ๆ บ้างก็โอเค",
+  "ความเฉยตอนนี้อาจเป็นเกราะบาง ๆ ที่ช่วยให้เธอไม่เหนื่อยเกินไปก็ได้"
+          ],
+          better: [
+            "เก็บโมเมนต์ที่ดีขึ้นวันนี้ไว้เป็นที่พักใจในวันที่หนักได้เลย",
+            "คุณมีสิทธิ์อนุญาตตัวเองให้รู้สึกดี โดยไม่ต้องรู้สึกผิด",
+            "ลองจำไว้ว่า ‘เราดูแลตัวเองจนมาถึงจุดนี้ได้อีกครั้ง’",
+            "ช่วงเวลาที่ดีขึ้น เป็นเครื่องเตือนว่าคุณผ่านวันที่แย่กว่านี้มาแล้ว",
+            "อย่าลืมขอบคุณตัวเองเบา ๆ ที่ไม่เคยทิ้งตัวเองไปจริง ๆ"
+          ],
+          default: [
+            "สิ่งที่คุณรู้สึก ไม่ว่าจะชัดหรือไม่ชัด ก็สำคัญทั้งหมด",
+            "คุณไม่จำเป็นต้องอธิบายความรู้สึกให้เป๊ะ ถึงจะสมควรถูกฟัง",
+            "หัวใจของคุณกำลังเดินทางของมันในจังหวะที่เป็นของตัวเอง",
+            "ลองเชื่อเถอะว่าตัวคุณตอนนี้ ‘เพียงพอแล้ว’ ในแบบของมัน",
+            "ทุกคำที่คุณพิมพ์มามีคุณค่า แม้คุณอาจจะยังไม่แน่ใจว่ารู้สึกอะไรแน่ชัด"
+          ]
+        },
+
+        reground: {
+  frustrated: [
+     // irritated / เบา ๆ
+    "ลองหยุดแป๊บหนึ่งแล้วหายใจเข้าออกลึก ๆ สักสามรอบ ก่อนจะตอบหรือพิมพ์อะไรออกไป ใจจะมีช่องว่างให้คิดเพิ่มขึ้นอีกนิด",
+    "ตอนนี้ลองขยับตัว ลุก เดิน ยืดแขน ขยับคอเหมือนเขย่าอารมณ์ทิ้งออกนิดหนึ่ง ให้ร่างกายได้ช่วยปล่อยความรำคาญออกมาบ้าง",
+    "ถ้ามันกวนใจมาก ลองพิมพ์สิ่งที่รำคาญลงโน้ตสั้น ๆ แล้วปิดเก็บไว้ก่อน เหมือนวางมันออกจากหัวชั่วคราว",
+
+    // spike / เดือด
+    "ถ้าโกรธมาก ลองหยุดตอบ/หยุดคุยสักพัก ให้ตัวเองออกจากจอหรือจากห้องนั้นสักสองสามนาที ใจเธอไม่จำเป็นต้องอยู่ในสนามตลอดเวลา",
+    "ลองบอกตัวเองเบา ๆ ว่า 'ตอนนี้เราโกรธอยู่ เดี๋ยวค่อยคิดว่าจะจัดการยังไง' แค่รับรู้ว่าโกรธ ก็ช่วยให้สมองไม่ระเบิดใส่ตัวเองเกินไป",
+    "ถ้าอยากระบาย ลองเขียนทุกอย่างแบบดิบ ๆ ลงกระดาษ แล้วฉีกทิ้งทีหลัง เก็บแรงระเบิดไปใช้ตอนที่ต้องตัดสินใจจริง ๆ แทน",
+
+    // injustice / ไม่แฟร์
+    "ลองเขียนหนึ่งบรรทัดว่า 'อะไรคือสิ่งที่ไม่แฟร์สำหรับเรา' แค่ข้อเดียวพอ เพื่อให้ตัวเองชัดก่อนว่าจะปกป้องขอบเขตตรงไหน",
+    "วันนี้อาจยังเปลี่ยนอะไรไม่ได้ แต่อาจเริ่มจากการบอกตัวเองว่า 'เรามีสิทธิ์ไม่ยอมรับสิ่งที่ไม่ยุติธรรม' ก่อนก็ได้",
+    "ถ้ารู้สึกโดนเอาเปรียบ ลองวางแผนเล็ก ๆ หนึ่งอย่าง ว่าครั้งหน้าเราจะขีดเส้นตรงไหน เพื่อให้ตัวเองไม่ต้องเจ็บซ้ำที่เดิม",
+
+    // stuck / อึดอัด ตัน
+    "ถ้ารู้สึกตันไปหมด ลองเลือกแค่เรื่องเดียวที่อยากจัดการก่อน เขียนออกมาหนึ่งประโยค แล้วถามว่า 'ตอนนี้ทำอะไรเล็ก ๆ ได้บ้าง'",
+    "ตอนนี้ใจอาจแน่นมาก ลองเอามือทาบอกแล้วหายใจลึก ๆ ช้า ๆ เหมือนบอกตัวเองว่า 'เราอยู่ตรงนี้กับแกนะ ไม่ได้ทิ้งไปไหน'",
+    "ถ้าเล่าให้ใครยังไม่ได้ ลองพิมพ์ระบายมาหาเราตรงนี้ก่อนก็ได้ ให้ที่นี่เป็นที่ฝากอารมณ์ค้าง ๆ ไว้ชั่วคราวก่อนที่เธอจะไปสู้ต่อ"
+          ],
+          sad: [
+  // sad_tearful
+  "ลองวางมือไว้ที่หน้าอกแล้วหายใจช้า ๆ สองรอบนะ ให้ร่างกายได้รู้ว่าเธออยู่ตรงนี้",
+  "ลองแตะอะไรนุ่ม ๆ ใกล้มือ เช่นผ้าห่มหรือแขนตัวเอง เพื่อให้ใจลงมานิดหนึ่ง",
+
+  // sad_lonely
+  "ลองกอดตัวเองเบา ๆ หน่อยนะ แค่ให้ร่างกายรู้ว่าเธอไม่ได้หายไปจากตัวเอง",
+  "ลองมองหาสามอย่างรอบตัวที่ทำให้รู้สึกปลอดภัยแม้แค่เล็กน้อย",
+
+  // sad_heavy
+  "ลองวางมือบนท้องแล้วหายใจลึก ๆ เหมือนปล่อยน้ำหนักลงจากอกทีละนิด",
+  "ลองขยับท่านั่งใหม่ ให้ร่างกายช่วยลดแรงกดตรงหน้าอกหน่อย",
+
+  // sad_memory
+  "ถ้าภาพเก่าย้อนมา ลองบอกตัวเองว่า 'นี่คืออดีต ไม่ใช่ตอนนี้' แล้วหายใจหนึ่งครั้ง",
+  "แตะสิ่งที่มีผิวชัด ๆ เช่นขอบแก้วหรือโต๊ะ เพื่อดึงตัวเองกลับมาที่ปัจจุบัน",
+
+  // sad_drained
+  "ถ้าล้ามาก ลองหลับตา 10 วินาทีแล้วหายใจลึก ๆ หนึ่งครั้งนะ",
+  "ลองยืดไหล่หรือหมุนคอเบา ๆ เพื่อให้ร่างกายปล่อยความล้าที่ค้างอยู่"
+          ],
+          anxious: [
+            "ตอนนี้มี 1 อย่างอะไรที่คุณทำได้ทันที ซึ่งจะช่วยให้เบาลงสักนิด?",
+            "ลองมองหาสิ่งที่เห็นได้รอบตัว 5 อย่าง แล้วค่อย ๆ เรียกชื่อมันในใจ",
+            "คุณอาจลองจดสิ่งที่กังวลลงกระดาษ แล้วแบ่งเป็น ‘ควบคุมได้/ควบคุมไม่ได้’",
+            "ให้ตัวเองพักจากหน้าจอ หรือข่าวทุกอย่างสัก 10 นาที",
+            "ลองเตือนตัวเองว่า ‘ตอนนี้ ตอนนี้…ฉันยังหายใจได้ และฉันปลอดภัยอยู่ตรงนี้’"
+          ],
+          tired: [
+            "ถ้าทำได้ ลองพัก 10–15 นาทีแบบไม่จับมือถือเลยสักครั้ง",
+            "ดื่มน้ำหนึ่งแก้ว ลุกยืดตัวเบา ๆ ให้เลือดสูบฉีดนิดนึง",
+            "วันนี้คุณไม่จำเป็นต้องเคลียร์ทุกอย่าง แค่เลือก 1–2 อย่างสำคัญก็พอ",
+            "ก่อนทำงานต่อ ลองถามตัวเองว่า ‘ฉันไหวแค่ไหนโดยไม่ฝืนเกินไป?’",
+            "คืนนี้ถ้าเป็นไปได้ ลองให้รางวัลตัวเองด้วยการพักแบบเต็ม ๆ สักคืน"
+          ],
+          numb: [
+            "ลองเช็คง่าย ๆ แค่สามอย่าง: หิวไหม ง่วงไหม ปวดตัวตรงไหนบ้าง แล้วค่อยดูใจตัวเองทีหลัง",
+  "ก่อนนอน ลองเขียนสั้น ๆ ว่า 'วันนี้ฉันทำอะไรไปแล้วบ้าง' แค่นั้นก็พอ",
+  "ถ้ายังไม่มีใครฟัง ลองเขียนบอกตัวเองว่า ‘วันนี้ฉันไม่ค่อยโอเค’ ก่อน อย่างน้อยก็มีตัวเธออีกคนที่กำลังฟังอยู่เงียบ ๆ",
+  "เลือกทำอะไรเล็ก ๆ ที่ตัวเองชอบสัก 5 นาที เหมือนฝากรอยเล็ก ๆ ไว้ในวันนี้ให้ตัวเอง",
+  "วันนี้ไม่ต้องพิเศษก็ได้ แค่ดื่มน้ำลึก ๆ สองสามอึก แล้วบอกตัวเองว่า 'โอเค วันนี้พอแค่นี้ก็ได้'"
+          ],
+          better: [
+            "ลองจดเก็บว่าอะไรช่วยให้คุณรู้สึกดีขึ้นวันนี้ เผื่อกลับมาใช้ได้อีก",
+            "คืนนี้อาจลองขอบคุณตัวเองสั้น ๆ ก่อนนอนสักหนึ่งประโยค",
+            "แบ่งช่วงเวลานี้เป็นของตัวเองจริง ๆ ไม่ต้องพิสูจน์อะไรให้ใครเห็น",
+            "ถ้ามีแรง ลองทำอะไรเล็ก ๆ ที่คุณชอบต่ออีกอย่างนึงก็ได้",
+            "ใช้โมเมนต์ที่เบาขึ้นนี้เป็นจุดเริ่มของการดูแลตัวเองต่อไป"
+          ],
+          default: [
+            "ลองหายใจเข้าลึก ๆ ยาว ๆ สองสามรอบ ให้ตัวเองได้ช้า ๆ ลงนิดนึง",
+            "ถ้าพอมีเวลา ลองเขียนความรู้สึกออกมาสัก 3 บรรทัด ไม่ต้องสวยก็ได้",
+            "ให้ตัวเองพักสายตาจากหน้าจอสัก 5 นาที มองอะไรไกล ๆ แทน",
+            "วันนี้ลองเลือกทำสิ่งเล็ก ๆ ที่รู้สึกว่าเป็นการดูแลตัวเองหนึ่งอย่าง",
+            "ตอนนี้ คุณแค่ยังอยู่ตรงนี้ได้ ก็ถือว่าเก่งมากแล้วนะ"
+          ]
+        }
+      }
+    };
+
+// ---------- 3) ฟังก์ชันวิเคราะห์อารมณ์ + เลือกประโยคแบบสมาร์ท ----------
+
+// (1) ทำความสะอาดข้อความผู้ใช้
+function normalize(text) {
+  return text.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+// (2) ตรวจจับ "ความหมายปฏิเสธ" เช่น “ไม่เศร้า” “ไม่ได้เบื่อ”
+function containsNegation(before) {
+  return before.includes("ไม่") || before.includes("ไม่ได้");
+}
+
+// (3) คำนวณคะแนนอารมณ์อย่างแม่นขึ้น
+function scoreEmotions(text) {
+  const s = normalize(text);
+  const scores = {};
+
+  for (const emo in EMOTION_DATA.emotionKeywords) {
+    scores[emo] = 0;
+  }
+
+  for (const emo in EMOTION_DATA.emotionKeywords) {
+    const { keywords, baseWeight, priority } = EMOTION_DATA.emotionKeywords[emo];
+    let count = 0;
+
+    for (const kw of keywords) {
+      let index = s.indexOf(kw);
+
+      while (index !== -1) {
+        const before = s.slice(Math.max(0, index - 4), index);
+
+        if (!containsNegation(before)) {
+          count++;
+        }
+
+        index = s.indexOf(kw, index + kw.length);
+      }
+    }
+
+    if (count > 0) {
+      const weight = baseWeight * Math.log(1 + count);
+      scores[emo] = weight + priority * 0.01;
+    }
+  }
+
+  return Object.keys(scores)
+    .map(k => ({ emo: k, score: scores[k] }))
+    .sort((a, b) => b.score - a.score);
+}
+
+// (4) เลือกอารมณ์หลักและรอง
+function pickTopEmotions(ranked) {
+  if (!ranked.length || ranked[0].score <= 0) return [];
+  const result = [ranked[0].emo];
+
+  if (ranked[1] && ranked[1].score >= ranked[0].score * 0.4) {
+    result.push(ranked[1].emo);
+  }
+
+  return result;
+}
+
+// (5) เลือกเทมเพลตแบบสุ่ม (รองรับ tone แต่ตอนนี้ยังไม่มี tone ในแต่ละข้อความก็โอเค)
+function getRandomTemplate(stage, emotion, tone) {
+  const pool =
+    EMOTION_DATA.journeyResponses[stage][emotion] ||
+    EMOTION_DATA.journeyResponses[stage].default;
+
+  const filtered = pool.filter(p => !p.tone || p.tone === tone || p.tone === "any");
+  const target = filtered.length > 0 ? filtered : pool;
+
+  return target[Math.floor(Math.random() * target.length)];
+}
+
+// (6) ตรวจจับ tone ย่อย (เริ่มจาก frustrated ก่อน)
+function detectTone(text) {
+  const t = text.toLowerCase();
+
+  // ---------- frustrated ----------
+  // รำคาญ / irritated
+  if (
+    t.includes("รำคาญ") ||
+    t.includes("รำคาญใจ") ||
+    t.includes("น่ารำคาญ") ||
+    t.includes("หงุดหงิด") ||
+    t.includes("ขัดใจ") ||
+    t.includes("หน่าย")
+  ) {
+    return "frustrated_irritated";
+  }
+
+  // โมโหพุ่ง / spike
+  if (
+    t.includes("โกรธมาก") ||
+    t.includes("โคตรหงุดหงิด") ||
+    t.includes("โคตรไม่โอเค") ||
+    t.includes("แม่งเซ็ง") ||
+    t.includes("แม่งเอ๊ย") ||
+    t.includes("โคตรเซ็ง")
+  ) {
+    return "frustrated_spike";
+  }
+
+  // ไม่ยุติธรรม / injustice
+  if (
+    t.includes("ไม่แฟร์") ||
+    t.includes("ไม่ยุติธรรม") ||
+    t.includes("โดนเอาเปรียบ") ||
+    t.includes("ทำไมต้องเป็นแบบนี้") ||
+    t.includes("ทำไมต้องเจอแบบนี้")
+  ) {
+    return "frustrated_injustice";
+  }
+
+  // อึดอัด / ตัน / กดไว้
+  if (
+    t.includes("อึดอัด") ||
+    t.includes("อึดอัดใจ") ||
+    t.includes("รู้สึกตัน") ||
+    t.includes("ตันไปหมด") ||
+    t.includes("ทนไม่ไหว") ||
+    t.includes("ไม่ไหวแล้ว") ||
+    t.includes("ไม่ไหวละ") ||
+    t.includes("เหนื่อยใจกับเรื่องนี้")
+  ) {
+    return "frustrated_stuck";
+  }
+
+  // ---------- sad ----------
+  // น้ำตา / เจ็บลึก
+  if (
+    t.includes("ร้องไห้") ||
+    t.includes("น้ำตา") ||
+    t.includes("จุก") ||
+    t.includes("เจ็บใจ") ||
+    t.includes("ฮือ") ||
+    t.includes("แง")
+  ) {
+    return "sad_tearful";
+  }
+
+  // เหงา / ว้าเหว่
+  if (
+    t.includes("เหงา") ||
+    t.includes("อ้างว้าง") ||
+    t.includes("ว้าเหว่") ||
+    t.includes("ไม่มีใคร") ||
+    t.includes("ไม่เหลือใคร") ||
+    t.includes("โดดเดี่ยว") ||
+    t.includes("อยู่คนเดียว")
+  ) {
+    return "sad_lonely";
+  }
+
+  // หน่วงหนัก / ใจพัง
+  if (
+    t.includes("หน่วง") ||
+    t.includes("ใจพัง") ||
+    t.includes("พัง") ||
+    t.includes("หมดหวัง") ||
+    t.includes("หมดกำลังใจ") ||
+    t.includes("หมดศรัทธา")
+  ) {
+    return "sad_heavy";
+  }
+
+  // ความทรงจำเก่า / เจ็บจากอดีต
+  if (
+    t.includes("เรื่องเก่า") ||
+    t.includes("ภาพเก่า") ||
+    t.includes("ความทรงจำ") ||
+    t.includes("เจ็บเก่า") ||
+    t.includes("คิดถึงแต่เรื่องแย่")
+  ) {
+    return "sad_memory";
+  }
+
+  // แย่ ๆ เครียดสะสม / ไม่มีแรงจะรู้สึก
+  if (
+    t.includes("วันนี้แย่") ||
+    t.includes("วันแย่") ||
+    t.includes("ไม่โอเคเลย") ||
+    t.includes("รู้สึกแย่") ||
+    t.includes("ท้อ") ||
+    t.includes("ท้อใจ")
+  ) {
+    return "sad_drained";
+  }
+
+}
+
+
+// (7) ประกอบข้อความตอบกลับ
+function composeReply(text) {
+  const ranked    = scoreEmotions(text);
+  const tops      = pickTopEmotions(ranked);
+  const primary   = tops[0] || "default";
+  const secondary = tops[1];
+  const tone      = detectTone(text);
+
+  // reflex
+  let reflex = getRandomTemplate("reflex", primary, tone);
+  if (secondary) {
+    reflex += "\n\nและฉันยังเห็นอีกมุมหนึ่งด้วย: " +
+      getRandomTemplate("reflex", secondary, tone);
+  }
+
+  // remind
+  let remind = getRandomTemplate("remind", primary, tone);
+  if (secondary) {
+    remind += "\n\nอีกเรื่องที่อยากฝากไว้คือ: " +
+      getRandomTemplate("remind", secondary, tone);
+  }
+
+  // reground
+  let reground = getRandomTemplate("reground", primary, tone);
+  if (secondary) {
+    reground += "\n\n" + getRandomTemplate("reground", secondary, tone);
+  }
+
+  return { reflex, remind, reground };
+}
+
+
+    // ---------- 4) DOM + interaction ----------
+    const nextButton        = document.getElementById('nextButton');
+    const reflectionPool    = document.querySelector('.reflection-pool');
+    const forestScene       = document.getElementById('forestScene');
+    const interactionSection= document.getElementById('interactionSection');
+
+    const submitButton   = document.getElementById('submitButton');
+    const feelingInput   = document.getElementById('feelingInput');
+    const inputContainer = document.getElementById('inputContainer');
+
+    const reflexStage    = document.getElementById('reflexStage');
+    const remindStage    = document.getElementById('remindStage');
+    const regroundStage  = document.getElementById('regroundStage');
+
+    const reflexMessage   = document.getElementById('reflexMessage');
+    const remindMessage   = document.getElementById('remindMessage');
+    const regroundMessage = document.getElementById('regroundMessage');
+
+    function zoomToReflection() {
+      forestScene.classList.add('zoomed');
+      setTimeout(() => {
+        forestScene.classList.add('hidden');
+        interactionSection.classList.add('visible');
+      }, 1500);
+    }
+
+    nextButton.addEventListener('click', zoomToReflection);
+    reflectionPool.addEventListener('click', zoomToReflection);
+
+    async function handleSubmit() {
+      const feeling = feelingInput.value.trim();
+      if (!feeling) return;
+
+      submitButton.disabled = true;
+      submitButton.classList.add('loading');
+
+      const analysis = composeReply(feeling);
+
+      inputContainer.classList.add('fade-out');
+
+      setTimeout(() => {
+        document.getElementById('initialQuestion').style.display = 'none';
+
+        reflexMessage.textContent   = analysis.reflex;
+        remindMessage.textContent   = analysis.remind;
+        regroundMessage.textContent = analysis.reground;
+
+        reflexStage.style.display = 'block';
+        setTimeout(() => {
+          reflexStage.classList.add('visible');
+          reflexMessage.classList.add('visible');
+        }, 100);
+
+        submitButton.disabled = false;
+        submitButton.classList.remove('loading');
+      }, 800);
+    }
+
+    submitButton.addEventListener('click', handleSubmit);
+    feelingInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      }
+    });
+
+    document.getElementById('reflexNext').addEventListener('click', () => {
+      reflexStage.classList.remove('visible');
+      setTimeout(() => {
+        reflexStage.style.display = 'none';
+        remindStage.style.display = 'block';
+        setTimeout(() => {
+          remindStage.classList.add('visible');
+          remindMessage.classList.add('visible');
+        }, 100);
+      }, 500);
+    });
+
+    document.getElementById('remindNext').addEventListener('click', () => {
+      remindStage.classList.remove('visible');
+      setTimeout(() => {
+        remindStage.style.display = 'none';
+        regroundStage.style.display = 'block';
+        setTimeout(() => {
+          regroundStage.classList.add('visible');
+          regroundMessage.classList.add('visible');
+        }, 100);
+      }, 500);
+    });
+
+    document.getElementById('backToHome').addEventListener('click', () => {
+      location.reload();
+    });
+
+    // ---------- 5) ปุ่มเปลี่ยนภาษา (ใช้ data-th / data-en ที่มีอยู่แล้ว) ----------
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentLang = btn.dataset.lang;
+
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('[data-th]').forEach(el => {
+          const text = currentLang === 'th' ? el.dataset.th : el.dataset.en;
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.placeholder = text;
+          } else {
+            el.innerHTML = text;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
