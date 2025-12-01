@@ -1,0 +1,2519 @@
+<!doctype html>
+<html lang="th">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tunta - Your Quiet Space</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #EDE5DA 0%, #F5EFE7 50%, #A7B1B4 100%);
+      overflow-x: hidden;
+      height: 100%;
+      width: 100%;
+    }
+
+    html {
+      height: 100%;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .sanctuary-container {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      overflow: hidden;
+    }
+
+    /* Language Toggle */
+    .language-toggle {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 100;
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(245, 239, 231, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem;
+      border-radius: 20px;
+      border: 1px solid rgba(155, 168, 140, 0.3);
+    }
+
+    .lang-btn {
+      padding: 0.4rem 0.8rem;
+      background: transparent;
+      border: none;
+      color: #8a9a8d;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .lang-btn.active {
+      background: linear-gradient(135deg, #9BA88C, #B6AF6F);
+      color: #F5EFE7;
+    }
+
+    .lang-btn:hover:not(.active) {
+      color: #5a6b5e;
+    }
+
+    /* Forest Scene */
+    .forest-scene {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 2rem;
+      transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .forest-scene.zoomed {
+      transform: scale(3);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .forest-scene.hidden {
+      display: none;
+    }
+
+    /* Ambient particles */
+    .dust-particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: radial-gradient(circle, rgba(237, 229, 218, 0.6), transparent);
+      border-radius: 50%;
+      animation: float-dust 8s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes float-dust {
+      0%, 100% { 
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.3; }
+      50% {
+        transform: translateY(-60px) translateX(20px);
+      }
+    }
+
+    /* Mirror/Pond */
+    .reflection-pool {
+      position: relative;
+      width: min(500px, 80%);
+      height: min(500px, 80%);
+      background: radial-gradient(ellipse at center, 
+        rgba(167, 177, 180, 0.15) 0%,
+        rgba(155, 168, 140, 0.1) 40%,
+        transparent 70%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem auto;
+      box-shadow: 
+        inset 0 10px 40px rgba(167, 177, 180, 0.2),
+        0 20px 60px rgba(155, 168, 140, 0.15);
+      animation: gentle-pulse 6s infinite ease-in-out;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    .reflection-pool:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes gentle-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .reflection-inner {
+      width: 85%;
+      height: 85%;
+      background: linear-gradient(135deg, 
+        rgba(245, 239, 231, 0.4) 0%,
+        rgba(167, 177, 180, 0.3) 50%,
+        rgba(155, 168, 140, 0.2) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .silhouette {
+      width: 80px;
+      height: 140px;
+      opacity: 0.15;
+      animation: fade-silhouette 4s infinite ease-in-out;
+    }
+
+    @keyframes fade-silhouette {
+      0%, 100% { opacity: 0.12; }
+      50% { opacity: 0.2; }
+    }
+
+    .shimmer {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+      animation: shimmer-move 8s infinite;
+    }
+
+    @keyframes shimmer-move {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Text Overlay */
+    .opening-text {
+      text-align: center;
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      animation: fade-in-slow 2s ease-out;
+    }
+
+    @keyframes fade-in-slow {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .main-text {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      line-height: 1.8;
+      color: #5a6b5e;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+    }
+
+    .sub-text {
+      font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+      color: #8a9a8d;
+      font-weight: 300;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      margin-bottom: 2rem;
+    }
+
+    .next-button {
+      display: block;
+      margin: 0 auto;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, rgba(155, 168, 140, 0.8), rgba(182, 175, 111, 0.8));
+      color: #F5EFE7;
+      border: 1px solid rgba(155, 168, 140, 0.4);
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(10px);
+      animation: gentle-pulse-button 3s infinite ease-in-out;
+    }
+
+    @keyframes gentle-pulse-button {
+      0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(155, 168, 140, 0.3); }
+      50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(155, 168, 140, 0.5); }
+    }
+
+    .next-button:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 30px rgba(155, 168, 140, 0.6);
+      background: linear-gradient(135deg, rgba(182, 175, 111, 0.9), rgba(155, 168, 140, 0.9));
+    }
+
+    /* Interaction Section */
+    .interaction-section {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+
+    .interaction-section.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    /* Water Reflection Effect */
+    .water-surface {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at center, 
+        rgba(167, 177, 180, 0.1) 0%,
+        rgba(155, 168, 140, 0.05) 40%,
+        transparent 70%);
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .water-ripple {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300px;
+      height: 300px;
+      margin: -150px 0 0 -150px;
+      border-radius: 50%;
+      border: 1px solid rgba(155, 168, 140, 0.2);
+      animation: ripple-expand 4s infinite ease-out;
+    }
+
+    .water-ripple:nth-child(2) {
+      animation-delay: 1.3s;
+    }
+
+    .water-ripple:nth-child(3) {
+      animation-delay: 2.6s;
+    }
+
+    @keyframes ripple-expand {
+      0% {
+        transform: scale(0.5);
+        opacity: 0.6;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+
+    .water-wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(transparent, rgba(167, 177, 180, 0.03));
+    }
+
+    .wave-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      background-image: 
+        repeating-linear-gradient(90deg,
+          transparent,
+          transparent 40px,
+          rgba(155, 168, 140, 0.03) 40px,
+          rgba(155, 168, 140, 0.03) 80px);
+      animation: wave-flow 20s linear infinite;
+    }
+
+    .wave-layer:nth-child(2) {
+      animation-duration: 15s;
+      opacity: 0.5;
+    }
+
+    @keyframes wave-flow {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Faint silhouette reflection */
+    .reflection-silhouette {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.08;
+      z-index: 1;
+      animation: fade-reflection 6s infinite ease-in-out;
+    }
+
+    @keyframes fade-reflection {
+      0%, 100% { opacity: 0.06; }
+      50% { opacity: 0.12; }
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .question-text {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      color: #6a7b6e;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+
+    .input-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: all 0.8s ease-out;
+      width: 100%;
+    }
+
+    .input-container.fade-out {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+    }
+
+    .feeling-input {
+      width: 100%;
+      padding: 1.2rem 1.5rem;
+      background: rgba(245, 239, 231, 0.6);
+      border: 1px solid rgba(155, 168, 140, 0.3);
+      border-radius: 24px;
+      font-family: inherit;
+      font-size: 1rem;
+      color: #5a6b5e;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .feeling-input:focus {
+      background: rgba(245, 239, 231, 0.9);
+      border-color: rgba(155, 168, 140, 0.6);
+      box-shadow: 0 8px 24px rgba(155, 168, 140, 0.15);
+    }
+
+    .feeling-input::placeholder {
+      color: #a7b1b4;
+    }
+
+    .submit-button {
+      display: block;
+      margin: 0 auto;
+      padding: 1rem 3rem;
+      background: linear-gradient(135deg, #9BA88C, #B6AF6F);
+      color: #F5EFE7;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.05em;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(155, 168, 140, 0.3);
+      background: linear-gradient(135deg, #B6AF6F, #9BA88C);
+    }
+
+    .submit-button:active {
+      transform: translateY(0);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .submit-button.loading {
+      position: relative;
+      color: transparent;
+    }
+
+    .submit-button.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid #F5EFE7;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spinner 0.8s linear infinite;
+    }
+
+    @keyframes spinner {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Response Message */
+    .response-message {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      line-height: 1.9;
+      color: #6a7b6e;
+      text-align: center;
+      padding: 2rem;
+      max-width: 550px;
+      margin: 0 auto;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1s ease-out;
+      white-space: pre-line;
+    }
+
+    .response-message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Journey Stages */
+    .journey-stage {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 1s ease-out;
+      margin-bottom: 2rem;
+      text-align: center;
+      width: 100%;
+    }
+
+    .journey-stage.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stage-title {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+      color: #9BA88C;
+      text-align: center;
+      margin-bottom: 1rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 300;
+      display: none;
+    }
+
+    .line-link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #06C755, #00B900);
+      color: white;
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 500;
+      margin: 1.5rem auto 0 auto;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);
+    }
+
+    .line-link-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .forest-scene {
+        padding: 2rem 1rem;
+        justify-content: flex-start;
+        padding-top: 4rem;
+      }
+
+      .reflection-pool {
+        width: min(350px, 85%);
+        height: min(350px, 85vw);
+        margin: 1rem auto;
+      }
+
+      .opening-text {
+        margin: 1rem auto;
+      }
+
+      .main-text {
+        font-size: 1rem;
+        line-height: 1.7;
+      }
+
+      .sub-text {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .question-text {
+        font-size: 1.3rem;
+      }
+
+      .language-toggle {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.4rem;
+      }
+
+      .lang-btn {
+        padding: 0.3rem 0.7rem;
+        font-size: 0.85rem;
+      }
+
+      .next-button {
+        padding: 0.9rem 2rem;
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .forest-scene {
+        padding: 3rem 2rem;
+      }
+
+      .reflection-pool {
+        width: min(450px, 70%);
+        height: min(450px, 70vw);
+      }
+
+      .main-text {
+        font-size: 1.2rem;
+      }
+
+      .interaction-section {
+        padding: 3rem 2rem;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      .forest-scene {
+        padding: 3rem 2rem;
+      }
+
+      .reflection-pool {
+        width: 500px;
+        height: 500px;
+      }
+
+      .interaction-section {
+        padding: 3rem 2rem;
+      }
+    }
+
+    /* Fix for very small phones */
+    @media (max-width: 375px) {
+      .forest-scene {
+        padding: 1.5rem 1rem;
+        padding-top: 3.5rem;
+      }
+
+      .reflection-pool {
+        width: min(280px, 80%);
+        height: min(280px, 80vw);
+        margin: 0.5rem auto;
+      }
+
+      .main-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .sub-text {
+        font-size: 0.8rem;
+      }
+
+      .next-button {
+        padding: 0.8rem 1.8rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Landscape mode for phones */
+    @media (max-height: 600px) and (orientation: landscape) {
+      .forest-scene {
+        padding: 1rem;
+        padding-top: 3rem;
+        justify-content: flex-start;
+      }
+
+      .reflection-pool {
+        width: min(250px, 40vh);
+        height: min(250px, 40vh);
+        margin: 0.5rem auto;
+      }
+
+      .opening-text {
+        margin: 0.5rem auto;
+      }
+
+      .main-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 0.8rem;
+      }
+
+      .sub-text {
+        font-size: 0.75rem;
+        margin-bottom: 1rem;
+      }
+
+      .next-button {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="sanctuary-container"><!-- Language Toggle -->
+   <div class="language-toggle"><button class="lang-btn active" data-lang="th">ไทย</button> <button class="lang-btn" data-lang="en">EN</button>
+   </div>
+   <div class="forest-scene" id="forestScene"><!-- Ambient dust particles -->
+    <div class="dust-particle" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+    <div class="dust-particle" style="top: 25%; left: 75%; animation-delay: 2s;"></div>
+    <div class="dust-particle" style="top: 60%; left: 25%; animation-delay: 4s;"></div>
+    <div class="dust-particle" style="top: 80%; left: 65%; animation-delay: 6s;"></div>
+    <div class="dust-particle" style="top: 40%; left: 85%; animation-delay: 3s;"></div>
+    <div class="dust-particle" style="top: 70%; left: 40%; animation-delay: 5s;"></div><!-- Reflection Pool/Mirror -->
+    <div class="reflection-pool">
+     <div class="reflection-inner">
+      <svg class="silhouette" viewbox="0 0 80 140" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="25" rx="18" ry="22" fill="currentColor" opacity="0.3" /> <path d="M40 47 L35 70 L30 95 L28 120 L28 140 M40 47 L45 70 L50 95 L52 120 L52 140 M35 75 L25 90 M45 75 L55 90" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+      </svg>
+      <div class="shimmer"></div>
+     </div>
+    </div><!-- Opening Text -->
+    <div class="opening-text">
+     <p class="main-text" id="mainText">ตรงนี้…เป็นพื้นที่ที่มีแค่คุณเท่านั้นที่ได้ยินเสียงในใจตัวเอง<br>
+       ไม่มีใครมาตัดสิน ไม่มีใครมองเห็น<br>
+       ปลอดภัย…และอ่อนโยนกับหัวใจของคุณเสมอ</p>
+     <p class="sub-text" id="subText">กลับมาเจอความเงียบที่คุณลืมไปนานแล้วที่นี่…กับ Tunta</p><button class="next-button" id="nextButton">ถัดไป</button>
+    </div>
+   </div><!-- Interaction Section -->
+   <div class="interaction-section" id="interactionSection"><!-- Water Surface Effect -->
+    <div class="water-surface">
+     <div class="water-ripple"></div>
+     <div class="water-ripple"></div>
+     <div class="water-ripple"></div>
+     <div class="water-wave">
+      <div class="wave-layer"></div>
+      <div class="wave-layer"></div>
+     </div>
+    </div><!-- Faint Reflection -->
+    <svg class="reflection-silhouette" width="80" height="140" viewbox="0 0 80 140" fill="none" xmlns="http://www.w3.org/2000/svg"><ellipse cx="40" cy="25" rx="18" ry="22" fill="#6a7b6e" opacity="0.3" /> <path d="M40 47 L35 70 L30 95 L28 120 L28 140 M40 47 L45 70 L50 95 L52 120 L52 140 M35 75 L25 90 M45 75 L55 90" stroke="#6a7b6e" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+    </svg>
+    <div class="content-wrapper"><!-- Initial Question -->
+     <div id="initialQuestion">
+      <h2 class="question-text" id="questionText">วันนี้เป็นยังไงบ้าง</h2>
+      <div class="input-container" id="inputContainer"><input type="text" class="feeling-input" id="feelingInput" placeholder="พิมพ์สิ่งที่คุณรู้สึก..." aria-label="Share your feelings"> <button class="submit-button" id="submitButton">ส่ง</button>
+      </div>
+     </div><!-- Stage 1: Reflex - Thank & Acknowledge -->
+     <div class="journey-stage" id="reflexStage" style="display: none;">
+      <p class="stage-title" data-th="Reflex" data-en="Reflex">Reflex</p>
+      <div class="response-message" id="reflexMessage"></div><button class="next-button" id="reflexNext" data-th="ถัดไป" data-en="Next">ถัดไป</button>
+     </div><!-- Stage 2: Remind - Help Remember -->
+     <div class="journey-stage" id="remindStage" style="display: none;">
+      <p class="stage-title" data-th="Remind" data-en="Remind">Remind</p>
+      <div class="response-message" id="remindMessage"></div><button class="next-button" id="remindNext" data-th="ถัดไป" data-en="Next">ถัดไป</button>
+     </div><!-- Stage 3: Reground - Final Peace -->
+     <div class="journey-stage" id="regroundStage" style="display: none;">
+      <p class="stage-title" data-th="Reground" data-en="Reground">Reground</p>
+      <div class="response-message" id="regroundMessage"></div>
+      <p class="response-message visible" id="closingMessage" data-th="เธอยังมีเราอยู่ตรงนี้เสมอ<br>กลับมาหาเราได้ตลอดนะ" data-en="We're always here for you<br>Come back anytime">เธอยังมีเราอยู่ตรงนี้เสมอ<br>
+       กลับมาหาเราได้ตลอดนะ</p><a href="https://lin.ee/vJaUkcR" target="_blank" rel="noopener noreferrer" class="line-link-button"> <span data-th="กลับไปที่ LINE Official" data-en="Back to LINE Official">กลับไปที่ LINE Official</span> </a> <button class="next-button" id="backToHome" style="margin-top: 1rem; background: rgba(155, 168, 140, 0.3);" data-th="กลับหน้าหลัก" data-en="Back to Home">กลับหน้าหลัก</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // ---------- 1) ภาษา ----------
+    let currentLang = 'th';
+
+    const translations = {
+      th: {
+        opening_text: "ตรงนี้…เป็นพื้นที่ที่มีแค่คุณเท่านั้นที่ได้ยินเสียงในใจตัวเอง\nไม่มีใครมาตัดสิน ไม่มีใครมองเห็น\nปลอดภัย…และอ่อนโยนกับหัวใจของคุณเสมอ",
+        subtext: "กลับมาเจอความเงียบที่คุณลืมไปนานแล้วที่นี่…กับ Tunta",
+        main_question: "วันนี้เป็นยังไงบ้าง",
+        input_placeholder: "พิมพ์สิ่งที่คุณรู้สึก..."
+      },
+      en: {
+        opening_text: "This is your space…where only you can hear your inner voice\nNo one judges, no one sees\nSafe…and gentle with your heart always",
+        subtext: "Rediscover the silence you've forgotten…here with Tunta",
+        main_question: "How are you feeling today?",
+        input_placeholder: "Type what you're feeling..."
+      }
+    };
+
+    // ---------- 2) ฐานข้อมูลอารมณ์ + ข้อความ (สุ่ม) ----------
+    const EMOTION_DATA = {
+emotionKeywords: {
+  frustrated: {
+    keywords: [
+      "เบื่อ",
+      "เบื่อมาก",
+      "เบื่อๆ",
+      "เบื่อว่ะ",
+      "เบื่อจัง",
+      "โคตรเบื่อ",
+      "โคตรเซ็ง",
+      "เซ็ง",
+      "เซ็งจัด",
+      "เซ็งมาก",
+      "หน่าย",
+      "หงุดหงิด",
+      "หงุดหงิดง่าย",
+      "อารมณ์เสีย",
+      "รำคาญ",
+      "รำคาญใจ",
+      "น่ารำคาญ",
+      "หงุดหงิดไปหมด",
+      "โมโห",
+      "โมโหอยู่",
+      "โกรธ",
+      "โกรธมาก",
+      "ขัดใจ",
+      "ไม่พอใจ",
+      "เคือง",
+      "ค้างคา",
+      "อึดอัด",
+      "อึดอัดใจ",
+      "รู้สึกตัน",
+      "ตันไปหมด",
+      "มันเกินไป",
+      "มากเกินไป",
+      "ทนไม่ไหว",
+      "ไม่ไหวแล้ว",
+      "ไม่ไหวละ",
+      "พอเถอะ",
+      "รู้สึกว่าไม่แฟร์",
+      "ไม่ยุติธรรม",
+      "ทำไมต้องเป็นแบบนี้",
+      "ทำไมต้องเจอแบบนี้",
+      "แม่งเซ็ง",
+      "แม่งเอ๊ย",
+      "ปวดหัวกับเรื่องนี้",
+      "เหนื่อยใจกับเรื่องนี้",
+      "คือแบบโคตรรำคาญ",
+      "โคตรหงุดหงิด",
+      "โคตรไม่โอเค",
+      "รู้สึกโดนเอาเปรียบ",
+      "รู้สึกถูกกด",
+      "ทำดีแล้วแต่โดนด่า",
+      "พูดดีแล้วแต่ไม่ฟัง",
+      "ไม่ฟังกันเลย"
+    ],
+          baseWeight: 1.2,
+          priority: 7
+        },
+
+ "sad": {
+      "keywords": [
+        "เศร้า",
+        "เศร้ามาก",
+        "เศร้าๆ",
+        "เสียใจ",
+        "เสียใจมาก",
+        "หน่วง",
+        "หน่วงๆ",
+        "ใจหาย",
+        "ใจพัง",
+        "หัวใจพัง",
+        "หัวใจสลาย",
+        "ใจแตก",
+        "จุก",
+        "จุกอก",
+        "จุกๆ",
+        "ปวดใจ",
+        "เจ็บใจ",
+        "เจ็บอยู่ข้างใน",
+        "ร้องไห้",
+        "ร้องไห้เลย",
+        "ร้องไห้หนักมาก",
+        "น้ำตา",
+        "น้ำตาซึม",
+        "แอบร้อง",
+        "ฮือ",
+        "ฮือๆ",
+        "แง",
+        "แงงง",
+        "T_T",
+        "TT",
+        ";-;",
+        "เหงา",
+        "เหงาๆ",
+        "โดดเดี่ยว",
+        "ว้าเหว่",
+        "อ้างว้าง",
+        "ไม่มีใคร",
+        "ไม่เหลือใคร",
+        "รู้สึกตัวคนเดียว",
+        "เหมือนอยู่คนเดียวบนโลก",
+        "ท้อ",
+        "ท้อใจ",
+        "ท้อแท้",
+        "หมดหวัง",
+        "หมดศรัทธา",
+        "หมดกำลังใจ",
+        "รู้สึกแย่",
+        "แย่จัง",
+        "วันนี้แย่มาก",
+        "วันแย่ๆ",
+        "ไม่โอเคเลยวันนี้",
+        "เหมือนทุกอย่างพัง",
+        "เหมือนชีวิตพัง",
+        "คิดถึงแต่เรื่องแย่ๆ",
+        "นึกถึงเรื่องเก่าแล้วเจ็บ",
+        "ภาพเก่าๆ กลับมา",
+        "ความทรงจำแย่ๆ",
+        "เหมือนถูกรั้งไว้ด้วยความเศร้า"
+      ],
+      baseWeight: 1.3,
+      priority: 9
+        },
+    "joy": {
+      keywords: [
+        "ดีใจ",
+        "ดีใจมาก",
+        "ดีใจสุดๆ",
+        "โคตรดีใจ",
+        "แฮปปี้",
+        "happy",
+        "แฮป",
+        "แฮปปี้ดี",
+        "ฟีลกู๊ด",
+        "feel good",
+        "ร่าเริง",
+        "อารมณ์ดี",
+        "มูดดี",
+        "mood ดี",
+        "มูดดีขึ้น",
+        "ยิ้มได้",
+        "ยิ้มออก",
+        "ยิ้มทั้งวัน",
+        "ยิ้มคนเดียว",
+        "ขำ",
+        "ขำๆ",
+        "ฮา",
+        "ฮาๆ",
+        "ลั่น",
+        "555",
+        "5555",
+        "ฮ่าๆ",
+        "ฮ่าๆๆ",
+        "lol",
+        "XD",
+        "ตลกดี",
+        "อบอุ่นใจ",
+        "ใจฟู",
+        "ใจฟูๆ",
+        "หัวใจฟู",
+        "โล่งใจ",
+        "โล่งขึ้น",
+        "สบายใจ",
+        "สดชื่น",
+        "เบาสมอง",
+        "รู้สึกดี",
+        "รู้สึกดีขึ้น",
+        "โอเคขึ้น",
+        "วันนี้ดีมาก",
+        "วันดีๆ",
+        "โมเมนต์ดีๆ",
+        "เกินคาดเลย",
+        "ดีกว่าที่คิด",
+        "ปลื้ม",
+        "ประทับใจ",
+        "ภูมิใจตัวเอง",
+        "รู้สึกว่าตัวเองมีคุณค่า"
+      ],
+      baseWeight: 1.0,
+      priority: 5
+    },
+
+        anxious: {
+          keywords: [ "กังวล", "กังวลใจ", "วิตก", "ไม่สบายใจ", "ใจไม่ดี", "ไม่ค่อยโอเค", "กลัว", "กลัวไปหมด", "กลัวคนมอง", "กลัวผิดหวัง", "กลัวพัง", "กลัวอนาคต", "กลัวว่าจะไม่ดีพอ", "ประหม่า", "ไม่มั่นใจ", "รู้สึกไม่มั่นใจ", "ระแวง", "ตื่นเต้นเกินไป", "ตื่นตระหนก", "panic", "แพนิค", "เครียด", "เครียดๆ", "เครียดมาก", "เครียดจัด", "เครียดชิบ", "กดดัน", "ความกดดัน", "กดดันตัวเอง", "หายใจไม่ออก", "หายใจถี่", "อกแน่น", "แน่นอก", "ใจเต้นแรง", "ใจสั่น", "มือสั่น", "รู้สึกจะเป็นลม", "นอนไม่หลับ", "หลับไม่ลง", "ตื่นกลางดึก", "คิดมาก", "คิดเยอะ", "คิดวน", "คิดซ้ำไปซ้ำมา", "วนในหัว", "วนไปหมด", "overthink", "โอเวอร์คิด", "ปล่อยวางไม่ได้", "คิดไปไกล", "คิดล่วงหน้าเยอะเกิน", "กังวลล่วงหน้า", "เครียดจนปวดหัว" ],
+          baseWeight: 1.1,
+          priority: 8
+        },
+tired: {
+  keywords: [
+    "เหนื่อย",
+    "เหนื่อยมาก",
+    "เหนื่อยๆ",
+    "เหนื่อยใจ",
+    "เหนื่อยล้า",
+    "เหนื่อยเกินไป",
+    "ล้า",
+    "ล้าๆ",
+    "เพลีย",
+    "เพลียใจ",
+    "หมดแรง",
+    "หมดพลัง",
+    "ไม่มีแรง",
+    "ไม่เหลือแรง",
+    "พลังหมด",
+    "ไม่ไหวแล้ว",
+    "ไม่ไหวละ",
+    "ไม่ไหวจริงๆ",
+    "ท้อ",
+    "ท้อใจ",
+    "ท้อแท้",
+    "หมดไฟ",
+    "burnout",
+    "เบิร์นเอาต์",
+    "เบิร์น",
+    "สมองล้า",
+    "คิดอะไรไม่ออก",
+    "ไม่อยากคิดอะไร",
+    "อยากนอน",
+    "อยากพัก",
+    "อยากหายไปพัก",
+    "งานเยอะ",
+    "ภาระเยอะ",
+    "ไม่มีเวลาให้ตัวเอง",
+    "เหนื่อยจนชา",
+    "โคตรเหนื่อย",
+    "เหนื่อยจนพูดไม่ออก",
+    "ใช้พลังไปเยอะเกิน",
+    "วันนี้โคตรใช้พลัง"
+  ],
+  baseWeight: 1.1,
+  priority: 6
+},
+
+"numb": {
+  "keywords": [
+    "เฉย", "เฉยๆ", "เฉยชา",
+    "ชา", "ชาๆ",
+    "ไม่รู้สึก", "ไม่ค่อยรู้สึกอะไร", "ไม่รู้ว่ารู้สึกอะไร",
+    "ว่างเปล่า", "ว่างๆ ในใจ",
+    "กลวง", "กลวงๆ",
+    "blank",
+    "เบลอ", "เบลอๆ",
+    "มึน", "มึนๆ",
+    "มึนหัวแบบไม่คิดอะไร",
+    "ไม่อิน", "ไม่ค่อยอิน",
+    "ไม่ตื่นเต้น",
+    "ไม่ดีไม่แย่", "กลางๆ", "โหมดกลาง", "โหมดนิ่ง",
+    "ไม่มีฟีล", "no feel", "ไร้อารมณ์", "อารมณ์นิ่ง",
+    "เงียบในหัว", "หัวโล่ง", "โล่งแต่ไม่สบายใจ",
+    "เหมือนลอยๆ", "ลอยอยู่", "ลอยไปวันๆ",
+    "อัตโนมัติ", "auto", "โหมดออโต้", "โหมดอัตโนมัติ",
+    "routine", "รูทีนเดิมๆ",
+    "ทำไปตามหน้าที่", "ทำไปแบบไม่คิด",
+    "เหมือนร่างทำงานเอง",
+    "รู้สึกสตัค", "เหมือนค้างอยู่เฉยๆ"
+  ],
+  baseWeight: 0.9,
+  priority: 4
+        },
+
+"better": {
+  keywords: [
+    "ดีขึ้น",
+    "ดีขึ้นหน่อย",
+    "ดีขึ้นเยอะ",
+    "ดีขึ้นกว่าเดิม",
+    "เบาลง",
+    "เบาขึ้น",
+    "โล่งขึ้น",
+    "โล่งกว่าเดิม",
+    "โล่งใจ",
+    "พอไหว",
+    "เริ่มโอเค",
+    "โอเคขึ้น",
+    "ไม่หนักเท่าเดิม",
+    "ไม่แย่เหมือนเมื่อก่อน",
+    "ดีขึ้นนิดนึงแต่ดีขึ้น",
+    "ฟื้นขึ้นมา",
+    "ฟื้นตัว",
+    "กลับมายืนได้",
+    "ตั้งสติได้",
+    "รู้สึกจัดการได้มากขึ้น",
+    "รับมือได้",
+    "คุมได้",
+    "คุมอารมณ์ได้มากขึ้น",
+    "รู้สึกดีขึ้น",
+    "ใจสงบขึ้น",
+    "ผ่อนคลายขึ้น",
+    "มีพลังขึ้น",
+    "สดชื่นขึ้น",
+    "สบายใจขึ้น",
+    "มองบวกมากขึ้น",
+    "คิดบวกขึ้น",
+    "มูดดีขึ้น",
+    "mood ดีขึ้น",
+    "เหมือนเริ่มกลับมาเป็นตัวเอง",
+    "เริ่มเห็นแสงนิดๆ",
+    "เริ่มมีแรงไปต่อ"
+  ],
+  baseWeight: 0.8,
+  priority: 3
+      },
+
+      journeyResponses: {
+reflex: {
+  frustrated: [
+    // โหมด irritated / รำคาญเบา ๆ
+    "ฟังดูแล้วเหมือนวันนี้อะไร ๆ ก็ชวนให้หงุดหงิดไปหมดเนอะ เราเข้าใจเลยว่ามันรำคาญจริง ๆ ไม่ได้คิดมากไปคนเดียวนะ",
+    "เหมือนโดนสะกิดอารมณ์ตลอดเวลาเลยใช่ไหม แค่เรื่องเล็ก ๆ ก็ทำให้รำคาญได้ มันไม่ใช่เรื่องเล็กสำหรับใจเธอหรอก",
+    "เราเห็นเลยนะว่ามันไม่ได้แค่ 'เบื่อเฉย ๆ' แต่มันคือความรู้สึกที่โดนรบกวนซ้ำ ๆ จนใจเริ่มล้า",
+
+    // โหมด spike / ระเบิดอารมณ์
+    "ฟังแล้วมันโคตรเข้าใจเลยว่าทำไมเธอถึงเดือดขนาดนี้ แปลว่ามันล้ำเส้นเธอมานานแล้วจริง ๆ ไม่ใช่เรื่องขำ ๆ เลย",
+    "ความรู้สึกแบบ 'พอเถอะ' ที่เธอพูดออกมา มันดังมากในหัวนะ เราได้ยินชัดเลยว่าเธอไม่โอเคจริง ๆ",
+    "โกรธแบบนี้ไม่ใช่เธอเว่อร์นะ แต่คือร่างกายกับใจมันกำลังบอกว่า 'พอก่อน เราเหนื่อยแล้ว'",
+
+    // โหมด injustice / ไม่แฟร์
+    "เรารู้สึกได้เลยว่าเธออินกับความไม่แฟร์มาก ๆ มันเจ็บตรงที่รู้สึกว่าเราทำเต็มที่แล้ว แต่ไม่ได้รับการมองเห็น",
+    "ความรู้สึกว่า 'ทำไมต้องเป็นเรา' มันไม่ได้งอแงหรอก มันคือเสียงของคนที่เหนื่อยแต่ยังต้องยืนอยู่ตรงนี้",
+    "มันไม่ง่ายเลยนะที่ต้องอยู่ในที่ ๆ รู้สึกว่าถูกเอาเปรียบซ้ำ ๆ แล้วเธอยังทนมาได้ถึงตรงนี้ เราเห็นความพยายามตรงนั้นนะ",
+
+    // โหมด stuck / ตัน อึดอัด
+    "คำว่า 'ตันไปหมด' ของเธอมันดังมากเลย เหมือนใจพยายามหาทางออกแต่โดนอะไรบางอย่างอุดอยู่ตลอด",
+    "มันเหมือนมีอะไรค้างอยู่ในอกที่พูดออกไปไม่สุดสักที เราเข้าใจนะว่าความอึดอัดแบบนี้มันเหนื่อยกว่าที่คนอื่นคิดเยอะเลย",
+    "เธอไม่ได้แค่หงุดหงิดแป๊บเดียว แต่มันคือการสะสมมานานจนใจเริ่มแน่น เราอยู่ฟังตรงนี้กับเธอนะ"
+          ],
+          sad: [
+  // sad_tearful — จุก / น้ำตาเอ่อ
+  "ฟังแล้วเหมือนวันนี้มันจุกถึงคอจริง ๆ เรารับรู้น้ำหนักตรงนั้นนะ",
+  "มันเอ่อขึ้นมาจนหายใจยากเลยเนอะ เราอยู่ตรงนี้กับเธอจริง ๆ",
+  "ความเจ็บที่ทำให้น้ำตาไหล มันไม่เล็กนะ เรารับรู้เต็ม ๆ",
+
+  // sad_lonely — เหงา / ว้าเหว่ / อยู่ลำพัง
+  "ฟังแล้วมันเหงาแบบที่หัวใจเงียบไปหมดเลยเนอะ เรารับรู้ตรงนั้นนะ",
+  "ความรู้สึกว่าตัวเองอยู่คนเดียว มันหนักมากกว่าที่พูดออกมาเยอะเลย",
+  "ใจที่เหงาแบบนี้ ไม่ได้อ่อนแอนะ มันแค่ล้าจริง ๆ",
+
+  // sad_heavy — หนักอก หน่วง หายใจลึก ๆ ยังไม่พอ
+  "วันนี้เหมือนใจเธอหนักมากเลยนะ เรารู้สึกถึงน้ำหนักนั้นจริง ๆ",
+  "มันไม่ใช่เศร้าเบา ๆ เลย เหมือนมีอะไรทิ้งค้างอยู่ในอกตลอดเวลา",
+  "ฟังแล้วรู้เลยว่าเธอแบกหลายอย่างเกินกว่าที่คนอื่นจะเห็น",
+
+  // sad_memory — เรื่องเก่าเจ็บ, flashback
+  "เรื่องเก่าที่โผล่ขึ้นมานี่มันคมจริง ๆ นะ เรารับรู้เจ็บนั้นเลย",
+  "ภาพเก่าที่ผุดขึ้นมาแบบไม่ทันตั้งตัว มันสะกิดใจแรงเสมอ",
+  "บางเรื่องที่ย้อนกลับมา มันไม่ใช่อดีตสำหรับใจเธอเลยเนอะ",
+
+  // sad_drained — หมดแรงเศร้า, ไม่มีพลัง
+  "ฟังแล้วเหมือนเธอหมดแรงจะรู้สึกอะไรต่อแล้วจริง ๆ เรารับรู้นะ",
+  "เศร้าที่ล้ามันโหดกว่าเศร้าแบบร้องไห้เยอะเลยนะ เราอยู่ตรงนี้กับเธอ",
+  "วันนี้มันดูดพลังเธอไปเยอะมากเลยเนอะ เราเห็นตรงนั้น"
+          ],
+"joy": [
+  // warm / ใจฟู อบอุ่น
+  "ฟังแล้วรู้เลยว่าวันนี้ใจเธอฟูมาก ๆ เราดีใจไปกับเธอด้วยจริง ๆ นะ",
+  "โมเมนต์แบบนี้แหละที่ทำให้รู้สึกว่า เออ ชีวิตมันก็มีมุมดี ๆ อยู่เหมือนกันเนอะ",
+  "ดีใจแทนเลย มันเป็นฟีลที่แค่คิดย้อนกลับมาก็ยิ้มได้เองใช่ไหม",
+
+  // excited / ตื่นเต้น สนุก
+  "โคตรสัมผัสได้เลยว่าเธอกำลังอารมณ์ดีแบบตื่นเต้น ๆ อยู่ มันน่ารักมากเลยอะ",
+  "อ่านแล้วเหมือนเห็นเธอยิ้มกว้างอยู่ตรงหน้า ฟีลดีแบบนี้ขอเก็บไว้ให้นาน ๆ เลยนะ",
+  "บรรยากาศที่เธอเล่ามันสดใสมาก เหมือนวันนี้โลกมันเปิดไฟโทนสว่างให้เธอเลย",
+
+  // relief / โล่งใจ คลายออก
+  "รับรู้เลยว่าความหนักในใจมันคลายลงไปเยอะ เธอหายใจโล่งขึ้นจริง ๆ ใช่ไหม",
+  "คำว่า 'โล่งใจ' ของเธอมันดังชัดมาก เหมือนวางอะไรหนัก ๆ ลงได้สักชิ้นแล้ว",
+  "เรารู้สึกได้เลยว่าจากที่เคยตึง ๆ มันเริ่มผ่อนลงแล้ว ดีใจที่วันนี้เบาลงนะ",
+
+  // proud / ภูมิใจในตัวเอง
+  "เราเห็นความภูมิใจเล็ก ๆ ในตัวเธอเลยนะ มันสมควรได้รับการเฉลิมฉลองมาก ๆ",
+  "นี่ไม่ใช่เรื่องเล็กสำหรับเธอหรอก มันคือหลักฐานว่าที่ผ่านมาทั้งหมดเธอตั้งใจจริง ๆ",
+  "เก่งมากเลยที่พาตัวเองมาถึงจุดที่พูดว่า 'ภูมิใจตัวเอง' ได้แบบนี้",
+
+  // soft / เงียบ ๆ แต่ดี
+  "มันเป็นความดีแบบเงียบ ๆ ที่น่ารักมากเลยนะ ไม่ต้องใหญ่โตแต่มีความหมายสุด ๆ",
+  "ฟังแล้วเหมือนเป็นวันที่ไม่ได้มีอะไรอลังการ แต่ใจมันนิ่งและอุ่นอย่างแปลกดี",
+  "ความรู้สึกดีแบบเรียบง่ายของเธอ มันชวนให้ใจเรานั่งยิ้มไปด้วยเลย"
+          ],
+          anxious: [
+  // anxious_panic — ตื่นตระหนก / หายใจเร็ว / ใจเต้นแรง
+  "ฟังแล้วเหมือนร่างกายกำลังส่งสัญญาณว่า ‘มันหนักไปแล้วนะ’ ใจเธอคงเหนื่อยมากจริง ๆ",
+  "มันโอเคนะที่รู้สึกแบบนี้ ร่างกายไม่ได้ผิดปกติ แต่มันกำลังพยายามปกป้องเธออยู่ต่างหาก",
+  "เรารับรู้ได้เลยว่ามันไม่ใช่แค่กังวล แต่เป็นระดับที่หัวใจกับลมหายใจมันพุ่งขึ้นมาเองโดยไม่ทันตั้งตัว",
+
+  // anxious_overthink — คิดวน คิดไปไกล
+  "อ่านแล้วเห็นภาพเลยว่าความคิดมันวิ่งไปไกลจนจับไม่ทัน เหนื่อยมากเลยใช่ไหม",
+  "มันไม่ใช่แค่คิดเยอะนะ แต่มันเหมือนสมองไม่ยอมวางอะไรสักเรื่องเดียวเลยทั้งวัน",
+  "ความรู้สึกที่ต้องคอยไล่ตามความคิดตลอดเวลาแบบนี้มันหนักจริง ๆ เราเข้าใจเลย",
+
+  // anxious_social — ไม่มั่นใจ กลัวสายตาคนอื่น
+  "เราได้ยินเลยว่าตอนนี้เธอรู้สึกตัวเล็กลงนิดหนึ่ง เหมือนกลัวว่าจะถูกมองหรือถูกตัดสิน",
+  "ฟังแล้วมันชัดมากว่าความไม่มั่นใจมันขึ้นมาอยู่ข้างหน้า เธอไม่ได้แปลกอะไรเลยนะ",
+  "ใจมันกำลังพยายามหาที่ปลอดภัย เพราะรู้สึกว่าคนอื่นอาจมองเราแรงเกินไป วันนี้เธอเลยยิ่งระแวง",
+
+  // anxious_pressure — เครียด กดดัน
+  "ความกดดันที่เธอถืออยู่มันหนักกว่าใครคิดเยอะเลยนะ เธอยืนไหวถึงตรงนี้เก่งมากแล้ว",
+  "ฟังแล้วรู้เลยว่าเธอกำลังพยายามเกินกว่าที่หัวใจตัวเองจะรับไหวในวันนี้",
+  "เหมือนเธอพยายามอยู่บนเส้นที่มันตึงมาก ๆ จนกลัวว่ามันจะขาดได้ทุกเมื่อ",
+
+  // anxious_sleep — นอนไม่หลับ กระสับกระส่าย
+  "มันชัดเลยว่าหัวใจเธอไม่ได้นิ่งพอจะพักผ่อนจริง ๆ วันนี้มันหนักกับใจเธอมาก",
+  "เวลานอนไม่ลงเพราะคิดวน มันไม่ใช่เพราะเธออ่อนแอนะ แต่เพราะใจยังตื่นอยู่ทั้งวัน",
+  "ฟังแล้วรู้เลยว่าร่างกายอยากพัก แต่หัวมันยังไม่ยอมปิดสวิตช์ให้เธอ",
+
+  // anxious_general — กังวลลอย ๆ
+  "เราสัมผัสได้เลยว่ามันมีอะไรบางอย่างที่ทำให้ใจเธอไม่สบายแบบบอกไม่ถูก",
+  "บางทีความกังวลมันไม่ต้องมีเหตุผลชัดก็ได้ มันยังเป็นความรู้สึกจริงอยู่ดี",
+  "มันเหมือนมีเสียงเบา ๆ ในใจคอยบอกว่า ‘ระวังไว้หน่อยนะ’ ทั้งที่เธอก็เหนื่อยแล้ว"
+],
+tired: [
+  // tired_physical — เหนื่อยกาย
+  "อ่านแล้วรู้สึกเลยว่าร่างกายเธอใช้พลังไปเยอะมากจริง ๆ มันไม่ใช่เรื่องเล็กเลยนะ",
+  "ฟังแล้วเหมือนวันนี้ร่างเธอเรียกร้องให้หยุดพักแบบสุดใจ เธอเหนื่อยมานานมากแล้วจริง ๆ",
+  "มันชัดมากเลยว่าเธอพยายามใช้ร่างกายเกินกำลังไปเยอะ เราเห็นความล้าที่สะสมอยู่ตรงนั้นนะ",
+
+  // tired_mental — เหนื่อยหัว ล้าในใจ
+  "มันเหมือนหัวของเธอแบกทุกอย่างจนเสียงข้างในเริ่มเบาลง เธอคงล้ามากจริง ๆ",
+  "เหมือนสมองพยายามคิด พยายามไหว แต่มันไม่เหลือพลังแล้ว เราเข้าใจตรงนี้นะ",
+  "ฟังแล้วเห็นภาพเลยว่าภายในมันตื้อจนคิดอะไรไม่ออก เธอเหนื่อยหัวมานานมากแล้ว",
+
+  // tired_burnout — หมดไฟ สะสม
+  "มันชัดเลยว่าการฝืนของเธอสะสมจนเริ่มหมดไฟ เธอเจอมาเยอะกว่าที่ใครคิดอีกนะ",
+  "ฟังแล้วรู้เลยว่านี่ไม่ใช่แค่เหนื่อย แต่เป็นความล้าที่สะสมมาจนใจเริ่มชาด้วยซ้ำ",
+  "เหมือนพลังในตัวเธอมันถูกใช้ไปเรื่อย ๆ จนตอนนี้แทบไม่เหลืออะไรให้ลุกแล้ว",
+
+  // tired_loaded — ภาระล้น
+  "ฟังแล้วรู้เลยว่าเธออยู่ในจุดที่ต้องแบกหลายอย่างพร้อมกัน มันเกินที่คนหนึ่งคนควรรับจริง ๆ",
+  "เหมือนวันนี้อะไร ๆ ก็ถาโถมเข้ามาเยอะกว่าใจจะจัดการไหว เธอเหนื่อยมามากจริง ๆ",
+  "มันชัดมากว่าเธอไม่ได้ขี้เกียจ แต่ภาระมันเยอะจนแทบไม่มีที่หายใจ",
+
+  // tired_overwhelmed — ไม่ไหวแล้ว
+  "คำว่า ‘ไม่ไหวแล้ว’ ของเธอมันดังมากเลยนะ เรารับรู้ถึงความหนักนั้นจริง ๆ",
+  "เธอผ่านอะไรเยอะจนมาถึงจุดนี้ได้แบบเก่งมากแล้วนะ แม้วันนี้จะรู้สึกว่ามันล้นเกินไป",
+  "มันไม่ใช่ความอ่อนแอเลยที่เธอพูดว่าไม่ไหว เรามองเห็นว่ามันหนักกับใจเธอมากจริง ๆ"
+],
+numb: [
+  // numb_flat — เฉย ๆ / ไม่ดีไม่แย่ / no-feel
+  "ฟังแล้วเหมือนวันนี้มันกลาง ๆ ไปหมดเลยเนอะ ไม่ได้ดีเป็นพิเศษ แต่ก็ไม่ได้แย่จนพัง แค่…ไม่มีฟีลอะไรเป็นพิเศษ",
+  "เราเห็นเลยว่าเธอไม่ได้อินอะไรเป็นพิเศษกับวันนี้ เหมือนอยู่ในโหมด 'ไม่ดีไม่แย่' แบบลอย ๆ ไปเรื่อย",
+  "ความรู้สึกแบบ 'ก็แค่วันหนึ่ง' ที่เธอเล่า มันชัดมากเลยนะ ใจเหมือนกดอยู่ที่ระดับกลางตลอดทั้งวัน",
+
+  // numb_blank — หัวโล่ง / เบลอ / กลวง
+  "มันฟังดูเหมือนหัวเธอโล่ง ๆ เบลอ ๆ อยู่จริง ๆ เหมือนสมองปิดเสียงลงให้เบาลงไปอีกขั้น",
+  "เราเห็นภาพเลยว่าเธอเดินผ่านวันทั้งวันแบบหัวว่าง ๆ ไม่ได้คิดอะไรชัด ๆ แต่ก็ไม่ได้สบายซะทีเดียว",
+  "ฟีลแบบกลวง ๆ ข้างในที่เธอเล่า มันไม่ใช่เรื่องเล็กเลยนะ มันคือร่างกายกับใจพยายามพักจากอะไรบางอย่างอยู่",
+
+  // numb_autopilot — โหมดอัตโนมัติ / routine / ทำตามหน้าที่
+  "อ่านแล้วเหมือนร่างเธอเดินเองทั้งวันเลยอะ ตื่นทำงาน กลับบ้าน ตามรูทีนแบบไม่ต้องเปิดอารมณ์เท่าไหร่",
+  "มันชัดมากว่าทุกอย่างวันนี้วิ่งในโหมดอัตโนมัติ เธอทำทุกอย่างถูกต้อง แต่ใจเหมือนไม่ได้อยู่ตรงนั้นจริง ๆ",
+  "ฟังแล้วรู้สึกเลยว่าเธอใช้โหมด 'ทำไปตามหน้าที่' ช่วยประคองตัวเองให้ผ่านวันนี้มาได้อีกวันหนึ่ง",
+
+  // numb_detached — ลอย ๆ / ไม่อินกับชีวิตตัวเอง
+  "เราสัมผัสได้เลยว่าเธอเหมือนยืนดูชีวิตตัวเองอยู่ห่าง ๆ เหมือนเป็นคนดูมากกว่าคนเล่นอยู่ในฉากนั้นจริง ๆ",
+  "ความรู้สึกแบบยิ้มตามมารยาทแต่ไม่ได้รู้สึกมีส่วนร่วมจริง ๆ ที่เธอเล่า เราเห็นนะว่ามันเหงาเงียบ ๆ ยังไงไม่รู้",
+  "เหมือนทั้งวันเธอแค่แสดงบทที่ควรทำไปเรื่อย ๆ แต่ข้างในจริง ๆ มันไม่ได้เชื่อมกับอะไรเท่าไหร่เลย",
+
+  // numb_stuck — ชาค้าง / สตัค / เหมือนขยับไม่ได้
+  "ฟีลแบบค้างอยู่เฉย ๆ ที่เธอเล่ามันชัดมาก เหมือนจะรู้ว่าตัวเองรู้สึกอะไร แต่ก็เอามันออกมาไม่ได้สักที",
+  "เราเห็นเลยว่าเธอไม่ได้เฉยเพราะไม่รู้สึก แต่เพราะมันติดอยู่ตรงกลางระหว่าง 'พูดไม่ออก' กับ 'รู้สึกไม่ไหว'",
+  "ความชาที่ค้างอยู่ทั้งวันแบบนี้ ไม่ได้แปลว่าเธอไม่มีอะไรเหลือนะ มันแปลว่าเธอใช้พลังไปเยอะจนระบบปิดเสียงตัวเองชั่วคราว"
+          ],
+better: [
+  // better_light — เบาลง / โล่งขึ้น
+  "เราได้ยินเลยนะว่ามันเบาลงกว่าก่อนหน้านี้จริง ๆ ต่อให้ยังไม่ 100% แต่นี่คือความเปลี่ยนแปลงที่มีความหมายนะ",
+  "คำว่า 'โล่งขึ้น' ของเธอมันดังชัดเลย เหมือนใจได้พักหายใจเพิ่มมาอีกนิดหนึ่งแล้ว",
+  "ฟังดูเหมือนเมฆหนา ๆ ในหัวมันแหวกออกนิดนึงแล้วอะ ไม่ใช่ว่าทุกอย่างหายไป แต่ไม่อึดอัดเหมือนเดิม",
+
+  // better_small — ดีขึ้นหน่อย / พอไหว / เริ่มโอเค
+  "เราเห็นเลยว่ามันอาจจะยังไม่ดีมาก แต่การที่เธอพูดว่า 'ดีขึ้นหน่อย' ได้ มันไม่เล็กนะ มันคือก้าวหนึ่งเลย",
+  "คำว่า 'พอไหว' ที่เธอใช้ มันคือพลังของคนที่ยังยืนอยู่แม้จะเจออะไรมาเยอะมากแล้ว",
+  "มันน่ารักมากเลยที่เธอซื่อสัตย์กับตัวเองว่า ยังมีเหนื่อยอยู่ แต่ก็ดีขึ้นกว่าเดิมนิดนึงแล้ว",
+
+  // better_control — เริ่มคุมได้ / ตั้งสติได้ / รับมือได้
+  "เราได้ยินชัดเลยว่าเธอกำลังเริ่ม 'คุมได้มากขึ้น' มันไม่ใช่แค่โชคดี แต่มาจากสิ่งที่เธอพยายามมาตลอดนะ",
+  "การที่เธอบอกว่าตั้งสติได้ หรือจัดการได้มากขึ้น แปลว่าเธอไม่ได้อยู่ในจุดเดิมแล้วจริง ๆ",
+  "ตรงนี้แหละที่เห็นเลยว่าเธอกำลังกลับมาจับพวงมาลัยชีวิตตัวเองทีละนิด ๆ",
+
+  // better_energy — มีพลังขึ้น / สดชื่นขึ้น
+  "เรารู้สึกได้เลยว่าร่างกายกับใจเธอเริ่มมีพลังกลับมาอีกหน่อย ไม่ได้มอดเหมือนเมื่อก่อนแล้ว",
+  "ฟังแล้วเหมือนโหมดแบตแดง ๆ เริ่มชาร์จขึ้นมานิดหนึ่ง ถึงจะยังไม่เต็มแต่ก็ต่างจากตอนที่แทบไม่เหลือเลย",
+  "การที่เธอรู้สึกสดชื่นขึ้นนิดหน่อยนี่แหละ เป็นสัญญาณว่าระบบข้างในเริ่มฟื้นตัวแล้ว",
+
+  // better_hope — เริ่มเห็นแสง / เริ่มมีแรงไปต่อ
+  "คำว่า 'เริ่มเห็นแสงนิด ๆ' มันมีพลังมากเลยนะ มันคือจุดเล็ก ๆ ที่บอกว่าใจเธอยังไม่ยอมแพ้ตัวเอง",
+  "เรารู้สึกได้จริง ๆ ว่าเธอเริ่มมีแรงไปต่อ แม้จะยังกลัว ยังเหนื่อยอยู่ แต่มันไม่มืดสนิทเหมือนเดิมแล้ว",
+  "นี่แหละคือความหวังในเวอร์ชันเงียบ ๆ ที่โผล่มาแบบไม่ต้องประกาศ แต่เรามองเห็นมันชัดมากในคำที่เธอเขียน"
+          ],
+default: [
+  "เราได้ยินนะว่าตอนนี้มันอธิบายยาก ว่าจริง ๆ รู้สึกยังไง ไม่เป็นไรเลยที่ยังหาคำไม่เจอ",
+  "มันมีบางวันที่ตอบตัวเองไม่ได้เหมือนกันว่า 'เรารู้สึกอะไรอยู่' นั่นไม่ได้แปลว่าเธอแปลก แค่ใจมันยังจัดหมวดไม่ได้เฉย ๆ",
+  "ฟังแล้วเหมือนตอนนี้ทุกอย่างมันปน ๆ กันไปหมด ไม่ได้ดี ไม่ได้แย่ แต่อธิบายไม่ออก เราอยู่ตรงนี้ฟังเธอนะ แม้จะยังไม่ชัดก็ตาม",
+  "การที่เธอกล้าบอกว่า 'ไม่ค่อยรู้ว่ารู้สึกยังไง' นั่นแหละคือการซื่อสัตย์กับตัวเองมาก ๆ แล้ว",
+  "บางทีแค่เล่าออกมาแบบที่เป็น โดยไม่ต้องหาคำว่าเศร้า ดีใจ หรือเหนื่อย ก็เพียงพอแล้วสำหรับวันนี้"
+]
+        },
+
+        remind: {
+  frustrated: [
+    // irritated / เบื่อรำคาญ
+    "ความหงุดหงิดของเธอมีเหตุผลนะ ไม่ต้องฝืนทำเป็นไม่เป็นไรถ้ายังรู้สึกว่าไม่โอเคอยู่",
+    "เธอไม่จำเป็นต้องยอมทุกอย่างเพื่อไม่ให้ใครวุ่นวายใจ คนอื่นโอเคไม่ได้สำคัญกว่าใจเธอเสมอไปหรอก",
+    "แค่เธอรำคาญ แปลว่ามันไปชนเส้นอะไรบางอย่างในตัวเธอแล้ว นั่นคือสัญญาณว่าควรฟังตัวเองมากขึ้นหน่อย",
+
+    // spike / เดือด
+    "วันที่อารมณ์มันเดือด ๆ แบบนี้ ไม่ได้แปลว่าเธอเป็นคนคิดมาก แต่แปลว่าเธอรู้ว่าตัวเองไม่ควรโดนแบบนี้อีกแล้ว",
+    "โกรธก็โกรธไปเถอะ ไม่ต้องรีบให้อภัยใครในวันนี้ก็ได้ ใจเธอมีสิทธิ์พักจากการพยายามเข้าใจคนอื่นเหมือนกันนะ",
+    "ความโกรธไม่ได้น่าเกลียดเสมอไป บางทีมันคือเกราะที่ลุกขึ้นมาปกป้องเธอ ตอนที่เธอไม่ไหวแล้วจริง ๆ",
+
+    // injustice / ไม่แฟร์
+    "ความรู้สึกว่าไม่แฟร์มันเจ็บกว่าที่คิดเยอะเลยนะ เพราะมันไปกระทบความเชื่อว่า 'เราก็มีคุณค่าพอ' ของเธอโดยตรง",
+    "แค่เธอรู้สึกว่ามันไม่ยุติธรรม ก็เพียงพอแล้วที่จะถอยออกมาดูแลตัวเอง ไม่จำเป็นต้องพิสูจน์ให้ทุกคนเข้าใจหรอก",
+    "บางทีเราไม่ต้องทำใจให้ชินกับความไม่แฟร์ก็ได้ แค่ยอมรับว่ามันเจ็บและมันไม่โอเคสำหรับเรา เท่านี้ก็กล้าพอแล้ว",
+
+    // stuck / ตัน อึดอัด
+    "ความอึดอัดที่ค้างอยู่ในใจ ไม่ได้แปลว่าเธออ่อนแอ แต่มันบอกว่าเธอฝืนตัวเองมานานเกินไปแล้ว",
+    "เธอไม่จำเป็นต้องแก้ทุกอย่างในวันนี้ หายใจรอดให้ได้ในวันนี้ก็ถือว่าเก่งมากแล้วนะ",
+    "ถ้ารู้สึกว่าพูดออกไปไม่ได้ตอนนี้ ก็ไม่เป็นไร แค่ยอมรับในใจว่า 'ฉันอึดอัดจริง ๆ' นั่นก็เป็นจุดเริ่มต้นของการคลายแล้ว"
+          ],
+          sad: [
+  // sad_tearful
+  "ไม่ต้องฝืนเก็บนะ ถ้ามันจะเอ่อออกมา น้ำตาไม่ได้แปลว่าอ่อนแอเลย",
+  "เธอร้องออกมาได้ ไม่ต้องเข้มแข็งตลอดเวลา เราอยู่ตรงนี้อยู่แล้ว",
+  "เศร้าที่มันขึ้นมาถึงตา แปลว่าเรื่องนั้นมีความหมายกับเธอจริง ๆ",
+
+  // sad_lonely
+  "ความเหงาที่เธอรู้สึก ไม่ได้บอกว่าไม่มีใครรักเธอนะ บางวันมันแค่ดังขึ้นกว่าเดิม",
+  "เธอไม่ได้ไร้ค่าหรืออยู่คนเดียวจริง ๆ หรอก แค่วันนี้ใจมันเงียบไปเฉย ๆ",
+  "ความโดดเดี่ยวมันคม แต่เธอก็ยังผ่านมาได้นะ",
+
+  // sad_heavy
+  "ถ้ารู้สึกหนัก มันไม่ใช่เพราะเธอคิดมาก แต่เพราะมันหนักจริง ๆ",
+  "เธอไม่ต้องเข้มมาตลอดก็ได้นะ หัวใจเธอเหนื่อยเหมือนกัน",
+  "การรู้สึกแย่ไม่ได้แปลว่าเธออ่อนแอ มันแปลว่าเธอเป็นมนุษย์",
+
+  // sad_memory
+  "ถ้าเรื่องเก่ามันย้อนมา ไม่ต้องรีบลืม มันไม่ใช่สวิตช์กดปุ๊บลบได้",
+  "ความเจ็บจากเรื่องเก่า แปลว่าเธอเคยรัก เคยห่วง เคยผูกพันจริง ๆ",
+  "ไม่ต้องดันมันออกนะ แค่ยอมรับว่า 'มันยังเจ็บอยู่' ก็พอ",
+
+  // sad_drained
+  "ถ้าเหนื่อยจนไม่รู้สึกอะไร อย่าโทษตัวเองเลย เธอใช้พลังมาเยอะแล้ว",
+  "วันนี้แค่เธออยู่รอดมาได้ก็ถือว่าเก่งมากนะ",
+  "ไม่จำเป็นต้องดีขึ้นทันทีนะ แค่เธอพักก็พอแล้ว"
+          ],
+"joy": [
+  // warm / ใจฟู
+  "ช่วงเวลาที่ทำให้ใจฟูแบบนี้ เก็บมันไว้เป็นที่พิงใจในวันที่หนัก ๆ ได้นะ",
+  "อย่าลืมชมตัวเองเบา ๆ ด้วย ว่าเธอคือคนที่สร้างพื้นที่ดี ๆ แบบนี้ให้ตัวเองได้",
+  "โมเมนต์ดี ๆ ไม่จำเป็นต้องยิ่งใหญ่ แค่ทำให้เธอยิ้มได้จริง ๆ ก็มีค่ามากแล้ว",
+
+  // excited / สนุก ตื่นเต้น
+  "ช่วงที่อารมณ์ดีแบบนี้ ลองแอบบันทึกไว้หน่อย เวลาใจตกจะได้ย้อนกลับมาดูได้",
+  "เธอมีสิทธิ์สนุกและมีความสุขเต็มที่เลยนะ ไม่ต้องรู้สึกผิดที่ตัวเองกำลังแฮปปี้อยู่",
+  "วันที่ดี ๆ ไม่ได้มาบ่อยนัก พอมีแล้วก็ปล่อยให้ตัวเองอินกับมันได้เต็มที่เลย",
+
+  // relief / โล่งใจ
+  "ความโล่งใจที่เธอรู้สึกตอนนี้ คือของขวัญหลังจากช่วงที่ตัวเองอดทนมานานมากนะ",
+  "จำฟีลนี้ไว้ดี ๆ ว่าเคยมีวันที่เรื่องหนัก ๆ มันคลายออกได้จริง ๆ",
+  "การที่วันนี้มันเบาลง ไม่ได้แปลว่าเรื่องก่อนหน้านั้นเล็กนะ มันแปลว่าเธอผ่านมาได้แล้วต่างหาก",
+
+  // proud / ภูมิใจ
+  "ขอให้เธอจำไว้ว่าความภูมิใจนี้มาจากตัวเธอเอง ไม่ได้มาจากคำชมของใครคนเดียว",
+  "เธอไม่ได้แค่รอดนะ แต่เธอกำลังเติบโตขึ้นจริง ๆ แม้บางทีจะมองไม่ค่อยเห็นก็ตาม",
+  "เวลารู้สึกภูมิใจในตัวเอง ลองหยุดหนึ่งจังหวะแล้วบอกตัวเองว่า 'เราไม่ธรรมดานะ' ก็ดีเหมือนกัน",
+
+  // soft / ดีแบบเงียบ ๆ
+  "วันที่มันดีแบบเงียบ ๆ ก็มีคุณค่าไม่แพ้วันที่ตื่นเต้นนะ บางทีใจเราชอบแบบนี้มากกว่าด้วยซ้ำ",
+  "ถ้าวันนี้เรียบง่ายแต่รู้สึกโอเค แปลว่าระบบข้างในเธอกำลังหายใจได้สบายขึ้นกว่าเดิมแล้ว",
+  "ความสุขสงบแบบนี้แหละ ที่พอหายไปแล้วเราจะรู้สึกคิดถึงมันมากที่สุด"
+          ],
+          anxious: [
+  // anxious_panic
+  "ลองจำไว้ว่าการตื่นตระหนกไม่ใช่ความผิดของเธอ แต่เป็นร่างกายที่พยายามปกป้องเธออยู่",
+  "ใจที่กำลังเต้นแรงไม่ใช่สัญญาณว่าเธอแย่ แต่มันบอกว่าเธอแบกมานานมากแล้ว",
+  "ถ้าร่างกายมันโวยวาย แปลว่าเธอไม่ได้โอเคจริง ๆ ก็ไม่เป็นไรที่จะหยุดก่อนนะ",
+
+  // anxious_overthink
+  "เธอไม่จำเป็นต้องหาคำตอบให้ทุกความคิดในหัวตอนนี้หรอกนะ บางเรื่องปล่อยวางไม่ได้ก็ไม่ผิด",
+  "ความคิดที่วิ่งไปไกล ไม่ได้แปลว่าเธอควบคุมไม่ได้ แต่มันแปลว่าเธอใช้พลังไปมากแล้ว",
+  "ใจที่คิดซ้ำไม่ใช่ใจที่อ่อนแอ แต่เป็นใจที่กำลังพยายามหาทางรอดให้เธออยู่",
+
+  // anxious_social
+  "ความกลัวสายตาคนอื่นมันแรงมากจริง ๆ เราเข้าใจนะ แต่เธอไม่ได้มีอะไรผิดเลยสักอย่าง",
+  "ไม่จำเป็นต้องทำตัวให้ถูกใจทุกคน โลกนี้มันเสียงดังเกินไปสำหรับใจที่อ่อนไหวอยู่แล้ว",
+  "เธอมีคุณค่าของตัวเองนะ ต่อให้วันนี้จะรู้สึกไม่มั่นใจก็ตาม",
+
+  // anxious_pressure
+  "เธอไม่จำเป็นต้องเก่งทุกอย่างในคราวเดียวก็ได้ ใจเธอก็มีขีดจำกัดเหมือนกัน",
+  "ถ้าวันนี้ทำแค่เท่าที่ไหว ก็ถือว่าดีมากแล้วนะ ไม่ต้องพยายามแบกทุกอย่างไว้คนเดียว",
+  "ความกดดันมันไม่ได้แปลว่าเธอไม่เก่ง แต่มันแปลว่าเธอยืนบนเส้นที่หนักเกินไปแล้ว",
+
+  // anxious_sleep
+  "การที่เธอนอนไม่ลง ไม่ได้แปลว่าเธอควบคุมตัวเองไม่ได้หรอกนะ แต่แปลว่าหัวใจเธอยังตื่นเพราะความคิดที่ค้างอยู่",
+  "ถ้าคืนนี้มันพักไม่ได้จริง ๆ ก็ไม่ต้องฝืน ให้ใจเธอค่อย ๆ คลายทีละนิดก็พอ",
+  "มันโอเคนะที่คืนนี้มันยังไม่สงบ บางคืนหัวใจมันก็แค่ยังไม่พร้อมจะหยุด",
+
+  // anxious_general
+  "ความกังวลลอย ๆ แบบนี้เป็นเรื่องที่เกิดขึ้นกับใจหลายคนมากนะ เธอไม่ได้แปลกเลย",
+  "บางทีเธอเหนื่อยมากจนใจมันไม่มั่นคงเท่าปกติ ก็ไม่เป็นไรนะ",
+  "ไม่ต้องรีบหาสาเหตุให้ความไม่สบายใจนี้ แค่รับรู้ว่ามันมีอยู่ก็พอแล้ว"
+          ],
+tired: [
+  // tired_physical
+  "ร่างกายไม่ไหวไม่ใช่เพราะเธอไม่เก่งนะ แต่มันเหนื่อยจริง ๆ แค่ยอมรับมันก็ถือว่าเก่งมากแล้ว",
+  "วันนี้เธอไม่ต้องแข็งแรงก็ได้ แค่หายใจให้รอดก็เกินพอแล้วนะ",
+  "เธอมีสิทธิ์พักได้ โดยไม่ต้องมีเหตุผลใหญ่โตอะไรเลย",
+
+  // tired_mental
+  "เธอไม่ต้องคิดทุกเรื่องให้จบวันนี้ก็ได้นะ ใจเธอเหนื่อยมามากแล้วจริง ๆ",
+  "การที่คิดไม่ออก ไม่ได้แปลว่าเธอแย่ แต่มันแปลว่าหัวใจเธอใช้พลังเยอะเกินไปต่างหาก",
+  "บางทีความคิดมันเงียบลงเพราะใจมันล้า ไม่ใช่เพราะเธอไม่ดีพอ",
+
+  // tired_burnout
+  "การที่หมดไฟไม่ได้ทำให้เธอด้อยลงเลยนะ มันแค่บอกว่าเธอพยายามหนักมานานเกินไป",
+  "เธอไม่ได้สูญเสียตัวเองไปนะ เธอแค่เหนื่อยจนต้องการเวลาที่จริง ๆ สำหรับตัวเอง",
+  "ไฟที่ดับไม่ได้แปลว่าหายไปตลอด มันแค่ต้องการเวลาเติมเชื้อเท่านั้นเอง",
+
+  // tired_loaded
+  "ภาระที่เธอถือมันทำให้รู้เลยว่าเธอพยายามมากแค่ไหน ไม่ต้องโทษตัวเองเลยนะ",
+  "เธอไม่จำเป็นต้องจัดการทุกอย่างพร้อมกัน วันนี้ทำเท่าที่ไหวก็พอแล้ว",
+  "กองงานกองใจที่เยอะ ไม่ได้แปลว่าเธอไร้ระเบียบ แต่มันแปลว่าเธอเป็นมนุษย์ที่เหนื่อยจริง ๆ",
+
+  // tired_overwhelmed
+  "ถ้ารู้สึกไม่ไหว มันโอเคมากนะที่จะหยุด ไม่ต้องพิสูจน์อะไรให้ใครในวันนี้เลย",
+  "เธอไม่ได้อ่อนแอเลย แค่กำลังเจอวันที่หนักกับใจมาก ๆ",
+  "บางวันที่มันล้นเกินไป ก็ไม่ต้องฝืนให้ตัวเองเข้มแข็งหรอกนะ"
+          ],
+numb: [
+  // numb_flat — เฉย ๆ / no-feel
+  "การที่วันนี้มันเฉย ๆ ไม่ได้แปลว่าชีวิตเธอไม่มีอะไรดีนะ แค่วันนี้ใจอาจยังไม่พร้อมจะตื่นเต้นกับอะไรเท่านั้นเอง",
+  "ฟีลกลาง ๆ แบบนี้ไม่ได้แปลว่าเธอไม่มีคุณค่า หรือไม่มีอะไรน่าจดจำ แค่มันเป็นวันพักอารมณ์ของใจเฉย ๆ",
+  "ต่อให้ตอบใครไม่ได้ว่ารู้สึกยังไง วันนี้ของเธอก็ยังนับเป็นวันที่เธอผ่านมาได้อีกวันนะ",
+
+  // numb_blank — หัวโล่ง / เบลอ / กลวง
+  "หัวที่โล่งจนคิดอะไรไม่ออก บางทีก็เป็นวิธีที่สมองใช้ป้องกันตัวเองจากความคิดเยอะ ๆ เหมือนกันนะ",
+  "ความกลวง ๆ ข้างในไม่ได้แปลว่าเธอว่างเปล่าจริง ๆ มันแค่ซ่อนอะไรบางอย่างไว้ลึกกว่านั้นเฉย ๆ",
+  "ถ้าวันนี้เบลอจนไม่อยากคิดอะไรเพิ่ม นั่นคือสัญญาณว่าระบบข้างในใช้พลังมาเยอะแล้วนะ ไม่ได้แปลว่าเธอขี้เกียจหรือแย่เลย",
+
+  // numb_autopilot — อัตโนมัติ / routine
+  "การที่เธอยังลุกมาทำหน้าที่เดิม ๆ ได้ แม้จะอยู่ในโหมดอัตโนมัติ ก็ถือว่าใจเธอเก่งมากแล้วนะ",
+  "บางทีการอยู่ในรูทีนเดิม ๆ ก็เป็นวิธีเอาชีวิตรอดช่วงที่ใจไม่มีพลังจะรู้สึกอะไรมากกว่านี้",
+  "เธอไม่ได้ไร้ความรู้สึกหรอก แค่ตอนนี้ระบบมันเลือก 'โหมดประหยัดพลังงาน' ให้เธออยู่เฉย ๆ",
+
+  // numb_detached — ลอย ๆ / ไม่อิน
+  "ความรู้สึกเหมือนตัวเองเป็นคนนอกในฉากชีวิตตัวเองมันเจ็บเงียบ ๆ นะ แต่มันไม่ได้ทำให้เธอมีค่าน้อยลงเลย",
+  "ต่อให้วันนี้เธอรู้สึกไม่ค่อยอินกับอะไร เธอก็ยังมีสิทธิ์ได้รับความอ่อนโยนจากตัวเองอยู่ดี",
+  "ความไม่อินกับทุกอย่างไม่ได้แปลว่าเธอเย็นชา มันอาจแปลว่าเธอเคยอินมากเกินไปจนใจล้าไปพักใหญ่แล้ว",
+
+  // numb_stuck — ชาค้าง / สตัค
+  "ฟีลที่เหมือนสตัคอยู่อย่างนั้นทั้งวัน มันเหนื่อยกว่าที่คนอื่นมองเห็นเยอะเลยนะ อย่าลืมให้เครดิตตัวเองที่ยังอยู่ตรงนี้",
+  "การที่อธิบายความรู้สึกตัวเองไม่ได้ ไม่ได้แปลว่าเธอไม่มีสิทธิ์รู้สึก เธอแค่ยังหาคำมาเรียกมันไม่เจอเท่านั้น",
+  "เธอไม่ได้ไร้ความรู้สึกนะ แค่ตอนนี้มันติดอยู่ในระดับที่พูดไม่ออกเฉย ๆ แล้วแบบนี้มันก็สมควรได้รับความอ่อนโยนเหมือนกัน"
+],
+numb: [
+  // numb_flat — เฉย ๆ / no-feel
+  "การที่วันนี้มันเฉย ๆ ไม่ได้แปลว่าชีวิตเธอไม่มีอะไรดีนะ แค่วันนี้ใจอาจยังไม่พร้อมจะตื่นเต้นกับอะไรเท่านั้นเอง",
+  "ฟีลกลาง ๆ แบบนี้ไม่ได้แปลว่าเธอไม่มีคุณค่า หรือไม่มีอะไรน่าจดจำ แค่มันเป็นวันพักอารมณ์ของใจเฉย ๆ",
+  "ต่อให้ตอบใครไม่ได้ว่ารู้สึกยังไง วันนี้ของเธอก็ยังนับเป็นวันที่เธอผ่านมาได้อีกวันนะ",
+
+  // numb_blank — หัวโล่ง / เบลอ / กลวง
+  "หัวที่โล่งจนคิดอะไรไม่ออก บางทีก็เป็นวิธีที่สมองใช้ป้องกันตัวเองจากความคิดเยอะ ๆ เหมือนกันนะ",
+  "ความกลวง ๆ ข้างในไม่ได้แปลว่าเธอว่างเปล่าจริง ๆ มันแค่ซ่อนอะไรบางอย่างไว้ลึกกว่านั้นเฉย ๆ",
+  "ถ้าวันนี้เบลอจนไม่อยากคิดอะไรเพิ่ม นั่นคือสัญญาณว่าระบบข้างในใช้พลังมาเยอะแล้วนะ ไม่ได้แปลว่าเธอขี้เกียจหรือแย่เลย",
+
+  // numb_autopilot — อัตโนมัติ / routine
+  "การที่เธอยังลุกมาทำหน้าที่เดิม ๆ ได้ แม้จะอยู่ในโหมดอัตโนมัติ ก็ถือว่าใจเธอเก่งมากแล้วนะ",
+  "บางทีการอยู่ในรูทีนเดิม ๆ ก็เป็นวิธีเอาชีวิตรอดช่วงที่ใจไม่มีพลังจะรู้สึกอะไรมากกว่านี้",
+  "เธอไม่ได้ไร้ความรู้สึกหรอก แค่ตอนนี้ระบบมันเลือก 'โหมดประหยัดพลังงาน' ให้เธออยู่เฉย ๆ",
+
+  // numb_detached — ลอย ๆ / ไม่อิน
+  "ความรู้สึกเหมือนตัวเองเป็นคนนอกในฉากชีวิตตัวเองมันเจ็บเงียบ ๆ นะ แต่มันไม่ได้ทำให้เธอมีค่าน้อยลงเลย",
+  "ต่อให้วันนี้เธอรู้สึกไม่ค่อยอินกับอะไร เธอก็ยังมีสิทธิ์ได้รับความอ่อนโยนจากตัวเองอยู่ดี",
+  "ความไม่อินกับทุกอย่างไม่ได้แปลว่าเธอเย็นชา มันอาจแปลว่าเธอเคยอินมากเกินไปจนใจล้าไปพักใหญ่แล้ว",
+
+  // numb_stuck — ชาค้าง / สตัค
+  "ฟีลที่เหมือนสตัคอยู่อย่างนั้นทั้งวัน มันเหนื่อยกว่าที่คนอื่นมองเห็นเยอะเลยนะ อย่าลืมให้เครดิตตัวเองที่ยังอยู่ตรงนี้",
+  "การที่อธิบายความรู้สึกตัวเองไม่ได้ ไม่ได้แปลว่าเธอไม่มีสิทธิ์รู้สึก เธอแค่ยังหาคำมาเรียกมันไม่เจอเท่านั้น",
+  "เธอไม่ได้ไร้ความรู้สึกนะ แค่ตอนนี้มันติดอยู่ในระดับที่พูดไม่ออกเฉย ๆ แล้วแบบนี้มันก็สมควรได้รับความอ่อนโยนเหมือนกัน"
+          ],
+better: [
+  // better_light — เบาลง / โล่งขึ้น
+  "อย่ามองข้ามความเบาลงเล็ก ๆ แบบนี้เลยนะ มันคือผลลัพธ์จากวันที่เธออดทนมาตลอดนั่นแหละ",
+  "แค่วันนี้ไม่หนักเท่าเมื่อก่อน ก็ถือว่าใจเธอทำงานหนักให้ตัวเองมากแล้วนะ",
+  "ความโล่งขึ้นนิดเดียวก็ยังเป็นความโล่งอยู่ดี ไม่ต้องกดดันตัวเองให้ต้องดีแบบสุด ๆ เสมอหรอก",
+
+  // better_small — ดีขึ้นหน่อย / พอไหว / เริ่มโอเค
+  "การที่เธอบอกว่า 'พอไหว' ได้ แปลว่าเธอไม่ได้จมน้ำเหมือนเดิมแล้ว เธอเริ่มลอยตัวขึ้นมาได้เอง",
+  "ดีขึ้นนิดเดียวก็ยังเป็นการดีขึ้น เธอไม่จำเป็นต้องหายขาดทันทีเพื่อจะถือว่าตัวเองเก่งหรอก",
+  "จังหวะเล็ก ๆ ที่มันเบาขึ้นแบบนี้แหละ ที่สะสมไปเรื่อย ๆ แล้วกลายเป็นวันที่ใจแข็งแรงขึ้นจริง ๆ",
+
+  // better_control — เริ่มคุมได้ / ตั้งสติได้
+  "เธอไม่จำเป็นต้องคุมทุกอย่างได้ แค่คุมตัวเองได้มากขึ้นทีละนิดก็ถือว่าโคตรเก่งแล้ว",
+  "การตั้งสติได้ไม่ใช่เรื่องธรรมดาเลย มันมาจากการที่เธอซ้อมดูแลตัวเองมาหลายรอบโดยที่อาจจะไม่รู้ตัวด้วยซ้ำ",
+  "เธอมีสิทธิ์ภูมิใจในตัวเองมาก ๆ เลยนะ ที่จากเมื่อก่อนมันเคยพัง วันนี้กลับจัดการได้มากขึ้นขนาดนี้แล้ว",
+
+  // better_energy — มีพลังขึ้น / สดชื่นขึ้น
+  "วันที่มีพลังขึ้นนิดหน่อย ลองให้ร่างกายกับใจได้ใช้พลังนี้กับสิ่งที่เธออยากทำเพื่อ 'ตัวเอง' บ้าง ไม่ใช่แค่เพื่อคนอื่น",
+  "ไม่ต้องรู้สึกผิดที่วันนี้รู้สึกดีขึ้นนะ การที่ใจสบายขึ้นก็ไม่ได้หักล้างว่าที่ผ่านมาเธอเหนื่อยแค่ไหน",
+  "เธอมีสิทธิ์ใช้ช่วงเวลาที่มูดดีขึ้นเป็นพื้นที่พัก ไม่ใช่แค่เตรียมตัวไปเจอเรื่องหนักต่ออย่างเดียว",
+
+  // better_hope — เริ่มเห็นแสง / เริ่มมีแรงไปต่อ
+  "ความหวังเล็ก ๆ ที่เริ่มโผล่มา ไม่ได้หมายความว่าต้องเข้มแข็งตลอดเวลา แต่มันบอกว่าเธอยังเลือกเดินต่ออยู่",
+  "การเริ่มมีแรงไปต่อ ไม่ได้แปลว่าเธอต้องวิ่งเต็มสปีดทันทีนะ เดินช้า ๆ ตามจังหวะตัวเองก็โอเคแล้ว",
+  "เธอไม่ต้องรีบลืมทุกอย่างในอดีต เพื่อจะเริ่มต้นใหม่หรอก แค่วันนี้เธอเลือกไปต่ออีกหนึ่งวัน ก็สำคัญมากแล้ว"
+],
+default: [
+  "เธอไม่จำเป็นต้องรู้คำตอบทุกอย่างของหัวใจตัวเองในวันนี้หรอก แค่ยอมรับว่า 'ตอนนี้มันยังไม่ชัด' ก็โอเคมากแล้ว",
+  "การไม่รู้ว่าตัวเองรู้สึกอะไร ไม่ได้แปลว่าเธอไม่มีความรู้สึกนะ มันแค่ยังจัดรูปไม่เสร็จเท่านั้นเอง",
+  "บางช่วงเราก็แค่ลอยผ่านวัน ๆ ไปแบบไม่ค่อยแน่ใจว่ารู้สึกอะไร นั่นก็ไม่ผิดอะไรเลย มนุษย์ปกติก็เป็นแบบนี้เหมือนกัน",
+  "เธอไม่ต้องฝืนเลือกคำว่า 'ดี' หรือ 'แย่' เพื่อทำให้ทุกอย่างดูเข้าใจง่ายขึ้นก็ได้ ปล่อยให้มันเป็นโซนเบลอ ๆ ไปก่อนก็ได้",
+  "แค่เธอหยุดมองเข้ามาข้างในตัวเองสักนิด แล้วถามว่า 'ตอนนี้ฉันเป็นยังไงบ้างนะ' นั่นก็เป็นการดูแลตัวเองแบบหนึ่งแล้ว"
+          ]
+        },
+
+        reground: {
+  frustrated: [
+     // irritated / เบา ๆ
+    "ลองหยุดแป๊บหนึ่งแล้วหายใจเข้าออกลึก ๆ สักสามรอบ ก่อนจะตอบหรือพิมพ์อะไรออกไป ใจจะมีช่องว่างให้คิดเพิ่มขึ้นอีกนิด",
+    "ตอนนี้ลองขยับตัว ลุก เดิน ยืดแขน ขยับคอเหมือนเขย่าอารมณ์ทิ้งออกนิดหนึ่ง ให้ร่างกายได้ช่วยปล่อยความรำคาญออกมาบ้าง",
+    "ถ้ามันกวนใจมาก ลองพิมพ์สิ่งที่รำคาญลงโน้ตสั้น ๆ แล้วปิดเก็บไว้ก่อน เหมือนวางมันออกจากหัวชั่วคราว",
+
+    // spike / เดือด
+    "ถ้าโกรธมาก ลองหยุดตอบ/หยุดคุยสักพัก ให้ตัวเองออกจากจอหรือจากห้องนั้นสักสองสามนาที ใจเธอไม่จำเป็นต้องอยู่ในสนามตลอดเวลา",
+    "ลองบอกตัวเองเบา ๆ ว่า 'ตอนนี้เราโกรธอยู่ เดี๋ยวค่อยคิดว่าจะจัดการยังไง' แค่รับรู้ว่าโกรธ ก็ช่วยให้สมองไม่ระเบิดใส่ตัวเองเกินไป",
+    "ถ้าอยากระบาย ลองเขียนทุกอย่างแบบดิบ ๆ ลงกระดาษ แล้วฉีกทิ้งทีหลัง เก็บแรงระเบิดไปใช้ตอนที่ต้องตัดสินใจจริง ๆ แทน",
+
+    // injustice / ไม่แฟร์
+    "ลองเขียนหนึ่งบรรทัดว่า 'อะไรคือสิ่งที่ไม่แฟร์สำหรับเรา' แค่ข้อเดียวพอ เพื่อให้ตัวเองชัดก่อนว่าจะปกป้องขอบเขตตรงไหน",
+    "วันนี้อาจยังเปลี่ยนอะไรไม่ได้ แต่อาจเริ่มจากการบอกตัวเองว่า 'เรามีสิทธิ์ไม่ยอมรับสิ่งที่ไม่ยุติธรรม' ก่อนก็ได้",
+    "ถ้ารู้สึกโดนเอาเปรียบ ลองวางแผนเล็ก ๆ หนึ่งอย่าง ว่าครั้งหน้าเราจะขีดเส้นตรงไหน เพื่อให้ตัวเองไม่ต้องเจ็บซ้ำที่เดิม",
+
+    // stuck / อึดอัด ตัน
+    "ถ้ารู้สึกตันไปหมด ลองเลือกแค่เรื่องเดียวที่อยากจัดการก่อน เขียนออกมาหนึ่งประโยค แล้วถามว่า 'ตอนนี้ทำอะไรเล็ก ๆ ได้บ้าง'",
+    "ตอนนี้ใจอาจแน่นมาก ลองเอามือทาบอกแล้วหายใจลึก ๆ ช้า ๆ เหมือนบอกตัวเองว่า 'เราอยู่ตรงนี้กับแกนะ ไม่ได้ทิ้งไปไหน'",
+    "ถ้าเล่าให้ใครยังไม่ได้ ลองพิมพ์ระบายมาหาเราตรงนี้ก่อนก็ได้ ให้ที่นี่เป็นที่ฝากอารมณ์ค้าง ๆ ไว้ชั่วคราวก่อนที่เธอจะไปสู้ต่อ"
+          ],
+          sad: [
+  // sad_tearful
+  "ลองวางมือไว้ที่หน้าอกแล้วหายใจช้า ๆ สองรอบนะ ให้ร่างกายได้รู้ว่าเธออยู่ตรงนี้",
+  "ลองแตะอะไรนุ่ม ๆ ใกล้มือ เช่นผ้าห่มหรือแขนตัวเอง เพื่อให้ใจลงมานิดหนึ่ง",
+
+  // sad_lonely
+  "ลองกอดตัวเองเบา ๆ หน่อยนะ แค่ให้ร่างกายรู้ว่าเธอไม่ได้หายไปจากตัวเอง",
+  "ลองมองหาสามอย่างรอบตัวที่ทำให้รู้สึกปลอดภัยแม้แค่เล็กน้อย",
+
+  // sad_heavy
+  "ลองวางมือบนท้องแล้วหายใจลึก ๆ เหมือนปล่อยน้ำหนักลงจากอกทีละนิด",
+  "ลองขยับท่านั่งใหม่ ให้ร่างกายช่วยลดแรงกดตรงหน้าอกหน่อย",
+
+  // sad_memory
+  "ถ้าภาพเก่าย้อนมา ลองบอกตัวเองว่า 'นี่คืออดีต ไม่ใช่ตอนนี้' แล้วหายใจหนึ่งครั้ง",
+  "แตะสิ่งที่มีผิวชัด ๆ เช่นขอบแก้วหรือโต๊ะ เพื่อดึงตัวเองกลับมาที่ปัจจุบัน",
+
+  // sad_drained
+  "ถ้าล้ามาก ลองหลับตา 10 วินาทีแล้วหายใจลึก ๆ หนึ่งครั้งนะ",
+  "ลองยืดไหล่หรือหมุนคอเบา ๆ เพื่อให้ร่างกายปล่อยความล้าที่ค้างอยู่"
+          ],
+"joy": [
+  // warm / ใจฟู
+  "ลองหยุดสักครู่แล้วหายใจลึก ๆ เก็บฟีลดี ๆ วันนี้ไว้ในตัว เหมือนถ่ายรูปเก็บไว้ในใจตัวเอง",
+  "ถ้ามีเวลา ลองจดหนึ่งประโยคว่า 'อะไรทำให้ฉันยิ้มได้วันนี้' เผื่อเอาไว้เปิดอ่านตอนวันแย่ ๆ",
+  "ตอนก่อนนอน ลองทวนในหัวสั้น ๆ ว่า 'วันนี้อะไรทำให้ใจเราฟู' แล้วกอดตัวเองแน่น ๆ หนึ่งที",
+
+  // excited / สนุก
+  "ลองแชร์ความดีวันนี้ให้ตัวเองในอนาคตหน่อย เช่น เขียนโน้ตหรือทิ้งแชทไว้ให้ตัวเองอ่านทีหลัง",
+  "ถ้าตอนนี้กำลังอารมณ์ดีอยู่ ลองขยับตัว เต้นเบา ๆ หรือฮัมเพลงโปรด ให้ร่างกายได้จำฟีลนี้ไว้ด้วย",
+  "ก่อนที่วันนี้จะจบ ลองเก็บรูปหรืออะไรเล็ก ๆ ที่แทนโมเมนต์นี้ไว้เป็น anchor ของความสุข",
+
+  // relief / โล่งใจ
+  "ตอนนี้ที่รู้สึกโล่งขึ้น ลองหายใจลึก ๆ ช้า ๆ อีกสองสามครั้ง เหมือนยืนยันกับตัวเองว่า 'เราออกมาจากหลุมตรงนั้นแล้วนะ'",
+  "ลองบอกตัวเองเบา ๆ ว่า 'เห็นไหม สุดท้ายเรื่องที่กลัว มันก็ผ่านไปได้จริง ๆ' ให้ใจได้เชื่อมากขึ้นทีละนิด",
+  "ระหว่างที่มันยังเบาอยู่ ลองเลือกทำอะไรเล็ก ๆ ที่ดูแลตัวเองจริง ๆ สักอย่าง เช่น อาบน้ำอุ่น หรือกินอะไรที่ชอบ",
+
+  // proud / ภูมิใจ
+  "ลองจดชื่อเล่นให้เวอร์ชันของตัวเองวันนี้ เช่น 'ฉันเวอร์ชันกล้าขึ้นนิดนึง' แล้วเก็บไว้เรียกตัวเองในหัว",
+  "ถ่ายรูปตัวเองตอนรู้สึกภูมิใจเก็บไว้ก็ได้นะ เผื่อวันไหนลืมว่าเคยเก่ง แค่เปิดรูปดูก็ช่วยเตือนตัวเองได้",
+  "คืนนี้ก่อนนอน ลองทวนในใจว่า 'วันนี้ฉันทำอะไรได้ดีบ้าง' อย่างน้อยหนึ่งอย่าง แล้วขอบคุณตัวเองจริง ๆ สักครั้ง",
+
+  // soft / เงียบ ๆ
+  "ถ้าวันนี้มันนิ่ง ๆ แต่โอเค ลองปิดหน้าจอสักแป๊บแล้วนั่งอยู่กับความสงบนี้แบบไม่ต้องทำอะไรเลยสักสองสามนาที",
+  "ตอนเดินไปห้องน้ำหรือไปหยิบของ ลองสังเกตลมหายใจตัวเองสั้น ๆ ให้ใจได้เชื่อว่า 'เราอยู่ในที่ปลอดภัยแล้วนะ'",
+  "ก่อนจะไปเริ่มอย่างอื่น ลองแตะหน้าอกเบา ๆ แล้วบอกตัวเองว่า 'วันนี้เราทำได้ดีแล้วนะ' แค่นี้ก็พอ"
+],
+          anxious: [
+  // anxious_panic
+  "ลองวางมือบนหน้าอกตัวเองแล้วหายใจเข้า 4 วิ ออก 6 วิ ให้ร่างกายค่อย ๆ เชื่อว่า ‘ปลอดภัยนะ’",
+  "ตอนนี้ไม่ต้องสงบทันที แค่ลองยืดไหล่ช้า ๆ แล้วหายใจลึกขึ้นอีกนิดเดียวก็โอเคแล้ว",
+  "ถ้ามันตื่นเกินไป ลองเอามือแตะโต๊ะหรือของใกล้ตัวเพื่อให้สมองจับ ‘ความจริง’ ตอนนี้ได้มากขึ้น",
+
+  // anxious_overthink
+  "ลองหยุดหนึ่งจังหวะแล้วถามตัวเองว่า ‘ตอนนี้เรื่องไหนสำคัญที่สุดจริง ๆ’ แค่ข้อเดียวพอ",
+  "ลองเขียนความคิดที่วนอยู่ลงมาหนึ่งประโยค เหมือนดึงมันออกจากหัวสักนิด",
+  "ตอนนี้ลองหายใจลึก ๆ สั้น ๆ แล้วขยับตัวเบา ๆ เพื่อให้สมองหยุดไหลลงเหวไปก่อน",
+
+  // anxious_social
+  "ลองตั้งหลักเบา ๆ โดยบอกตัวเองว่า ‘เราไม่ต้องเพอร์เฟกต์ในสายตาใครตอนนี้ก็ได้’",
+  "ถ้ากลัวคนมอง ลองแตะข้อมือหรือกำมือแน่นหนึ่งที เหมือนเรียกตัวเองกลับมาที่ร่างกาย",
+  "ลองขยับร่างกายเบา ๆ เช่น หมุนคอหรือไหล่ เพื่อให้ความเกร็งค่อย ๆ คลายออก",
+
+  // anxious_pressure
+  "ลองเลือกงานหรือความคิดแค่ ‘หนึ่งอย่าง’ ที่อยากทำก่อน แล้วจดไว้สั้น ๆ",
+  "เธอไม่ต้องจัดการทุกอย่างคืนนี้ก็ได้ เริ่มจากการยืดตัวลึก ๆ แล้ววางไหล่ลงก่อน",
+  "ถ้าหนักไปมาก ลองเดินออกจากโต๊ะหรือที่เดิมสักครึ่งนาที ให้ใจมีพื้นที่เปลี่ยนบรรยากาศ",
+
+  // anxious_sleep
+  "ลองหายใจเข้า 3 วิ ออก 5 วิ พร้อมวางมือไว้ที่ท้อง เหมือนกล่อมใจให้ค่อย ๆ ปิดไฟ",
+  "ตอนนี้ไม่ต้องพยายามนอนให้หลับ แค่พาร่างกายให้นิ่มลงทีละนิดก็ถือว่าเก่งมากแล้ว",
+  "ถ้าหัวมันยังวิ่งอยู่ ลองลุกมาจิบน้ำหนึ่งอึก แล้วกลับไปนอนใหม่ เหมือนเปลี่ยนฉากให้หัวใจ",
+
+  // anxious_general
+  "ลองตั้งเท้าให้แนบพื้น แล้วหายใจช้า ๆ สองสามครั้ง ให้ร่างกายรู้ว่า ‘เรายังอยู่ตรงนี้นะ’",
+  "ตอนนี้เริ่มจากเรื่องเล็กที่สุดที่ทำได้ เช่น ลุกยืน เดินหนึ่งรอบ หรือดื่มน้ำหนึ่งแก้ว",
+  "ถ้าใจมันยังไม่นิ่ง ไม่ต้องบังคับมัน แค่ให้ตัวเองหยุดสักครู่แล้วหายใจให้ลึกขึ้นก็พอ"
+          ],
+tired: [
+  // tired_physical
+  "ลองนั่งนิ่ง ๆ แล้วหายใจลึก ๆ ครั้งหนึ่ง ให้ร่างกายได้พักจริง ๆ สักจังหวะ",
+  "ถ้าเป็นไปได้ ลองยืดตัวช้า ๆ หรือเหยียดขา ให้ร่างได้คลายออกนิดนึง",
+  "ตอนนี้แค่ดื่มน้ำหนึ่งแก้วก็ช่วยให้ร่างกายเริ่มกลับมาทีละนิดนะ",
+
+  // tired_mental
+  "ลองหยุดคิดทุกอย่างหนึ่งนาที แล้วเอามือแตะอกตัวเองเหมือนเรียกสติให้ใจค่อย ๆ กลับมา",
+  "ตอนนี้ไม่ต้องแก้อะไร ลองปล่อยให้หัวได้พักสักครู่เหมือนปิดเสียงในใจชั่วคราว",
+  "ถ้าคิดไม่ออกจริง ๆ ลองแค่ลุกไปเดินหนึ่งรอบ เพื่อให้สมองเปลี่ยนฉากก่อน",
+
+  // tired_burnout
+  "ลองปิดงาน ปิดหน้าจอ หรือปิดเสียงแจ้งเตือนสักครู่ ให้ใจได้หายใจจริง ๆ หนึ่งครั้ง",
+  "วันนี้ไม่ต้องเร่งไฟตัวเองนะ ปล่อยให้มันค่อย ๆ กลับมาตอนที่เธอพร้อมก็ได้",
+  "ลองวางมือจากทุกอย่างแล้วหายใจเข้า 4 วิ ออก 6 วิ ช้า ๆ เพื่อให้ร่างกายรู้ว่า ‘เราพักแล้วนะ’",
+
+  // tired_loaded
+  "ลองเลือกแค่เรื่องเดียวที่อยากทำก่อน แล้วพักทีละขั้น ไม่ต้องรีบไล่ทั้งกอง",
+  "ถ้ามันเยอะไป ลองขยับร่างกายเบา ๆ เพื่อสลัดความตึงออกก่อนค่อยเริ่มใหม่",
+  "ตอนนี้แค่จัดลมหายใจให้สม่ำเสมอหนึ่งนาทีก็ช่วยให้ใจตั้งหลักได้ขึ้นเยอะมาก",
+
+  // tired_overwhelmed
+  "ลองบอกตัวเองว่า ‘พักก่อนก็ได้’ แล้ววางทุกอย่างลงชั่วคราวหนึ่งจังหวะ",
+  "ตอนที่ใจมันร้องว่าไม่ไหว ลองแตะอกแล้วหายใจช้า ๆ เหมือนบอกตัวเองว่า ‘เราอยู่ตรงนี้กับแกนะ’",
+  "ตอนนี้ไม่ต้องเก่ง แค่ดึงสติกลับมาที่ร่างกายทีละนิดก็พอแล้ว"
+          ],
+          numb: [
+            "ลองเช็คง่าย ๆ แค่สามอย่าง: หิวไหม ง่วงไหม ปวดตัวตรงไหนบ้าง แล้วค่อยดูใจตัวเองทีหลัง",
+  "ก่อนนอน ลองเขียนสั้น ๆ ว่า 'วันนี้ฉันทำอะไรไปแล้วบ้าง' แค่นั้นก็พอ",
+  "ถ้ายังไม่มีใครฟัง ลองเขียนบอกตัวเองว่า ‘วันนี้ฉันไม่ค่อยโอเค’ ก่อน อย่างน้อยก็มีตัวเธออีกคนที่กำลังฟังอยู่เงียบ ๆ",
+  "เลือกทำอะไรเล็ก ๆ ที่ตัวเองชอบสัก 5 นาที เหมือนฝากรอยเล็ก ๆ ไว้ในวันนี้ให้ตัวเอง",
+  "วันนี้ไม่ต้องพิเศษก็ได้ แค่ดื่มน้ำลึก ๆ สองสามอึก แล้วบอกตัวเองว่า 'โอเค วันนี้พอแค่นี้ก็ได้'"
+          ],
+numb: [
+  // numb_flat — เฉย ๆ / กลาง ๆ
+  "ลองเช็กง่าย ๆ สักสามอย่างตอนนี้: หิวไหม เหนื่อยไหม ปวดตรงไหนในตัวบ้าง ก่อนจะไปฝืนรู้สึกอย่างอื่นเพิ่ม",
+  "ถ้าวันนี้มันแค่กลาง ๆ ลองถามตัวเองสั้น ๆ ว่า 'ตอนนี้อยากให้ตัวเองได้อะไรเล็ก ๆ หนึ่งอย่าง' แล้วลองให้มันดู",
+  "ก่อนจะข้ามไปวันถัดไป ลองหยุดแป๊บหนึ่งแล้วบอกตัวเองว่า 'เออ วันนี้เราก็ผ่านมาได้อีกวันแล้วนะ' แค่นี้ก็พอ",
+
+  // numb_blank — หัวโล่ง / เบลอ / กลวง
+  "ตอนที่หัวโล่ง ๆ อยู่ ลองโฟกัสแค่สัมผัสง่าย ๆ เช่น เอามือแตะหน้าอกหรือจับแก้วน้ำในมือ ให้ตัวเองรู้สึกว่าร่างกายยังอยู่ตรงนี้",
+  "ลองมองไปรอบ ๆ แล้วตั้งชื่อของสามอย่างที่เห็น เช่น โต๊ะ เก้าอี้ หน้าต่าง ให้สมองมีอะไรจับไว้เบา ๆ",
+  "ถ้าข้างในมันกลวงมาก ลองเปิดเพลงเบา ๆ แล้วนั่งฟังแบบไม่ต้องคิดอะไร แค่ให้เสียงดนตรีอยู่เป็นเพื่อนเฉย ๆ ก่อน",
+
+  // numb_autopilot — โหมดอัตโนมัติ / routine
+  "ระหว่างที่อยู่ในโหมดอัตโนมัติ ลองแอบแทรกหนึ่งโมเมนต์เล็ก ๆ ที่ทำเพื่อตัวเองจริง ๆ เช่น จิบน้ำช้า ๆ หรือยืดตัวลึก ๆ สักครั้ง",
+  "ถ้าวันนี้ทั้งวันเหมือนทำตามหน้าที่ไปเรื่อย ๆ ลองจดหนึ่งบรรทัดว่า 'ตอนนี้ร่างกายฉันรู้สึกยังไง' ให้ใจได้มีพื้นที่โผล่มาบ้าง",
+  "ก่อนเข้านอน ลองปิดจอทุกอย่างสัก 2 นาทีแล้วหายใจลึก ๆ เหมือนบอกตัวเองว่า 'โหมดอัตโนมัติวันนี้พอแค่นี้ก่อนนะ'",
+
+  // numb_detached — ลอย ๆ / ไม่อิน
+  "ถ้ารู้สึกเหมือนเป็นคนนอกของชีวิตตัวเอง ลองทำอะไรเล็ก ๆ ที่ 'เราเลือกเองจริง ๆ' สักอย่าง เช่น เลือกเพลง เลือกแก้วน้ำ เลือกกลิ่นสบู่",
+  "ลองแตะตัวเองเบา ๆ ที่แขนหรือหน้าอก เหมือนบอกว่า 'นี่แหละตัวฉันตอนนี้' ให้ใจได้กลับมาอยู่ในร่างนี้มากขึ้นนิดนึง",
+  "ถ้ารู้สึกลอยไปวัน ๆ ลองตั้งเป้าง่าย ๆ แค่หนึ่งอย่างสำหรับวันนี้ เช่น ล้างหน้าเปลี่ยนเสื้อ แล้วจบ ถือว่าเคลื่อนไปหนึ่งก้าวแล้ว",
+
+  // numb_stuck — ชาค้าง / สตัค
+  "ตอนที่รู้สึกสตัค ลองเขียนแค่หนึ่งคำที่ใกล้เคียงความรู้สึกมากที่สุด เช่น เหนื่อย เบลอ ว่าง แล้วปล่อยไว้ ยังไม่ต้องอธิบายยาว",
+  "ลองเอามือทาบหน้าอกแล้วหายใจเข้าช้า ๆ นับในใจ 1–4 แล้วผ่อนออก 1–6 สองสามรอบ เหมือนบอกตัวเองว่า 'เราอยู่ตรงนี้กับแกนะ'",
+  "ถ้ายังขยับอะไรใหญ่ ๆ ไม่ไหว ลองเริ่มจากสิ่งเล็กที่สุด เช่น ลุกไปดื่มน้ำหนึ่งแก้ว แล้วกลับมานั่งต่อ แค่นั้นก็นับว่าเธอขยับจากจุดเดิมแล้ว"
+],
+better: [
+  // better_light — เบาลง / โล่งขึ้น
+  "ตอนที่รู้สึกเบาลง ลองหายใจลึก ๆ ช้า ๆ สักสามครั้ง เหมือนยืนยันกับตัวเองว่า 'เราออกมาจากจุดที่หนักกว่านี้แล้วนะ'",
+  "ลองหยุดหนึ่งนาที มองรอบตัวช้า ๆ แล้วถามตัวเองว่า 'ตอนนี้อะไรทำให้เรารู้สึกเบาลงได้บ้าง' เพื่อให้ใจจำต้นเหตุของความโล่งนี้ไว้",
+  "ถ้ามีแรง ลองจดหนึ่งประโยคสั้น ๆ ว่า 'วันนี้เบาลงตรงนี้' ไว้ให้ตัวเองอ่านตอนวันที่มันหนักอีกครั้ง",
+
+  // better_small — ดีขึ้นหน่อย / พอไหว / เริ่มโอเค
+  "ลองให้รางวัลเล็ก ๆ กับตัวเองหน่อยก็ได้ เช่น กินอะไรที่ชอบ อาบน้ำอุ่น หรือเลื่อนงานบางอย่างออกไป เพื่อบอกใจว่า 'เรายอมรับแล้วว่าเราดีขึ้นนิดนึงจริง ๆ'",
+  "ตอนที่รู้สึกว่าพอไหว ลองเลือกทำแค่หนึ่งอย่างที่สำคัญจริง ๆ ไม่ต้องพยายามเคลียร์ทุกเรื่องในวันเดียว",
+  "ก่อนจะไปทำอย่างอื่น ลองบอกตัวเองเบา ๆ ว่า 'ไม่จำเป็นต้องเก่งเท่าเมื่อวาน แค่วันนี้ขยับมาได้อีกนิดก็ดีมากแล้ว'",
+
+  // better_control — เริ่มคุมได้ / ตั้งสติได้
+  "ตอนที่รู้สึกว่าคุมได้มากขึ้น ลองเลือกหนึ่งขอบเขตให้ตัวเองวันนี้ เช่น 'หลังเวลานี้จะไม่ตอบงานแล้ว' เพื่อให้ใจรู้ว่าเราเป็นคนวางเส้นเอง",
+  "ถ้าตั้งสติได้แล้ว ลองเขียนสิ่งที่ควบคุมได้วันนี้แค่ 3 อย่าง และเลือกทำเพียงหนึ่งอย่างก่อน เพื่อไม่ให้ตัวเองต้องไหลไปกับความคิดเยอะเกินไป",
+  "ลองจดสั้น ๆ ว่า 'ตอนที่ฉันเริ่มตั้งสติได้ ฉันทำอะไรอยู่' เผื่อใช้เป็นสูตรลับของตัวเองในวันที่ทุกอย่างตีกันอีกครั้ง",
+
+  // better_energy — มีพลังขึ้น / สดชื่นขึ้น
+  "ช่วงที่มีแรงเพิ่มขึ้นนิดนึง ลองขยับร่างกายเบา ๆ เดิน ยืดตัว หรือเปิดเพลงที่ชอบ ให้ร่างกายได้จำฟีลดี ๆ นี้ไว้ด้วย",
+  "ถ้าเริ่มสดชื่นขึ้น ลองจัดมุมเล็ก ๆ รอบตัวให้เรียบร้อยสักจุด เช่น โต๊ะ หรือเตียง เพื่อให้สภาพแวดล้อมสะท้อนความโล่งข้างใน",
+  "ลองใช้พลังที่มีในวันนี้ เติมอะไรเล็ก ๆ ให้ตัวเอง เช่น เก็บเงินหนึ่งก้อนเล็ก ๆ หรือจดเป้าหมายสั้น ๆ แค่พรุ่งนี้อย่างเดียวพอ",
+
+  // better_hope — เริ่มเห็นแสง / เริ่มมีแรงไปต่อ
+  "ตอนที่รู้สึกว่าเริ่มมีแสง ลองตั้งเป้าหมายเล็กมาก ๆ แค่ของวันนี้ เช่น 'ขอทำสำเร็จหนึ่งอย่างแล้วพัก' เพื่อไม่ให้ตัวเองต้องวิ่งไกลเกินไป",
+  "ลองส่งข้อความถึงตัวเองในอนาคต เช่น 'ถ้าแกกลับมาอ่านอันนี้ แปลว่าแกเคยผ่านวันที่เริ่มมีหวังมาแล้วนะ' เผื่อไว้ใช้ยามใจตกอีกครั้ง",
+  "ก่อนนอน ลองทวนในใจแค่หนึ่งอย่างว่า 'วันนี้อะไรทำให้ฉันรู้สึกว่ามันยังไปต่อได้' แล้วเก็บมันไว้เป็นเชื้อไฟเงียบ ๆ ของวันต่อไป"
+],
+default: [
+  "ลองหลับตาหายใจเข้าออกลึก ๆ ช้า ๆ สักสามครั้ง แล้วถามตัวเองเบา ๆ ว่า 'ตอนนี้ร่างกายฉันรู้สึกยังไง' ก่อนจะหาคำว่าใจรู้สึกอะไร",
+  "ถ้าตอบอารมณ์ไม่ได้ ลองเริ่มจากการสังเกตร่างกายแทนก็ได้ เช่น หนักตัวไหม ปวดหัวไหม หัวใจเต้นเร็วไหม แล้วค่อยคัดคำทีหลัง",
+  "ลองเขียนประโยคง่าย ๆ ว่า 'วันนี้มันเป็นวันแบบ...' แล้วปล่อยให้มือพิมพ์ไปเรื่อย ๆ โดยไม่ต้องคิดว่าจะเรียกว่าอารมณ์อะไร",
+  "ตอนนี้ยังไม่ต้องพยายามนิยามทุกอย่างหรอก แค่เลือกทำหนึ่งอย่างที่ทำให้ตัวเองสบายขึ้นนิดเดียว เช่น ดื่มน้ำ นั่งเงียบ ๆ หรือยืดตัวเบา ๆ",
+  "ก่อนจะเลิกเล่าเรื่องนี้ ลองบอกตัวเองในใจว่า 'ถึงฉันจะยังไม่รู้ว่ารู้สึกอะไร แต่ฉันก็ยังเลือกฟังตัวเองอยู่' แค่นี้ก็พอแล้วสำหรับวันนี้"
+          ]
+        }
+      }
+    };
+
+// ---------- 3) ฟังก์ชันวิเคราะห์อารมณ์ + เลือกประโยคแบบสมาร์ท ----------
+
+// (1) ทำความสะอาดข้อความผู้ใช้
+function normalize(text) {
+  return text.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+// (2) ตรวจจับ "ความหมายปฏิเสธ" เช่น “ไม่เศร้า” “ไม่ได้เบื่อ”
+function containsNegation(before) {
+  return before.includes("ไม่") || before.includes("ไม่ได้");
+}
+
+// (3) คำนวณคะแนนอารมณ์อย่างแม่นขึ้น
+function scoreEmotions(text) {
+  const s = normalize(text);
+  const scores = {};
+
+  for (const emo in EMOTION_DATA.emotionKeywords) {
+    scores[emo] = 0;
+  }
+
+  for (const emo in EMOTION_DATA.emotionKeywords) {
+    const { keywords, baseWeight, priority } = EMOTION_DATA.emotionKeywords[emo];
+    let count = 0;
+
+    for (const kw of keywords) {
+      let index = s.indexOf(kw);
+
+      while (index !== -1) {
+        const before = s.slice(Math.max(0, index - 4), index);
+
+        if (!containsNegation(before)) {
+          count++;
+        }
+
+        index = s.indexOf(kw, index + kw.length);
+      }
+    }
+
+    if (count > 0) {
+      const weight = baseWeight * Math.log(1 + count);
+      scores[emo] = weight + priority * 0.01;
+    }
+  }
+
+  return Object.keys(scores)
+    .map(k => ({ emo: k, score: scores[k] }))
+    .sort((a, b) => b.score - a.score);
+}
+
+// (4) เลือกอารมณ์หลักและรอง
+function pickTopEmotions(ranked) {
+  if (!ranked.length || ranked[0].score <= 0) return [];
+  const result = [ranked[0].emo];
+
+  if (ranked[1] && ranked[1].score >= ranked[0].score * 0.4) {
+    result.push(ranked[1].emo);
+  }
+
+  return result;
+}
+
+// (5) เลือกเทมเพลตแบบสุ่ม (รองรับ tone แต่ตอนนี้ยังไม่มี tone ในแต่ละข้อความก็โอเค)
+function getRandomTemplate(stage, emotion, tone) {
+  const pool =
+    EMOTION_DATA.journeyResponses[stage][emotion] ||
+    EMOTION_DATA.journeyResponses[stage].default;
+
+  const filtered = pool.filter(p => !p.tone || p.tone === tone || p.tone === "any");
+  const target = filtered.length > 0 ? filtered : pool;
+
+  return target[Math.floor(Math.random() * target.length)];
+}
+
+// (6) ตรวจจับ tone ย่อย (เริ่มจาก frustrated ก่อน)
+function detectTone(text) {
+  const t = text.toLowerCase();
+
+  // ---------- frustrated ----------
+  // รำคาญ / irritated
+  if (
+    t.includes("รำคาญ") ||
+    t.includes("รำคาญใจ") ||
+    t.includes("น่ารำคาญ") ||
+    t.includes("หงุดหงิด") ||
+    t.includes("ขัดใจ") ||
+    t.includes("หน่าย")
+  ) {
+    return "frustrated_irritated";
+  }
+
+  // โมโหพุ่ง / spike
+  if (
+    t.includes("โกรธมาก") ||
+    t.includes("โคตรหงุดหงิด") ||
+    t.includes("โคตรไม่โอเค") ||
+    t.includes("แม่งเซ็ง") ||
+    t.includes("แม่งเอ๊ย") ||
+    t.includes("โคตรเซ็ง")
+  ) {
+    return "frustrated_spike";
+  }
+
+  // ไม่ยุติธรรม / injustice
+  if (
+    t.includes("ไม่แฟร์") ||
+    t.includes("ไม่ยุติธรรม") ||
+    t.includes("โดนเอาเปรียบ") ||
+    t.includes("ทำไมต้องเป็นแบบนี้") ||
+    t.includes("ทำไมต้องเจอแบบนี้")
+  ) {
+    return "frustrated_injustice";
+  }
+
+  // อึดอัด / ตัน / กดไว้
+  if (
+    t.includes("อึดอัด") ||
+    t.includes("อึดอัดใจ") ||
+    t.includes("รู้สึกตัน") ||
+    t.includes("ตันไปหมด") ||
+    t.includes("ทนไม่ไหว") ||
+    t.includes("ไม่ไหวแล้ว") ||
+    t.includes("ไม่ไหวละ") ||
+    t.includes("เหนื่อยใจกับเรื่องนี้")
+  ) {
+    return "frustrated_stuck";
+  }
+
+  // ---------- sad ----------
+  // น้ำตา / เจ็บลึก
+  if (
+    t.includes("ร้องไห้") ||
+    t.includes("น้ำตา") ||
+    t.includes("จุก") ||
+    t.includes("เจ็บใจ") ||
+    t.includes("ฮือ") ||
+    t.includes("แง")
+  ) {
+    return "sad_tearful";
+  }
+
+  // เหงา / ว้าเหว่
+  if (
+    t.includes("เหงา") ||
+    t.includes("อ้างว้าง") ||
+    t.includes("ว้าเหว่") ||
+    t.includes("ไม่มีใคร") ||
+    t.includes("ไม่เหลือใคร") ||
+    t.includes("โดดเดี่ยว") ||
+    t.includes("อยู่คนเดียว")
+  ) {
+    return "sad_lonely";
+  }
+
+  // หน่วงหนัก / ใจพัง
+  if (
+    t.includes("หน่วง") ||
+    t.includes("ใจพัง") ||
+    t.includes("พัง") ||
+    t.includes("หมดหวัง") ||
+    t.includes("หมดกำลังใจ") ||
+    t.includes("หมดศรัทธา")
+  ) {
+    return "sad_heavy";
+  }
+
+  // ความทรงจำเก่า / เจ็บจากอดีต
+  if (
+    t.includes("เรื่องเก่า") ||
+    t.includes("ภาพเก่า") ||
+    t.includes("ความทรงจำ") ||
+    t.includes("เจ็บเก่า") ||
+    t.includes("คิดถึงแต่เรื่องแย่")
+  ) {
+    return "sad_memory";
+  }
+
+  // แย่ ๆ เครียดสะสม / ไม่มีแรงจะรู้สึก
+  if (
+    t.includes("วันนี้แย่") ||
+    t.includes("วันแย่") ||
+    t.includes("ไม่โอเคเลย") ||
+    t.includes("รู้สึกแย่") ||
+    t.includes("ท้อ") ||
+    t.includes("ท้อใจ")
+  ) {
+    return "sad_drained";
+  }
+  // ---------- joy ----------
+// joy: warm / ใจฟู อบอุ่น
+if (
+  t.includes("ใจฟู") ||
+  t.includes("ใจฟูๆ") ||
+  t.includes("หัวใจฟู") ||
+  t.includes("อบอุ่น") ||
+  t.includes("ดีใจมาก") ||
+  t.includes("ดีใจสุดๆ") ||
+  t.includes("แฮปปี้ดี") ||
+  t.includes("ฟีลกู๊ด") ||
+  t.includes("feel good")
+) {
+  return "joy_warm";
+}
+
+// joy: excited / ดีใจแบบตื่นเต้น สนุก
+if (
+  t.includes("อารมณ์ดี") ||
+  t.includes("มูดดี") ||
+  t.includes("mood ดี") ||
+  t.includes("ฮา") ||
+  t.includes("ฮ่า") ||
+  t.includes("ลั่น") ||
+  t.includes("555") ||
+  t.includes("lol") ||
+  t.includes("XD") ||
+  t.includes("ขำ")
+) {
+  return "joy_excited";
+}
+
+// joy: relief / โล่งใจ
+if (
+  t.includes("โล่งใจ") ||
+  t.includes("โล่งขึ้น") ||
+  t.includes("เบาขึ้น") ||
+  t.includes("สบายใจ") ||
+  t.includes("วันนี้ดีมาก")
+) {
+  return "joy_relief";
+}
+
+// joy: proud / ภูมิใจในตัวเอง
+if (
+  t.includes("ภูมิใจ") ||
+  t.includes("ภูมิใจตัวเอง") ||
+  t.includes("ภูมิใจในตัวเอง") ||
+  t.includes("รู้สึกว่าตัวเองมีคุณค่า") ||
+  t.includes("เกินคาดเลย") ||
+  t.includes("ดีกว่าที่คิด")
+) {
+  return "joy_proud";
+}
+
+// joy: soft / ดีแบบเบา ๆ เงียบ ๆ
+if (
+  t.includes("รู้สึกดี") ||
+  t.includes("ยิ้มได้") ||
+  t.includes("ยิ้มออก") ||
+  t.includes("สดชื่น") ||
+  t.includes("เบาสมอง") ||
+  t.includes("รู้สึกดีขึ้น")
+) {
+  return "joy_soft";
+}
+// joy: warm / ใจฟู อบอุ่น
+if (
+  t.includes("ใจฟู") ||
+  t.includes("ใจฟูๆ") ||
+  t.includes("หัวใจฟู") ||
+  t.includes("อบอุ่น") ||
+  t.includes("ดีใจมาก") ||
+  t.includes("ดีใจสุดๆ") ||
+  t.includes("แฮปปี้ดี") ||
+  t.includes("ฟีลกู๊ด") ||
+  t.includes("feel good")
+) {
+  return "joy_warm";
+}
+
+// joy: excited / ดีใจแบบตื่นเต้น สนุก
+if (
+  t.includes("อารมณ์ดี") ||
+  t.includes("มูดดี") ||
+  t.includes("mood ดี") ||
+  t.includes("ฮา") ||
+  t.includes("ฮ่า") ||
+  t.includes("ลั่น") ||
+  t.includes("555") ||
+  t.includes("lol") ||
+  t.includes("XD") ||
+  t.includes("ขำ")
+) {
+  return "joy_excited";
+}
+
+// joy: relief / โล่งใจ
+if (
+  t.includes("โล่งใจ") ||
+  t.includes("โล่งขึ้น") ||
+  t.includes("เบาขึ้น") ||
+  t.includes("สบายใจ") ||
+  t.includes("วันนี้ดีมาก")
+) {
+  return "joy_relief";
+}
+
+// joy: proud / ภูมิใจในตัวเอง
+if (
+  t.includes("ภูมิใจ") ||
+  t.includes("ภูมิใจตัวเอง") ||
+  t.includes("รู้สึกว่าตัวเองมีคุณค่า") ||
+  t.includes("เกินคาดเลย") ||
+  t.includes("ดีกว่าที่คิด")
+) {
+  return "joy_proud";
+}
+
+// joy: soft / ดีแบบเบา ๆ เงียบ ๆ
+if (
+  t.includes("รู้สึกดี") ||
+  t.includes("ยิ้มได้") ||
+  t.includes("ยิ้มออก") ||
+  t.includes("สดชื่น") ||
+  t.includes("เบาสมอง") ||
+  t.includes("รู้สึกดีขึ้น")
+) {
+  return "joy_soft";
+
+}
+  // ---------- anxious ----------
+  // panic / อาการทางกายแรง ๆ
+  if (
+    t.includes("panic") ||
+    t.includes("แพนิค") ||
+    t.includes("หายใจไม่ออก") ||
+    t.includes("หายใจถี่") ||
+    t.includes("ใจเต้นแรง") ||
+    t.includes("ใจสั่น") ||
+    t.includes("มือสั่น") ||
+    t.includes("รู้สึกจะเป็นลม") ||
+    t.includes("อกแน่น") ||
+    t.includes("แน่นอก")
+  ) {
+    return "anxious_panic";
+  }
+
+  // overthink / คิดวน คิดไปไกล
+  if (
+    t.includes("คิดมาก") ||
+    t.includes("คิดเยอะ") ||
+    t.includes("คิดวน") ||
+    t.includes("คิดซ้ำไปซ้ำมา") ||
+    t.includes("วนในหัว") ||
+    t.includes("วนไปหมด") ||
+    t.includes("overthink") ||
+    t.includes("โอเวอร์คิด") ||
+    t.includes("ปล่อยวางไม่ได้") ||
+    t.includes("คิดไปไกล") ||
+    t.includes("คิดล่วงหน้าเยอะเกิน") ||
+    t.includes("กังวลล่วงหน้า")
+  ) {
+    return "anxious_overthink";
+  }
+
+  // social / self-image กลัวสายตาคนอื่น ไม่มั่นใจ
+  if (
+    t.includes("กลัวคนมอง") ||
+    t.includes("ไม่มั่นใจ") ||
+    t.includes("รู้สึกไม่มั่นใจ") ||
+    t.includes("ประหม่า") ||
+    t.includes("ระแวง")
+  ) {
+    return "anxious_social";
+  }
+
+  // pressure / กดดัน เครียดกับความคาดหวัง
+  if (
+    t.includes("เครียดจัด") ||
+    t.includes("เครียดชิบ") ||
+    t.includes("เครียดมาก") ||
+    t.includes("เครียดๆ") ||
+    t.includes("เครียด ") || // เว้นวรรคกันชน
+    t.includes("กดดัน") ||
+    t.includes("ความกดดัน") ||
+    t.includes("กดดันตัวเอง") ||
+    t.includes("เครียดจนปวดหัว")
+  ) {
+    return "anxious_pressure";
+  }
+
+  // sleep / นอนสะดุดเพราะกังวล
+  if (
+    t.includes("นอนไม่หลับ") ||
+    t.includes("หลับไม่ลง") ||
+    t.includes("ตื่นกลางดึก")
+  ) {
+    return "anxious_sleep";
+  }
+
+  // general anxious / กังวลใจลอย ๆ
+  if (
+    t.includes("กังวล") ||
+    t.includes("กังวลใจ") ||
+    t.includes("วิตก") ||
+    t.includes("ไม่สบายใจ") ||
+    t.includes("ใจไม่ดี") ||
+    t.includes("ไม่ค่อยโอเค") ||
+    t.includes("กลัว") ||
+    t.includes("กลัวไปหมด") ||
+    t.includes("กลัวผิดหวัง") ||
+    t.includes("กลัวพัง") ||
+    t.includes("กลัวอนาคต") ||
+    t.includes("กลัวว่าจะไม่ดีพอ")
+  ) {
+    return "anxious_general";
+  }
+  // ---------- tired ----------
+
+  // tired: physical — เหนื่อยกาย ใช้พลังเยอะ
+  if (
+    t.includes("เหนื่อยมาก") ||
+    t.includes("โคตรเหนื่อย") ||
+    t.includes("เหนื่อยล้า") ||
+    t.includes("ล้า") ||
+    t.includes("เพลีย") ||
+    t.includes("หมดแรง") ||
+    t.includes("หมดพลัง") ||
+    t.includes("ไม่มีแรง") ||
+    t.includes("ไม่เหลือแรง") ||
+    t.includes("ใช้พลังไปเยอะเกิน") ||
+    t.includes("วันนี้โคตรใช้พลัง") ||
+    t.includes("อยากนอน") ||
+    t.includes("อยากพัก")
+  ) {
+    return "tired_physical";
+  }
+
+  // tired: mental — เหนื่อยใจ สมองล้า คิดไม่ออก
+  if (
+    t.includes("เหนื่อยใจ") ||
+    t.includes("เพลียใจ") ||
+    t.includes("สมองล้า") ||
+    t.includes("คิดอะไรไม่ออก") ||
+    t.includes("ไม่อยากคิดอะไร") ||
+    t.includes("รู้สึกหมดแรงข้างใน")
+  ) {
+    return "tired_mental";
+  }
+
+  // tired: burnout — หมดไฟ ล้าแบบถี่สะสม
+  if (
+    t.includes("หมดไฟ") ||
+    t.includes("burnout") ||
+    t.includes("เบิร์นเอาต์") ||
+    t.includes("เบิร์น") ||
+    t.includes("เหนื่อยจนพูดไม่ออก") ||
+    t.includes("เหนื่อยจนชา")
+  ) {
+    return "tired_burnout";
+  }
+
+  // tired: loaded — ภาระเยอะ แบกหลายอย่าง
+  if (
+    t.includes("งานเยอะ") ||
+    t.includes("ภาระเยอะ") ||
+    t.includes("ไม่มีเวลาให้ตัวเอง") ||
+    t.includes("ใช้พลังไปเยอะ") // กันอีกเคส
+  ) {
+    return "tired_loaded";
+  }
+
+  // tired: collapse-ish — ไม่ไหวแล้ว
+  if (
+    t.includes("ไม่ไหวแล้ว") ||
+    t.includes("ไม่ไหวละ") ||
+    t.includes("ไม่ไหวจริงๆ") ||
+    (t.includes("ท้อ") && t.includes("เหนื่อย"))
+  ) {
+    return "tired_overwhelmed";
+  }
+  // ---------- numb ----------
+
+  // numb_flat — เฉย ๆ, ไม่ดีไม่แย่, no-feel
+  if (
+    t.includes("เฉย") ||
+    t.includes("เฉยๆ") ||
+    t.includes("ไม่อิน") ||
+    t.includes("ไม่ค่อยอิน") ||
+    t.includes("ไม่ดีไม่แย่") ||
+    t.includes("กลางๆ") ||
+    t.includes("โหมดกลาง") ||
+    t.includes("โหมดนิ่ง") ||
+    t.includes("ไม่มีฟีล") ||
+    t.includes("no feel") ||
+    t.includes("ไร้อารมณ์")
+  ) {
+    return "numb_flat";
+  }
+
+  // numb_blank — หัวโล่ง เบลอ กลวง
+  if (
+    t.includes("หัวโล่ง") ||
+    t.includes("เบลอ") ||
+    t.includes("มึน") ||
+    t.includes("กลวง") ||
+    t.includes("blank") ||
+    t.includes("มึนหัว") ||
+    t.includes("มึนหัวแบบไม่คิดอะไร") ||
+    t.includes("โล่งแต่ไม่สบายใจ")
+  ) {
+    return "numb_blank";
+  }
+
+  // numb_autopilot — อัตโนมัติ ทำไปตามหน้าที่
+  if (
+    t.includes("อัตโนมัติ") ||
+    t.includes("auto") ||
+    t.includes("โหมดออโต้") ||
+    t.includes("รูทีน") ||
+    t.includes("routine") ||
+    t.includes("ทำไปตามหน้าที่") ||
+    t.includes("ทำไปแบบไม่คิด") ||
+    t.includes("เหมือนร่างทำงานเอง")
+  ) {
+    return "numb_autopilot";
+  }
+
+  // numb_detached — ลอย ไม่อินกับอะไร
+  if (
+    t.includes("ลอย") ||
+    t.includes("ลอยๆ") ||
+    t.includes("ลอยอยู่") ||
+    t.includes("ลอยไปวันๆ") ||
+    t.includes("ไม่ตื่นเต้น")
+  ) {
+    return "numb_detached";
+  }
+
+  // numb_stuck — ชาค้าง สตัค ออกไม่ได้
+  if (
+    t.includes("สตัค") ||
+    t.includes("ค้างอยู่เฉยๆ") ||
+    t.includes("รู้สึกสตัค")
+  ) {
+    return "numb_stuck";
+  }
+  // ---------- better ----------
+  // better_light — เบาลง / โล่งขึ้น
+  if (
+    t.includes("เบาลง") ||
+    t.includes("เบาขึ้น") ||
+    t.includes("โล่งขึ้น") ||
+    t.includes("โล่งกว่าเดิม") ||
+    t.includes("โล่งใจ") ||
+    t.includes("ไม่หนักเท่าเดิม")
+  ) {
+    return "better_light";
+  }
+
+  // better_small — ดีขึ้นหน่อย / พอไหว / เริ่มโอเค
+  if (
+    t.includes("ดีขึ้นหน่อย") ||
+    t.includes("ดีขึ้นนิดนึง") ||
+    t.includes("เริ่มโอเค") ||
+    t.includes("โอเคขึ้น") ||
+    t.includes("พอไหว") ||
+    t.includes("ไม่แย่เหมือนเมื่อก่อน")
+  ) {
+    return "better_small";
+  }
+
+  // better_control — เริ่มคุมได้ / ตั้งสติได้ / รับมือได้
+  if (
+    t.includes("ตั้งสติได้") ||
+    t.includes("รู้สึกจัดการได้มากขึ้น") ||
+    t.includes("รับมือได้") ||
+    t.includes("คุมได้") ||
+    t.includes("คุมอารมณ์ได้มากขึ้น")
+  ) {
+    return "better_control";
+  }
+
+  // better_energy — มีพลังขึ้น / สดชื่นขึ้น / กลับมาเป็นตัวเอง
+  if (
+    t.includes("มีพลังขึ้น") ||
+    t.includes("สดชื่นขึ้น") ||
+    t.includes("สบายใจขึ้น") ||
+    t.includes("มูดดีขึ้น") ||
+    t.includes("mood ดีขึ้น") ||
+    t.includes("เหมือนเริ่มกลับมาเป็นตัวเอง")
+  ) {
+    return "better_energy";
+  }
+
+  // better_hope — เริ่มเห็นแสง / เริ่มมีแรงไปต่อ / มองบวก
+  if (
+    t.includes("มองบวกมากขึ้น") ||
+    t.includes("คิดบวกขึ้น") ||
+    t.includes("เริ่มเห็นแสงนิดๆ") ||
+    t.includes("เริ่มมีแรงไปต่อ") ||
+    t.includes("ฟื้นขึ้นมา") ||
+    t.includes("ฟื้นตัว") ||
+    t.includes("กลับมายืนได้")
+  ) {
+    return "better_hope";
+  }
+
+  // ถ้าไม่เข้าเคสไหนเลย
+  return "neutral";
+}
+
+
+// (7) ประกอบข้อความตอบกลับ
+function composeReply(text) {
+  const ranked    = scoreEmotions(text);
+  const tops      = pickTopEmotions(ranked);
+  const primary   = tops[0] || "default";
+  const secondary = tops[1];
+  const tone      = detectTone(text);
+
+  // reflex
+  let reflex = getRandomTemplate("reflex", primary, tone);
+  if (secondary) {
+    reflex += "\n\nและฉันยังเห็นอีกมุมหนึ่งด้วย: " +
+      getRandomTemplate("reflex", secondary, tone);
+  }
+
+  // remind
+  let remind = getRandomTemplate("remind", primary, tone);
+  if (secondary) {
+    remind += "\n\nอีกเรื่องที่อยากฝากไว้คือ: " +
+      getRandomTemplate("remind", secondary, tone);
+  }
+
+  // reground
+  let reground = getRandomTemplate("reground", primary, tone);
+  if (secondary) {
+    reground += "\n\n" + getRandomTemplate("reground", secondary, tone);
+  }
+
+  return { reflex, remind, reground };
+}
+// ---------- 3.x) ส่ง emotion/tone ไปเก็บใน Google Sheet ----------
+
+// URL ที่ได้มาจากหน้า Deploy → Web app ของเธอ
+const LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbzwkiEYHsz3Q-dDfh7dUXwlYJ7HlCprVn0og-M33B-wD0KZGyLSXMkic7yUzXLmghEBhg/exec";
+
+async function logEmotionToSheet(emotion, tone) {
+  try {
+    await fetch(LOG_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors", // ให้ยิงแบบไม่ต้องรอ response ละเอียด
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        emotion: emotion || "",
+        tone: tone || "",
+        // ถ้าอยากเพิ่ม field อื่นค่อยเติมตรงนี้ได้ เช่น clientTime: new Date().toISOString()
+      }),
+    });
+  } catch (err) {
+    console.error("logEmotionToSheet error:", err);
+  }
+}
+
+    // ---------- 4) DOM + interaction ----------
+document.addEventListener('DOMContentLoaded', () => {
+  // ---------- 4) DOM + interaction ----------
+  const nextButton        = document.getElementById('nextButton');
+  const reflectionPool    = document.querySelector('.reflection-pool');
+  const forestScene       = document.getElementById('forestScene');
+  const interactionSection= document.getElementById('interactionSection');
+
+  const submitButton   = document.getElementById('submitButton');
+  const feelingInput   = document.getElementById('feelingInput');
+  const inputContainer = document.getElementById('inputContainer');
+
+  const reflexStage    = document.getElementById('reflexStage');
+  const remindStage    = document.getElementById('remindStage');
+  const regroundStage  = document.getElementById('regroundStage');
+
+  const reflexMessage   = document.getElementById('reflexMessage');
+  const remindMessage   = document.getElementById('remindMessage');
+  const regroundMessage = document.getElementById('regroundMessage');
+
+  function zoomToReflection() {
+    forestScene.classList.add('zoomed');
+    setTimeout(() => {
+      forestScene.classList.add('hidden');
+      interactionSection.classList.add('visible');
+    }, 1500);
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', zoomToReflection);
+  }
+  if (reflectionPool) {
+    reflectionPool.addEventListener('click', zoomToReflection);
+  }
+
+  async function handleSubmit() {
+    const feeling = feelingInput.value.trim();
+    if (!feeling) return;
+
+    submitButton.disabled = true;
+    submitButton.classList.add('loading');
+
+    const analysis = composeReply(feeling);
+
+    const ranked   = scoreEmotions(feeling);
+    const tops     = pickTopEmotions(ranked);
+    const primaryEmotion = tops[0] || "default";
+    const tone     = detectTone(feeling) || "neutral";
+
+    logEmotionToSheet(primaryEmotion, tone);
+
+    inputContainer.classList.add('fade-out');
+
+    setTimeout(() => {
+      document.getElementById('initialQuestion').style.display = 'none';
+
+      reflexMessage.textContent   = analysis.reflex;
+      remindMessage.textContent   = analysis.remind;
+      regroundMessage.textContent = analysis.reground;
+
+      reflexStage.style.display = 'block';
+      setTimeout(() => {
+        reflexStage.classList.add('visible');
+        reflexMessage.classList.add('visible');
+      }, 100);
+
+      submitButton.disabled = false;
+      submitButton.classList.remove('loading');
+    }, 800);
+  }
+
+  submitButton.addEventListener('click', handleSubmit);
+  feelingInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  });
+
+  document.getElementById('reflexNext').addEventListener('click', () => {
+    reflexStage.classList.remove('visible');
+    setTimeout(() => {
+      reflexStage.style.display = 'none';
+      remindStage.style.display = 'block';
+      setTimeout(() => {
+        remindStage.classList.add('visible');
+        remindMessage.classList.add('visible');
+      }, 100);
+    }, 500);
+  });
+
+  document.getElementById('remindNext').addEventListener('click', () => {
+    remindStage.classList.remove('visible');
+    setTimeout(() => {
+      remindStage.style.display = 'none';
+      regroundStage.style.display = 'block';
+      setTimeout(() => {
+        regroundStage.classList.add('visible');
+        regroundMessage.classList.add('visible');
+      }, 100);
+    }, 500);
+  });
+
+  document.getElementById('backToHome').addEventListener('click', () => {
+    location.reload();
+  });
+
+  // ปุ่มเปลี่ยนภาษา
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentLang = btn.dataset.lang;
+
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.querySelectorAll('[data-th]').forEach(el => {
+        const text = currentLang === 'th' ? el.dataset.th : el.dataset.en;
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+          el.placeholder = text;
+        } else {
+          el.innerHTML = text;
+        }
+      });
+    });
+  });
+});
+
+    // ---------- 5) ปุ่มเปลี่ยนภาษา (ใช้ data-th / data-en ที่มีอยู่แล้ว) ----------
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentLang = btn.dataset.lang;
+
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('[data-th]').forEach(el => {
+          const text = currentLang === 'th' ? el.dataset.th : el.dataset.en;
+          if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+            el.placeholder = text;
+          } else {
+            el.innerHTML = text;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
