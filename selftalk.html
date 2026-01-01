@@ -1,0 +1,1898 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirror Self Talk</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Madelyn+Rough&amp;family=Playfair+Display:wght@400;700&amp;family=Caveat:wght@400;700&amp;family=Cloud+Loop&amp;family=Bodoni+Moda:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cloud Loop', cursive;
+    }
+    
+    .font-title {
+      font-family: 'Madelyn Rough', cursive;
+    }
+    
+    .font-subtitle {
+      font-family: 'Playfair Display', serif;
+    }
+    
+    .font-body {
+      font-family: 'Cloud Loop', cursive;
+    }
+    
+    .scene {
+      transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
+    }
+    
+    .scene-exit {
+      opacity: 0;
+      transform: scale(1.2);
+    }
+    
+    .scene-enter {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    
+    .water-shimmer {
+      animation: shimmer 4s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+    
+    .water-ripple-circle {
+      animation: rippleExpand 3s ease-out infinite;
+    }
+    
+    @keyframes rippleExpand {
+      0% { 
+        r: 130;
+        opacity: 0.4;
+      }
+      100% { 
+        r: 160;
+        opacity: 0;
+      }
+    }
+    
+    .zoom-in-mirror {
+      animation: zoomIntoMirror 2s ease-in-out forwards;
+    }
+    
+    @keyframes zoomIntoMirror {
+      0% { 
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% { 
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+    
+    .door-swing {
+      animation: doorOpen 1s ease-out forwards;
+      transform-origin: left center;
+    }
+    
+    @keyframes doorOpen {
+      from { transform: perspective(1000px) rotateY(0deg); }
+      to { transform: perspective(1000px) rotateY(-90deg); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 1s ease-in forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in-slow {
+      animation: fadeInSlow 2s ease-in forwards;
+    }
+    
+    @keyframes fadeInSlow {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .silhouette {
+      filter: brightness(0) opacity(0.8);
+    }
+    
+    .door-container {
+      perspective: 1000px;
+    }
+    
+    .three-doors {
+      animation: doorsReveal 1.5s ease-out forwards;
+    }
+    
+    @keyframes doorsReveal {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    .door-summary {
+      opacity: 0;
+      transform: translateY(30px);
+      animation: doorSummaryAppear 0.8s ease-out forwards;
+    }
+    
+    .door-summary:nth-child(1) {
+      animation-delay: 0.2s;
+    }
+    
+    .door-summary:nth-child(2) {
+      animation-delay: 0.4s;
+    }
+    
+    .door-summary:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+    
+    @keyframes doorSummaryAppear {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .final-message-container {
+      opacity: 0;
+      animation: finalMessageAppear 1s ease-out 1.2s forwards;
+    }
+    
+    @keyframes finalMessageAppear {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .lang-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .lang-btn:hover {
+      transform: scale(1.05);
+    }
+    
+    .submit-btn:hover {
+      background: #D3906F !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(225, 174, 125, 0.4) !important;
+    }
+    
+    .message-input::placeholder {
+      color: rgba(253, 243, 233, 0.5);
+    }
+    
+    .star-twinkle {
+      animation: twinkle 2s ease-in-out infinite;
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    
+    .rainbow-shimmer {
+      animation: rainbowShimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes rainbowShimmer {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; }
+    }
+
+    .memory-gif {
+      width: 100%;
+      max-width: 480px;      /* กว้างสุดประมาณเท่า textarea */
+      display: block;
+      margin: 0 auto 16px auto;
+      border-radius: 14px;
+      object-fit: cover;      /* ให้ภาพเต็มกรอบสวย ๆ */
+    }
+
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="w-full h-full"></div>
+  <script>
+    const defaultConfig = {
+      background_color: '#5A5A5A',
+      surface_color: '#FDF3E9',
+      text_color: '#5A5A5A',
+      primary_action_color: '#D3906F',
+      secondary_action_color: '#8F9C8D',
+      font_family: 'Cloud Loop',
+      font_size: 18,
+      intro_title: 'Mirror Self Talk',
+      intro_text: 'Sometimes, the most important conversation is the one you have with yourself. Step through the mirror and meet all the parts of you.',
+      past_question: 'If you were a child, what would you say to yourself today?',
+      present_question: 'What would you say to yourself, right now?',
+      future_question: 'If you were your older self, what would you say to yourself today?',
+      final_message: "See? You're not alone. You have us! All the parts of you, living quietly inside your heart. Thank you for all you do for us. When you're tired, come back to us whenever you need. We're here.",
+      language: 'th'
+    };
+
+    const translations = {
+      en: {
+        intro_title: 'Mirror Self Talk',
+        intro_line1: 'Sometimes in life,',
+        intro_line2: 'we drift far from our own voice.',
+        intro_line3: 'This door... will take you back to them again.',
+        enter_mirror: 'Go To Talk',
+        zoom_line1: 'This world',
+        zoom_line2: 'is a world full of beliefs, dreams, and a certain kind of courage',
+        zoom_line3: 'that you may have forgotten as you grew up.',
+        zoom_line4: 'Today... you come back to them again.',
+        past_door: 'Past',
+        present_door: 'Present',
+        future_door: 'Future',
+        past_question: 'If you were a child, what would you say to yourself today?',
+        present_question: 'What would you say to yourself, right now?',
+        future_question: 'If you were your older self, what would you say to yourself today?',
+        placeholder: 'Type your message here...',
+        send: 'Send',
+        next: 'Next',
+        final_message: "See? You're not alone.\nYou have us!\nAll the parts of you, living quietly inside your heart.\n\nThank you for all you do for us.\nWhen you're tired, come back to us whenever you need.\nWe're here.",
+        past_label: 'Your childhood self said:',
+        present_label: 'Your present self said:',
+        future_label: 'Your future self said:',
+        start_again: 'Start Again'
+      },
+      th: {
+        intro_title: 'Mirror Self Talk',
+        intro_line1: 'บางช่วงของชีวิต',
+        intro_line2: 'เราห่างจากเสียงของตัวเองไปไก���',
+        intro_line3: 'ประตูนี้…จะพาคุณกลับไปหาเขาอีกครั้ง',
+        enter_mirror: 'Go To Talk',
+        zoom_line1: 'โลกของเด็กใบนี้',
+        zoom_line2: 'เป็นโลกที่เต็มไปด้วยความเชื่อ ความฝัน และความกล้าบางอย่าง',
+        zoom_line3: 'ที่คุณอาจหลงลืมไปในระหว่างการเติบโต',
+        zoom_line4: 'วันนี้…คุณกลับมาหาเขาอีกครั้ง',
+        past_door: 'อดีต',
+        present_door: 'ปัจจุบัน',
+        future_door: 'อนาคต',
+        past_question: 'ถ้าคุณเป็นเด็ก คุณจะพูดอะไรกับตัวเองในวันนี้?',
+        present_question: 'คุณอยา���จะพ��ดอะไรกับตัวเองใน��อนนี้?',
+        future_question: 'ถ้าคุณเป็นตัวเองในอนาคต คุณจะพูดอะไรกับตัวเองในวันนี้?',
+        placeholder: 'พิมพ์ข้อความของคุณที่นี่...',
+        send: 'ส่ง',
+        next: 'ถัดไป',
+        final_message: 'เห็นไหม? คุณไม่ได้อยู่คนเดียว\nคุณมีพวกเรา!\nทุกส่วนของคุณที่อาศัยอยู่อย่างเงียบๆ ในหัวใจ\n\nขอบคุณสำหรับทุกสิ่งที่คุณทำเพื่อพวกเรา\nเมื่อคุณเหนื่อย กลับมาหาพวกเราได้เสมอ\nพวกเราอยู่ที่นี่',
+        past_label: 'ตัวเองในวัยเด็กของคุณพ���ดว่า:',
+        present_label: 'ตัวเองในปัจจุบันของคุณพูดว่า:',
+        future_label: 'ตัวเองในอนาคตของคุณพูดว่า:',
+        start_again: 'เริ่มใหม่'
+      }
+    };
+
+    let currentScene = 'intro';
+    let userMessages = {
+      past: '',
+      present: '',
+      future: ''
+    };
+    let currentLanguage = 'th';
+
+    function t(key) {
+      return translations[currentLanguage][key] || key;
+    }
+
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      if (window.elementSdk) {
+        window.elementSdk.setConfig({ language: lang });
+      }
+      render();
+    }
+
+    function createLanguageButtons() {
+      return `
+        <div class="absolute top-6 left-6 flex items-center" style="z-index: 100;">
+          <div class="flex items-center gap-1 px-1 py-1 rounded-full" style="border: 2px solid white;">
+            <button 
+              onclick="setLanguage('th')" 
+              class="lang-btn px-3 py-1 rounded-full font-body transition-all ${currentLanguage === 'th' ? 'active' : ''}"
+              style="background-color: ${currentLanguage === 'th' ? 'white' : 'transparent'}; color: ${currentLanguage === 'th' ? defaultConfig.text_color : 'white'}; font-size: ${defaultConfig.font_size * 0.75}px; font-family: ${defaultConfig.font_family}, cursive; border: none;"
+            >
+              ไทย
+            </button>
+            <button 
+              onclick="setLanguage('en')" 
+              class="lang-btn px-3 py-1 rounded-full font-body transition-all ${currentLanguage === 'en' ? 'active' : ''}"
+              style="background-color: ${currentLanguage === 'en' ? 'white' : 'transparent'}; color: ${currentLanguage === 'en' ? defaultConfig.text_color : 'white'}; font-size: ${defaultConfig.font_size * 0.75}px; font-family: ${defaultConfig.font_family}, cursive; border: none;"
+            >
+              EN
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function createMirrorScene() {
+      return `
+        <div class="relative w-full h-full flex items-center justify-center" style="background: linear-gradient(to bottom, ${defaultConfig.background_color}, #2a2a2a);">
+          ${createLanguageButtons()}
+          
+          <!-- Water droplet particles in background -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: 0.3;">
+            <circle cx="10%" cy="15%" r="3" fill="#7B8A92" opacity="0.6">
+              <animate attributeName="cy" values="15%;20%;15%" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="85%" cy="25%" r="4" fill="#7B8A92" opacity="0.5">
+              <animate attributeName="cy" values="25%;30%;25%" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="20%" cy="40%" r="2" fill="#7B8A92" opacity="0.7">
+              <animate attributeName="cy" values="40%;45%;40%" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="75%" cy="50%" r="3" fill="#7B8A92" opacity="0.6">
+              <animate attributeName="cy" values="50%;55%;50%" dur="4.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="30%" cy="70%" r="4" fill="#7B8A92" opacity="0.5">
+              <animate attributeName="cy" values="70%;75%;70%" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="90%" cy="60%" r="2" fill="#7B8A92" opacity="0.7">
+              <animate attributeName="cy" values="60%;65%;60%" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="15%" cy="85%" r="3" fill="#7B8A92" opacity="0.6">
+              <animate attributeName="cy" values="85%;90%;85%" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="60%" cy="20%" r="2" fill="#7B8A92" opacity="0.7">
+              <animate attributeName="cy" values="20%;25%;20%" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="40%" cy="30%" r="3" fill="#7B8A92" opacity="0.5">
+              <animate attributeName="cy" values="30%;35%;30%" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="70%" cy="80%" r="4" fill="#7B8A92" opacity="0.6">
+              <animate attributeName="cy" values="80%;85%;80%" dur="4.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="5%" cy="55%" r="3" fill="#7B8A92" opacity="0.6">
+              <animate attributeName="cy" values="55%;60%;55%" dur="4.2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="95%" cy="35%" r="2" fill="#7B8A92" opacity="0.7">
+              <animate attributeName="cy" values="35%;40%;35%" dur="3.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="50%" cy="10%" r="4" fill="#7B8A92" opacity="0.5">
+              <animate attributeName="cy" values="10%;15%;10%" dur="4.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="25%" cy="65%" r="3" fill="#7B8A92" opacity="0.6">
+              <animate attributeName="cy" values="65%;70%;65%" dur="4.3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4.3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="80%" cy="45%" r="2" fill="#7B8A92" opacity="0.7">
+              <animate attributeName="cy" values="45%;50%;45%" dur="3.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.6s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          
+          <div class="text-center fade-in">
+            <h1 class="font-title mb-8" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 4}px; font-family: 'Madelyn Rough', cursive; letter-spacing: 3px;">
+              ${t('intro_title')}
+            </h1>
+            <p class="font-body mb-2 max-w-2xl mx-auto px-6" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.3}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.9;">
+              ${t('intro_line1')}
+            </p>
+            <p class="font-body mb-2 max-w-2xl mx-auto px-6" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.3}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.9;">
+              ${t('intro_line2')}
+            </p>
+            <p class="font-body mb-12 max-w-2xl mx-auto px-6" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.4}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1;">
+              ${t('intro_line3')}
+            </p>
+            
+            <div class="relative inline-block cursor-pointer" onclick="enterMirror()">
+              <svg width="350" height="600" viewBox="0 0 350 600">
+                <defs>
+                  <linearGradient id="mirrorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#E8E8E8;stop-opacity:0.9" />
+                    <stop offset="30%" style="stop-color:#C0C0C0;stop-opacity:0.95" />
+                    <stop offset="50%" style="stop-color:#A8A8A8;stop-opacity:1" />
+                    <stop offset="70%" style="stop-color:#C0C0C0;stop-opacity:0.95" />
+                    <stop offset="100%" style="stop-color:#D0D0D0;stop-opacity:0.9" />
+                  </linearGradient>
+                  <linearGradient id="woodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#8F9C8D;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#6B7A78;stop-opacity:1" />
+                  </linearGradient>
+                  <filter id="ripple">
+                    <feTurbulence type="turbulence" baseFrequency="0.01" numOctaves="2" result="turbulence"/>
+                    <feDisplacementMap in2="turbulence" in="SourceGraphic" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+                  </filter>
+                </defs>
+                
+                <!-- Animated water ripple ellipses at mirror base -->
+                <ellipse cx="175" cy="560" rx="140" ry="25" fill="none" stroke="#7B8A92" stroke-width="2" opacity="0.4">
+                  <animate attributeName="rx" values="140;200" dur="5s" repeatCount="indefinite"/>
+                  <animate attributeName="ry" values="25;45" dur="5s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.4;0" dur="5s" repeatCount="indefinite"/>
+                </ellipse>
+                <ellipse cx="175" cy="560" rx="140" ry="25" fill="none" stroke="#7B8A92" stroke-width="2" opacity="0.4">
+                  <animate attributeName="rx" values="140;200" dur="5s" begin="1.5s" repeatCount="indefinite"/>
+                  <animate attributeName="ry" values="25;45" dur="5s" begin="1.5s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.4;0" dur="5s" begin="1.5s" repeatCount="indefinite"/>
+                </ellipse>
+                <ellipse cx="175" cy="560" rx="140" ry="25" fill="none" stroke="#7B8A92" stroke-width="2" opacity="0.4">
+                  <animate attributeName="rx" values="140;200" dur="5s" begin="3s" repeatCount="indefinite"/>
+                  <animate attributeName="ry" values="25;45" dur="5s" begin="3s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.4;0" dur="5s" begin="3s" repeatCount="indefinite"/>
+                </ellipse>
+                
+                <!-- Left wooden stand -->
+                <rect x="30" y="380" width="25" height="60" fill="url(#woodGrad)" rx="3"/>
+                <rect x="35" y="440" width="15" height="140" fill="url(#woodGrad)" rx="2"/>
+                <ellipse cx="42.5" cy="580" rx="20" ry="8" fill="${defaultConfig.secondary_action_color}" opacity="0.8"/>
+                
+                <!-- Right wooden stand -->
+                <rect x="295" y="380" width="25" height="60" fill="url(#woodGrad)" rx="3"/>
+                <rect x="300" y="440" width="15" height="140" fill="url(#woodGrad)" rx="2"/>
+                <ellipse cx="307.5" cy="580" rx="20" ry="8" fill="${defaultConfig.secondary_action_color}" opacity="0.8"/>
+                
+                <!-- Main full-length mirror with silver/gray color -->
+                <ellipse cx="175" cy="300" rx="130" ry="280" fill="url(#mirrorGrad)" filter="url(#ripple)" opacity="0.95"/>
+                
+                <!-- Mirror frame -->
+                <ellipse cx="175" cy="300" rx="135" ry="285" fill="none" stroke="#C7AF83" stroke-width="4" opacity="0.9"/>
+                <ellipse cx="175" cy="300" rx="125" ry="275" fill="none" stroke="#8F9C8D" stroke-width="2" opacity="0.6"/>
+                
+                <!-- Decorative frame details -->
+                <circle cx="175" cy="25" r="12" fill="#C7AF83" opacity="0.7"/>
+                <circle cx="175" cy="575" r="12" fill="#C7AF83" opacity="0.7"/>
+              </svg>
+              
+              <div class="absolute inset-0 flex items-center justify-center" style="top: 80px;">
+                <span class="font-subtitle px-10 py-5 transition-all hover:scale-110 cursor-pointer" style="color: white; font-size: ${defaultConfig.font_size * 1.6}px; font-family: 'Playfair Display', serif; text-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: bold; letter-spacing: 1px;">
+                  ${t('enter_mirror')}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function createZoomScene() {
+      return `
+        <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: radial-gradient(circle, #A8A8A8, #5A5A5A, #2a2a2a);" onclick="showDoorFromZoom()">
+          ${createLanguageButtons()}
+          
+          <!-- Water droplets -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: 0.7;">
+            <!-- Water droplets with fade animation -->
+            <circle cx="20%" cy="25%" r="4" fill="#B0E0E6" opacity="0.9">
+              <animate attributeName="cy" values="25%;30%;25%" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.3;0.9" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="40%" cy="15%" r="5" fill="#ADD8E6" opacity="0.8">
+              <animate attributeName="cy" values="15%;20%;15%" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="60%" cy="40%" r="3" fill="#B0E0E6" opacity="1">
+              <animate attributeName="cy" values="40%;45%;40%" dur="2.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="80%" cy="50%" r="4" fill="#ADD8E6" opacity="0.9">
+              <animate attributeName="cy" values="50%;55%;50%" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.2;0.9" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="30%" cy="65%" r="5" fill="#B0E0E6" opacity="0.8">
+              <animate attributeName="cy" values="65%;70%;65%" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="50%" cy="75%" r="3" fill="#ADD8E6" opacity="1">
+              <animate attributeName="cy" values="75%;80%;75%" dur="2.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="70%" cy="85%" r="4" fill="#B0E0E6" opacity="0.9">
+              <animate attributeName="cy" values="85%;90%;85%" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.2;0.9" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="45%" cy="35%" r="3" fill="#ADD8E6" opacity="1">
+              <animate attributeName="cy" values="35%;40%;35%" dur="2.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="65%" cy="55%" r="4" fill="#B0E0E6" opacity="0.8">
+              <animate attributeName="cy" values="55%;60%;55%" dur="3.2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="35%" cy="45%" r="5" fill="#ADD8E6" opacity="0.9">
+              <animate attributeName="cy" values="45%;50%;45%" dur="3.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.3;0.9" dur="3.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="55%" cy="22%" r="3" fill="#B0E0E6" opacity="1">
+              <animate attributeName="cy" values="22%;27%;22%" dur="2.7s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.7s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="12%" cy="42%" r="4" fill="#ADD8E6" opacity="0.8">
+              <animate attributeName="cy" values="42%;47%;42%" dur="3.3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="88%" cy="48%" r="3" fill="#B0E0E6" opacity="0.9">
+              <animate attributeName="cy" values="48%;53%;48%" dur="2.9s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.9s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="42%" cy="68%" r="4" fill="#ADD8E6" opacity="0.8">
+              <animate attributeName="cy" values="68%;73%;68%" dur="3.4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="68%" cy="32%" r="3" fill="#B0E0E6" opacity="1">
+              <animate attributeName="cy" values="32%;37%;32%" dur="2.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="10%" cy="60%" r="5" fill="#ADD8E6" opacity="0.8">
+              <animate attributeName="cy" values="60%;65%;60%" dur="3.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="90%" cy="70%" r="4" fill="#B0E0E6" opacity="0.9">
+              <animate attributeName="cy" values="70%;75%;70%" dur="3.1s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.3;0.9" dur="3.1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="25%" cy="10%" r="3" fill="#ADD8E6" opacity="1">
+              <animate attributeName="cy" values="10%;15%;10%" dur="2.9s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="1;0.3;1" dur="2.9s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="75%" cy="20%" r="4" fill="#B0E0E6" opacity="0.8">
+              <animate attributeName="cy" values="20%;25%;20%" dur="3.7s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.7s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="15%" cy="80%" r="5" fill="#ADD8E6" opacity="0.9">
+              <animate attributeName="cy" values="80%;85%;80%" dur="3.3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.9;0.3;0.9" dur="3.3s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          
+          <div class="text-center fade-in-slow px-6">
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.8}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.95; line-height: 1.6;">
+              ${t('zoom_line1')}
+            </p>
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.5}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.9; line-height: 1.6;">
+              ${t('zoom_line2')}
+            </p>
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.5}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.9; line-height: 1.6;">
+              ${t('zoom_line3')}
+            </p>
+            <p class="font-body max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.6}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.6; margin-top: 2rem;">
+              ${t('zoom_line4')}
+            </p>
+            <p class="font-body mt-8 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.7; font-style: italic;">
+              (แตะหน้าจอเพื่อดำเนินการต่อ)
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function createIntroPastScene() {
+      return `
+        <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: linear-gradient(135deg, #FDF3E9, #FFE5D9, #FFC8DD);" onclick="goToPastRoom()">
+          ${createLanguageButtons()}
+          
+          <div class="text-center fade-in-slow px-6">
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.6}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.8;">
+              โลกของเด็กใบนี้
+            </p>
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.4}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.95; line-height: 1.8;">
+              เต็มไปด้วยความเชื่อ ความฝัน และความกล้า
+            </p>
+            <p class="font-body mb-8 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.4}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.95; line-height: 1.8;">
+              ที่คุณอาจหลงลืมไปในระหว่างการเติบโต
+            </p>
+            <p class="font-body max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.5}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.8; margin-top: 2rem;">
+              เด็กน้อยคนนี้กลับมาหาคุณอีกครั้ง...
+            </p>
+            <p class="font-body mt-8 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.7; font-style: italic;">
+              (แตะหน้าจอเพื่อดำเนินการต่อ)
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function createIntroPresentScene() {
+      return `
+        <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: linear-gradient(135deg, #8F9C8D, #7B8A92);" onclick="goToPresentRoom()">
+          ${createLanguageButtons()}
+          
+          <div class="text-center fade-in-very-slow px-6">
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.6}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.8;">
+              พื้นที่ที่คุณยืนอยู่…ในวันนี้
+            </p>
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.4}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.95; line-height: 1.8;">
+              เต็มไปด้วยเรื่องมากมายที่คุณต้องร���บมือ
+            </p>
+            <p class="font-body mb-8 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.4}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.95; line-height: 1.8;">
+              เต็มไปด้วยความพยายามที่ไม่มีใครเห็น
+            </p>
+            <p class="font-body max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.5}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.8; margin-top: 2rem;">
+              ลองพูดกับตัวเองว่า...
+            </p>
+            <p class="font-body mt-8 max-w-2xl mx-auto" style="color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.7; font-style: italic;">
+              (แตะห���้าจอเพื่อดำเนินการต่อ)
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function createIntroFutureScene() {
+      return `
+        <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: linear-gradient(135deg, #FDF3E9, #C7AF83);" onclick="goToFutureRoom()">
+          ${createLanguageButtons()}
+          
+          <div class="text-center fade-in-very-slow px-6">
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.6}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.8;">
+              คุณในวันข้างหน้า
+            </p>
+            <p class="font-body mb-4 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.4}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.95; line-height: 1.8;">
+              ได้เดินผ่านเส้นทางที่คุณยังมองไม่เห็น
+            </p>
+            <p class="font-body max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.5}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 1; line-height: 1.8; margin-top: 2rem;">
+              และวันนี้เขาต้องการบอกกับคุณในวันนี้ว่า...
+            </p>
+            <p class="font-body mt-8 max-w-2xl mx-auto" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1}px; font-family: ${defaultConfig.font_family}, cursive; opacity: 0.7; font-style: italic;">
+              (แตะหน้าจอเพื่อดำเนินการต่อ)
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function createDoorScene(doorType) {
+      if (doorType === 'past') {
+        return `
+          <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: linear-gradient(135deg, #FDF3E9, #FFE5D9, #FFC8DD);" onclick="openPastDoor()">
+            ${createLanguageButtons()}
+            
+            <!-- Colorful water droplets scattered across background -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: 0.5;">
+              <circle cx="8%" cy="12%" r="5" fill="#FF6B9D" opacity="0.8">
+                <animate attributeName="cy" values="12%;17%;12%" dur="3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="18%" cy="8%" r="6" fill="#FFD700" opacity="0.7">
+                <animate attributeName="cy" values="8%;13%;8%" dur="3.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="28%" cy="15%" r="4" fill="#87CEEB" opacity="0.9">
+                <animate attributeName="cy" values="15%;20%;15%" dur="2.8s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="38%" cy="10%" r="5" fill="#98D8C8" opacity="0.8">
+                <animate attributeName="cy" values="10%;15%;10%" dur="3.2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="48%" cy="18%" r="6" fill="#FFA07A" opacity="0.7">
+                <animate attributeName="cy" values="18%;23%;18%" dur="3.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.6s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="58%" cy="12%" r="4" fill="#DDA0DD" opacity="0.9">
+                <animate attributeName="cy" values="12%;17%;12%" dur="2.9s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.9s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="68%" cy="16%" r="5" fill="#FFB6C1" opacity="0.8">
+                <animate attributeName="cy" values="16%;21%;16%" dur="3.3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.3s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="78%" cy="9%" r="6" fill="#F0E68C" opacity="0.7">
+                <animate attributeName="cy" values="9%;14%;9%" dur="3.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.7s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="88%" cy="14%" r="4" fill="#B0E0E6" opacity="0.9">
+                <animate attributeName="cy" values="14%;19%;14%" dur="2.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.7s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="92%" cy="20%" r="5" fill="#FF6B9D" opacity="0.8">
+                <animate attributeName="cy" values="20%;25%;20%" dur="3.4s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.4s" repeatCount="indefinite"/>
+              </circle>
+              
+              <circle cx="12%" cy="35%" r="6" fill="#FFD700" opacity="0.7">
+                <animate attributeName="cy" values="35%;40%;35%" dur="3.1s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.1s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="22%" cy="42%" r="4" fill="#87CEEB" opacity="0.9">
+                <animate attributeName="cy" values="42%;47%;42%" dur="2.9s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.9s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="32%" cy="38%" r="5" fill="#98D8C8" opacity="0.8">
+                <animate attributeName="cy" values="38%;43%;38%" dur="3.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="42%" cy="45%" r="6" fill="#FFA07A" opacity="0.7">
+                <animate attributeName="cy" values="45%;50%;45%" dur="3.8s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="52%" cy="40%" r="4" fill="#DDA0DD" opacity="0.9">
+                <animate attributeName="cy" values="40%;45%;40%" dur="2.8s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="62%" cy="48%" r="5" fill="#FFB6C1" opacity="0.8">
+                <animate attributeName="cy" values="48%;53%;48%" dur="3.2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="72%" cy="36%" r="6" fill="#F0E68C" opacity="0.7">
+                <animate attributeName="cy" values="36%;41%;36%" dur="3.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.6s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="82%" cy="44%" r="4" fill="#B0E0E6" opacity="0.9">
+                <animate attributeName="cy" values="44%;49%;44%" dur="2.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.7s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="92%" cy="39%" r="5" fill="#FF6B9D" opacity="0.8">
+                <animate attributeName="cy" values="39%;44%;39%" dur="3.3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.3s" repeatCount="indefinite"/>
+              </circle>
+              
+              <circle cx="10%" cy="62%" r="5" fill="#FFD700" opacity="0.8">
+                <animate attributeName="cy" values="62%;67%;62%" dur="3.4s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.4s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="20%" cy="68%" r="6" fill="#87CEEB" opacity="0.7">
+                <animate attributeName="cy" values="68%;73%;68%" dur="3.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.7s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="30%" cy="65%" r="4" fill="#98D8C8" opacity="0.9">
+                <animate attributeName="cy" values="65%;70%;65%" dur="2.8s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="40%" cy="72%" r="5" fill="#FFA07A" opacity="0.8">
+                <animate attributeName="cy" values="72%;77%;72%" dur="3.1s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.1s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="50%" cy="66%" r="6" fill="#DDA0DD" opacity="0.7">
+                <animate attributeName="cy" values="66%;71%;66%" dur="3.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="60%" cy="70%" r="4" fill="#FFB6C1" opacity="0.9">
+                <animate attributeName="cy" values="70%;75%;70%" dur="2.9s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.9s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="70%" cy="64%" r="5" fill="#F0E68C" opacity="0.8">
+                <animate attributeName="cy" values="64%;69%;64%" dur="3.2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="80%" cy="69%" r="6" fill="#B0E0E6" opacity="0.7">
+                <animate attributeName="cy" values="69%;74%;69%" dur="3.6s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.6s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="90%" cy="63%" r="4" fill="#FF6B9D" opacity="0.9">
+                <animate attributeName="cy" values="63%;68%;63%" dur="2.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.7s" repeatCount="indefinite"/>
+              </circle>
+              
+              <circle cx="15%" cy="85%" r="6" fill="#FFD700" opacity="0.7">
+                <animate attributeName="cy" values="85%;90%;85%" dur="3.3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.2;0.7" dur="3.3s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="25%" cy="88%" r="4" fill="#87CEEB" opacity="0.9">
+                <animate attributeName="cy" values="88%;93%;88%" dur="2.8s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.8s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="35%" cy="82%" r="5" fill="#98D8C8" opacity="0.8">
+                <animate attributeName="cy" values="82%;87%;82%" dur="3.4s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.4s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="45%" cy="90%" r="6" fill="#FFA07A" opacity="0.7">
+                <animate attributeName="cy" values="90%;95%;90%" dur="3.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.7s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="55%" cy="86%" r="4" fill="#DDA0DD" opacity="0.9">
+                <animate attributeName="cy" values="86%;91%;86%" dur="2.9s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.9s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="65%" cy="92%" r="5" fill="#FFB6C1" opacity="0.8">
+                <animate attributeName="cy" values="92%;97%;92%" dur="3.1s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.1s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="75%" cy="84%" r="6" fill="#F0E68C" opacity="0.7">
+                <animate attributeName="cy" values="84%;89%;84%" dur="3.5s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.5s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="85%" cy="89%" r="4" fill="#B0E0E6" opacity="0.9">
+                <animate attributeName="cy" values="89%;94%;89%" dur="2.7s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2.7s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+            
+            <!-- Sprinkles scattered densely across background -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: 0.7;">
+              <!-- Colorful sprinkles - Top section -->
+              <rect x="5%" y="10%" width="8" height="3" fill="#FF6B9D" rx="1" transform="rotate(25 5 10)"/>
+              <rect x="15%" y="15%" width="6" height="3" fill="#FFD700" rx="1" transform="rotate(-30 15 15)"/>
+              <rect x="25%" y="8%" width="7" height="3" fill="#87CEEB" rx="1" transform="rotate(45 25 8)"/>
+              <rect x="35%" y="20%" width="8" height="3" fill="#98D8C8" rx="1" transform="rotate(-15 35 20)"/>
+              <rect x="45%" y="12%" width="6" height="3" fill="#FFA07A" rx="1" transform="rotate(60 45 12)"/>
+              <rect x="55%" y="18%" width="7" height="3" fill="#DDA0DD" rx="1" transform="rotate(-45 55 18)"/>
+              <rect x="65%" y="10%" width="8" height="3" fill="#FFB6C1" rx="1" transform="rotate(30 65 10)"/>
+              <rect x="75%" y="22%" width="6" height="3" fill="#F0E68C" rx="1" transform="rotate(-20 75 22)"/>
+              <rect x="85%" y="14%" width="7" height="3" fill="#B0E0E6" rx="1" transform="rotate(50 85 14)"/>
+              <rect x="92%" y="18%" width="8" height="3" fill="#FF6B9D" rx="1" transform="rotate(-35 92 18)"/>
+              <rect x="10%" y="5%" width="6" height="3" fill="#FFD700" rx="1" transform="rotate(15 10 5)"/>
+              <rect x="30%" y="3%" width="7" height="3" fill="#87CEEB" rx="1" transform="rotate(-40 30 3)"/>
+              <rect x="50%" y="7%" width="8" height="3" fill="#98D8C8" rx="1" transform="rotate(35 50 7)"/>
+              <rect x="70%" y="4%" width="6" height="3" fill="#FFA07A" rx="1" transform="rotate(-25 70 4)"/>
+              <rect x="90%" y="9%" width="7" height="3" fill="#DDA0DD" rx="1" transform="rotate(55 90 9)"/>
+              
+              <!-- Middle-upper section -->
+              <rect x="8%" y="35%" width="6" height="3" fill="#FFD700" rx="1" transform="rotate(40 8 35)"/>
+              <rect x="18%" y="40%" width="7" height="3" fill="#87CEEB" rx="1" transform="rotate(-25 18 40)"/>
+              <rect x="28%" y="32%" width="8" height="3" fill="#98D8C8" rx="1" transform="rotate(55 28 32)"/>
+              <rect x="38%" y="45%" width="6" height="3" fill="#FFA07A" rx="1" transform="rotate(-40 38 45)"/>
+              <rect x="48%" y="38%" width="7" height="3" fill="#DDA0DD" rx="1" transform="rotate(20 48 38)"/>
+              <rect x="58%" y="42%" width="8" height="3" fill="#FFB6C1" rx="1" transform="rotate(-50 58 42)"/>
+              <rect x="68%" y="36%" width="6" height="3" fill="#F0E68C" rx="1" transform="rotate(35 68 36)"/>
+              <rect x="78%" y="44%" width="7" height="3" fill="#B0E0E6" rx="1" transform="rotate(-15 78 44)"/>
+              <rect x="88%" y="38%" width="8" height="3" fill="#FF6B9D" rx="1" transform="rotate(45 88 38)"/>
+              <rect x="3%" y="28%" width="7" height="3" fill="#FFD700" rx="1" transform="rotate(-30 3 28)"/>
+              <rect x="13%" y="33%" width="6" height="3" fill="#87CEEB" rx="1" transform="rotate(25 13 33)"/>
+              <rect x="23%" y="48%" width="8" height="3" fill="#98D8C8" rx="1" transform="rotate(-45 23 48)"/>
+              <rect x="33%" y="26%" width="7" height="3" fill="#FFA07A" rx="1" transform="rotate(50 33 26)"/>
+              <rect x="43%" y="30%" width="6" height="3" fill="#DDA0DD" rx="1" transform="rotate(-20 43 30)"/>
+              <rect x="53%" y="27%" width="8" height="3" fill="#FFB6C1" rx="1" transform="rotate(40 53 27)"/>
+              <rect x="63%" y="49%" width="7" height="3" fill="#F0E68C" rx="1" transform="rotate(-35 63 49)"/>
+              <rect x="73%" y="31%" width="6" height="3" fill="#B0E0E6" rx="1" transform="rotate(30 73 31)"/>
+              <rect x="83%" y="29%" width="8" height="3" fill="#FF6B9D" rx="1" transform="rotate(-25 83 29)"/>
+              <rect x="93%" y="46%" width="7" height="3" fill="#FFD700" rx="1" transform="rotate(45 93 46)"/>
+              
+              <!-- Middle-lower section -->
+              <rect x="10%" y="60%" width="7" height="3" fill="#FFD700" rx="1" transform="rotate(-30 10 60)"/>
+              <rect x="20%" y="65%" width="8" height="3" fill="#87CEEB" rx="1" transform="rotate(25 20 65)"/>
+              <rect x="30%" y="58%" width="6" height="3" fill="#98D8C8" rx="1" transform="rotate(-45 30 58)"/>
+              <rect x="40%" y="68%" width="7" height="3" fill="#FFA07A" rx="1" transform="rotate(50 40 68)"/>
+              <rect x="50%" y="62%" width="8" height="3" fill="#DDA0DD" rx="1" transform="rotate(-20 50 62)"/>
+              <rect x="60%" y="66%" width="6" height="3" fill="#FFB6C1" rx="1" transform="rotate(40 60 66)"/>
+              <rect x="70%" y="60%" width="7" height="3" fill="#F0E68C" rx="1" transform="rotate(-35 70 60)"/>
+              <rect x="80%" y="64%" width="8" height="3" fill="#B0E0E6" rx="1" transform="rotate(30 80 64)"/>
+              <rect x="90%" y="58%" width="6" height="3" fill="#FF6B9D" rx="1" transform="rotate(-25 90 58)"/>
+              <rect x="5%" y="52%" width="8" height="3" fill="#FFD700" rx="1" transform="rotate(35 5 52)"/>
+              <rect x="15%" y="56%" width="7" height="3" fill="#87CEEB" rx="1" transform="rotate(-40 15 56)"/>
+              <rect x="25%" y="69%" width="6" height="3" fill="#98D8C8" rx="1" transform="rotate(55 25 69)"/>
+              <rect x="35%" y="54%" width="8" height="3" fill="#FFA07A" rx="1" transform="rotate(-15 35 54)"/>
+              <rect x="45%" y="71%" width="7" height="3" fill="#DDA0DD" rx="1" transform="rotate(45 45 71)"/>
+              <rect x="55%" y="53%" width="6" height="3" fill="#FFB6C1" rx="1" transform="rotate(-30 55 53)"/>
+              <rect x="65%" y="72%" width="8" height="3" fill="#F0E68C" rx="1" transform="rotate(25 65 72)"/>
+              <rect x="75%" y="55%" width="7" height="3" fill="#B0E0E6" rx="1" transform="rotate(-50 75 55)"/>
+              <rect x="85%" y="69%" width="6" height="3" fill="#FF6B9D" rx="1" transform="rotate(40 85 69)"/>
+              <rect x="95%" y="63%" width="8" height="3" fill="#FFD700" rx="1" transform="rotate(-20 95 63)"/>
+              
+              <!-- Bottom section -->
+              <rect x="12%" y="82%" width="8" height="3" fill="#FFD700" rx="1" transform="rotate(35 12 82)"/>
+              <rect x="22%" y="88%" width="6" height="3" fill="#87CEEB" rx="1" transform="rotate(-40 22 88)"/>
+              <rect x="32%" y="80%" width="7" height="3" fill="#98D8C8" rx="1" transform="rotate(55 32 80)"/>
+              <rect x="42%" y="90%" width="8" height="3" fill="#FFA07A" rx="1" transform="rotate(-15 42 90)"/>
+              <rect x="52%" y="85%" width="6" height="3" fill="#DDA0DD" rx="1" transform="rotate(45 52 85)"/>
+              <rect x="62%" y="88%" width="7" height="3" fill="#FFB6C1" rx="1" transform="rotate(-30 62 88)"/>
+              <rect x="72%" y="82%" width="8" height="3" fill="#F0E68C" rx="1" transform="rotate(25 72 82)"/>
+              <rect x="82%" y="86%" width="6" height="3" fill="#B0E0E6" rx="1" transform="rotate(-50 82 86)"/>
+              <rect x="92%" y="84%" width="7" height="3" fill="#FF6B9D" rx="1" transform="rotate(40 92 84)"/>
+              <rect x="7%" y="76%" width="6" height="3" fill="#FFD700" rx="1" transform="rotate(-25 7 76)"/>
+              <rect x="17%" y="94%" width="8" height="3" fill="#87CEEB" rx="1" transform="rotate(30 17 94)"/>
+              <rect x="27%" y="73%" width="7" height="3" fill="#98D8C8" rx="1" transform="rotate(-45 27 73)"/>
+              <rect x="37%" y="78%" width="6" height="3" fill="#FFA07A" rx="1" transform="rotate(50 37 78)"/>
+              <rect x="47%" y="95%" width="8" height="3" fill="#DDA0DD" rx="1" transform="rotate(-20 47 95)"/>
+              <rect x="57%" y="77%" width="7" height="3" fill="#FFB6C1" rx="1" transform="rotate(40 57 77)"/>
+              <rect x="67%" y="93%" width="6" height="3" fill="#F0E68C" rx="1" transform="rotate(-35 67 93)"/>
+              <rect x="77%" y="75%" width="8" height="3" fill="#B0E0E6" rx="1" transform="rotate(25 77 75)"/>
+              <rect x="87%" y="79%" width="7" height="3" fill="#FF6B9D" rx="1" transform="rotate(-50 87 79)"/>
+              <rect x="97%" y="91%" width="6" height="3" fill="#FFD700" rx="1" transform="rotate(45 97 91)"/>
+            </svg>
+            
+            <div class="door-container fade-in">
+              <svg width="400" height="500" viewBox="0 0 400 500">
+                <defs>
+                  <linearGradient id="pastDoorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#FFB3D9;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#FFC8DD;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FFB3D9;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="doorFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#A0522D;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" />
+                  </linearGradient>
+                  <filter id="doorShadow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="4" result="offsetblur"/>
+                    <feComponentTransfer>
+                      <feFuncA type="linear" slope="0.5"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                      <feMergeNode/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <linearGradient id="knobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                
+                <g id="past-door-group">
+                  <!-- Door frame (wood) -->
+                  <rect x="85" y="35" width="230" height="410" fill="url(#doorFrameGrad)" rx="8"/>
+                  
+                  <!-- Door shadow -->
+                  <rect x="100" y="50" width="200" height="380" fill="black" opacity="0.2" rx="6" filter="url(#doorShadow)"/>
+                  
+                  <!-- Main door panel -->
+                  <rect id="past-door" x="100" y="50" width="200" height="380" fill="url(#pastDoorGrad)" stroke="#D8A7C3" stroke-width="3" rx="6"/>
+                  
+                  <!-- Sign inside door at top -->
+                  <rect x="150" y="70" width="100" height="60" fill="${defaultConfig.surface_color}" stroke="${defaultConfig.text_color}" stroke-width="2" rx="5"/>
+                  <text x="200" y="110" text-anchor="middle" font-size="32" font-family="'Playfair Display', serif" fill="${defaultConfig.text_color}" font-weight="bold">
+                    Past
+                  </text>
+                  
+                  <!-- Door panels (raised sections) -->
+                  <rect x="115" y="70" width="170" height="100" fill="none" stroke="#FFB3D9" stroke-width="4" rx="4" opacity="0.6"/>
+                  <rect x="115" y="185" width="170" height="100" fill="none" stroke="#FFB3D9" stroke-width="4" rx="4" opacity="0.6"/>
+                  <rect x="115" y="300" width="170" height="115" fill="none" stroke="#FFB3D9" stroke-width="4" rx="4" opacity="0.6"/>
+                  
+                  <!-- Inner panel details -->
+                  <rect x="120" y="75" width="160" height="90" fill="#FFD6E8" opacity="0.3" rx="3"/>
+                  <rect x="120" y="190" width="160" height="90" fill="#FFD6E8" opacity="0.3" rx="3"/>
+                  <rect x="120" y="305" width="160" height="105" fill="#FFD6E8" opacity="0.3" rx="3"/>
+                  
+                  <!-- Rainbow decorations in middle panel -->
+                  <path d="M 135 210 Q 200 195 265 210" stroke="#FF6B9D" stroke-width="6" fill="none" opacity="0.8"/>
+                  <path d="M 140 220 Q 200 207 260 220" stroke="#FFA07A" stroke-width="5" fill="none" opacity="0.8"/>
+                  <path d="M 145 230 Q 200 219 255 230" stroke="#FFD700" stroke-width="4" fill="none" opacity="0.8"/>
+                  <path d="M 150 240 Q 200 231 250 240" stroke="#98D8C8" stroke-width="3" fill="none" opacity="0.8"/>
+                  
+                  <!-- Stars in middle panel -->
+                  <path d="M 150 255 L 153 263 L 161 263 L 155 268 L 157 276 L 150 271 L 143 276 L 145 268 L 139 263 L 147 263 Z" fill="#FFD700" opacity="0.9"/>
+                  <path d="M 250 250 L 252 256 L 258 256 L 253 260 L 255 266 L 250 262 L 245 266 L 247 260 L 242 256 L 248 256 Z" fill="#FFA07A" opacity="0.9"/>
+                  
+                  <!-- Decorative elements in bottom panel -->
+                  <circle cx="160" cy="340" r="10" fill="#FFB6C1" opacity="0.7"/>
+                  <circle cx="200" cy="360" r="12" fill="#DDA0DD" opacity="0.7"/>
+                  <circle cx="240" cy="345" r="9" fill="#F0E68C" opacity="0.7"/>
+                  <path d="M 180 380 L 183 388 L 191 388 L 184 393 L 187 401 L 180 396 L 173 401 L 176 393 L 169 388 L 177 388 Z" fill="#87CEEB" opacity="0.8"/>
+                  <path d="M 220 385 L 223 393 L 231 393 L 224 398 L 227 406 L 220 401 L 213 406 L 216 398 L 209 393 L 217 393 Z" fill="#98D8C8" opacity="0.8"/>
+                  
+                  <!-- Door knob with realistic shading -->
+                  <ellipse cx="260" cy="240" rx="14" ry="16" fill="url(#knobGrad)" opacity="0.95"/>
+                  <circle cx="260" cy="240" r="12" fill="url(#knobGrad)"/>
+                  <circle cx="257" cy="237" r="4" fill="#FFFACD" opacity="0.8"/>
+                  <circle cx="260" cy="240" r="5" fill="#8B4513" opacity="0.3"/>
+                  
+                  <!-- Keyhole -->
+                  <ellipse cx="260" cy="255" rx="3" ry="4" fill="#333333" opacity="0.8"/>
+                  <rect x="258" y="257" width="4" height="6" fill="#333333" opacity="0.8" rx="1"/>
+                  
+                  <!-- Door hinges (left side) -->
+                  <rect x="105" y="80" width="8" height="25" fill="#8B4513" rx="2"/>
+                  <circle cx="109" cy="87" r="2" fill="#333333"/>
+                  <circle cx="109" cy="98" r="2" fill="#333333"/>
+                  
+                  <rect x="105" y="230" width="8" height="25" fill="#8B4513" rx="2"/>
+                  <circle cx="109" cy="237" r="2" fill="#333333"/>
+                  <circle cx="109" cy="248" r="2" fill="#333333"/>
+                  
+                  <rect x="105" y="380" width="8" height="25" fill="#8B4513" rx="2"/>
+                  <circle cx="109" cy="387" r="2" fill="#333333"/>
+                  <circle cx="109" cy="398" r="2" fill="#333333"/>
+                </g>
+                
+                <!-- Tap instruction -->
+                <text x="200" y="480" text-anchor="middle" font-size="16" font-family="${defaultConfig.font_family}, cursive" fill="${defaultConfig.text_color}" opacity="0.7" font-style="italic">
+                  (แตะเพื่อเปิดประตู)
+                </text>
+              </svg>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (doorType === 'present') {
+        return `
+          <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: linear-gradient(135deg, #8F9C8D, #7B8A92);" onclick="openPresentDoor()">
+            ${createLanguageButtons()}
+            
+            <div class="door-container fade-in">
+              <svg width="400" height="500" viewBox="0 0 400 500">
+                <defs>
+                  <linearGradient id="presentDoorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#7B8A92;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#8F9C8D;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#7B8A92;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="presentFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5A6A6A;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#6B7A78;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#5A6A6A;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="presentKnobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#C0C0C0;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#A8A8A8;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#909090;stop-opacity:1" />
+                  </linearGradient>
+                  <filter id="presentDoorShadow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="4" result="offsetblur"/>
+                    <feComponentTransfer>
+                      <feFuncA type="linear" slope="0.5"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                      <feMergeNode/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                
+                <g id="present-door-group">
+                  <!-- Door frame -->
+                  <rect x="85" y="35" width="230" height="410" fill="url(#presentFrameGrad)" rx="8"/>
+                  
+                  <!-- Door shadow -->
+                  <rect x="100" y="50" width="200" height="380" fill="black" opacity="0.2" rx="6" filter="url(#presentDoorShadow)"/>
+                  
+                  <!-- Main door panel -->
+                  <rect id="present-door" x="100" y="50" width="200" height="380" fill="url(#presentDoorGrad)" stroke="#6B7A78" stroke-width="3" rx="6"/>
+                  
+                  <!-- Hanging sign at top -->
+                  <line x1="180" y1="60" x2="180" y2="80" stroke="#5A6A6A" stroke-width="2"/>
+                  <line x1="220" y1="60" x2="220" y2="80" stroke="#5A6A6A" stroke-width="2"/>
+                  <rect x="150" y="80" width="100" height="60" fill="${defaultConfig.surface_color}" stroke="${defaultConfig.text_color}" stroke-width="2" rx="5"/>
+                  <text x="200" y="120" text-anchor="middle" font-size="28" font-family="'Playfair Display', serif" fill="${defaultConfig.text_color}" font-weight="bold">
+                    Present
+                  </text>
+                  
+                  <!-- Door panels -->
+                  <rect x="115" y="155" width="170" height="100" fill="none" stroke="#8F9C8D" stroke-width="4" rx="4" opacity="0.6"/>
+                  <rect x="115" y="270" width="170" height="145" fill="none" stroke="#8F9C8D" stroke-width="4" rx="4" opacity="0.6"/>
+                  
+                  <!-- Inner panel details -->
+                  <rect x="120" y="160" width="160" height="90" fill="#A8B8B8" opacity="0.3" rx="3"/>
+                  <rect x="120" y="275" width="160" height="135" fill="#A8B8B8" opacity="0.3" rx="3"/>
+                  
+                  <!-- Minimalist lines in middle panel -->
+                  <line x1="130" y1="190" x2="270" y2="190" stroke="#6B7A78" stroke-width="2" opacity="0.5"/>
+                  <line x1="130" y1="210" x2="270" y2="210" stroke="#6B7A78" stroke-width="2" opacity="0.5"/>
+                  <line x1="130" y1="230" x2="270" y2="230" stroke="#6B7A78" stroke-width="2" opacity="0.5"/>
+                  
+                  <!-- Simple geometric shapes in bottom panel -->
+                  <circle cx="160" cy="330" r="15" fill="none" stroke="#6B7A78" stroke-width="2" opacity="0.6"/>
+                  <rect x="185" y="315" width="30" height="30" fill="none" stroke="#6B7A78" stroke-width="2" opacity="0.6" rx="2"/>
+                  <polygon points="240,315 255,345 225,345" fill="none" stroke="#6B7A78" stroke-width="2" opacity="0.6"/>
+                  
+                  <!-- Door knob -->
+                  <ellipse cx="260" cy="240" rx="14" ry="16" fill="url(#presentKnobGrad)" opacity="0.95"/>
+                  <circle cx="260" cy="240" r="12" fill="url(#presentKnobGrad)"/>
+                  <circle cx="257" cy="237" r="4" fill="#E0E0E0" opacity="0.8"/>
+                  <circle cx="260" cy="240" r="5" fill="#5A6A6A" opacity="0.3"/>
+                  
+                  <!-- Keyhole -->
+                  <ellipse cx="260" cy="255" rx="3" ry="4" fill="#333333" opacity="0.8"/>
+                  <rect x="258" y="257" width="4" height="6" fill="#333333" opacity="0.8" rx="1"/>
+                  
+                  <!-- Door hinges -->
+                  <rect x="105" y="80" width="8" height="25" fill="#5A6A6A" rx="2"/>
+                  <circle cx="109" cy="87" r="2" fill="#333333"/>
+                  <circle cx="109" cy="98" r="2" fill="#333333"/>
+                  
+                  <rect x="105" y="230" width="8" height="25" fill="#5A6A6A" rx="2"/>
+                  <circle cx="109" cy="237" r="2" fill="#333333"/>
+                  <circle cx="109" cy="248" r="2" fill="#333333"/>
+                  
+                  <rect x="105" y="380" width="8" height="25" fill="#5A6A6A" rx="2"/>
+                  <circle cx="109" cy="387" r="2" fill="#333333"/>
+                  <circle cx="109" cy="398" r="2" fill="#333333"/>
+                </g>
+                
+                <text x="200" y="480" text-anchor="middle" font-size="16" font-family="${defaultConfig.font_family}, cursive" fill="${defaultConfig.surface_color}" opacity="0.7" font-style="italic">
+                  (แตะเพื่อเปิดประตู)
+                </text>
+              </svg>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (doorType === 'future') {
+        return `
+          <div class="relative w-full h-full flex items-center justify-center cursor-pointer" style="background: linear-gradient(135deg, #FDF3E9, #C7AF83);" onclick="openFutureDoor()">
+            ${createLanguageButtons()}
+            
+            <div class="door-container fade-in">
+              <svg width="400" height="500" viewBox="0 0 400 500">
+                <defs>
+                  <linearGradient id="futureDoorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#C7AF83;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#D4C4A0;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#C7AF83;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="futureFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#A89968;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#B8A978;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#A89968;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="futureKnobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#C5A028;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
+                  </linearGradient>
+                  <filter id="futureDoorShadow">
+                    <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+                    <feOffset dx="2" dy="4" result="offsetblur"/>
+                    <feComponentTransfer>
+                      <feFuncA type="linear" slope="0.5"/>
+                    </feComponentTransfer>
+                    <feMerge>
+                      <feMergeNode/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                
+                <g id="future-door-group">
+                  <!-- Door frame -->
+                  <rect x="85" y="35" width="230" height="410" fill="url(#futureFrameGrad)" rx="8"/>
+                  
+                  <!-- Door shadow -->
+                  <rect x="100" y="50" width="200" height="380" fill="black" opacity="0.2" rx="6" filter="url(#futureDoorShadow)"/>
+                  
+                  <!-- Main door panel -->
+                  <rect id="future-door" x="100" y="50" width="200" height="380" fill="url(#futureDoorGrad)" stroke="#B8A978" stroke-width="3" rx="6"/>
+                  
+                  <!-- Hanging sign at top -->
+                  <line x1="180" y1="60" x2="180" y2="80" stroke="#A89968" stroke-width="2"/>
+                  <line x1="220" y1="60" x2="220" y2="80" stroke="#A89968" stroke-width="2"/>
+                  <rect x="150" y="80" width="100" height="60" fill="${defaultConfig.surface_color}" stroke="${defaultConfig.text_color}" stroke-width="2" rx="5"/>
+                  <text x="200" y="120" text-anchor="middle" font-size="30" font-family="'Playfair Display', serif" fill="${defaultConfig.text_color}" font-weight="bold">
+                    Future
+                  </text>
+                  
+                  <!-- Door panels -->
+                  <rect x="115" y="155" width="170" height="100" fill="none" stroke="#D4C4A0" stroke-width="4" rx="4" opacity="0.6"/>
+                  <rect x="115" y="270" width="170" height="145" fill="none" stroke="#D4C4A0" stroke-width="4" rx="4" opacity="0.6"/>
+                  
+                  <!-- Inner panel details -->
+                  <rect x="120" y="160" width="160" height="90" fill="#E8DCC0" opacity="0.3" rx="3"/>
+                  <rect x="120" y="275" width="160" height="135" fill="#E8DCC0" opacity="0.3" rx="3"/>
+                  
+                  <!-- Elegant curves in middle panel -->
+                  <path d="M 130 190 Q 200 180 270 190" stroke="#A89968" stroke-width="2" fill="none" opacity="0.6"/>
+                  <path d="M 130 210 Q 200 220 270 210" stroke="#A89968" stroke-width="2" fill="none" opacity="0.6"/>
+                  <path d="M 130 230 Q 200 220 270 230" stroke="#A89968" stroke-width="2" fill="none" opacity="0.6"/>
+                  
+                  <!-- Stars and moon in bottom panel -->
+                  <circle cx="160" cy="330" r="18" fill="none" stroke="#A89968" stroke-width="2" opacity="0.6"/>
+                  <circle cx="160" cy="330" r="12" fill="#E8DCC0" opacity="0.4"/>
+                  <path d="M 210 320 L 213 328 L 221 328 L 215 333 L 217 341 L 210 336 L 203 341 L 205 333 L 199 328 L 207 328 Z" fill="#A89968" opacity="0.7"/>
+                  <path d="M 245 335 L 247 341 L 253 341 L 248 345 L 250 351 L 245 347 L 240 351 L 242 345 L 237 341 L 243 341 Z" fill="#A89968" opacity="0.7"/>
+                  
+                  <!-- Door knob -->
+                  <ellipse cx="260" cy="240" rx="14" ry="16" fill="url(#futureKnobGrad)" opacity="0.95"/>
+                  <circle cx="260" cy="240" r="12" fill="url(#futureKnobGrad)"/>
+                  <circle cx="257" cy="237" r="4" fill="#F4E4C0" opacity="0.8"/>
+                  <circle cx="260" cy="240" r="5" fill="#8B7355" opacity="0.3"/>
+                  
+                  <!-- Keyhole -->
+                  <ellipse cx="260" cy="255" rx="3" ry="4" fill="#333333" opacity="0.8"/>
+                  <rect x="258" y="257" width="4" height="6" fill="#333333" opacity="0.8" rx="1"/>
+                  
+                  <!-- Door hinges -->
+                  <rect x="105" y="80" width="8" height="25" fill="#A89968" rx="2"/>
+                  <circle cx="109" cy="87" r="2" fill="#333333"/>
+                  <circle cx="109" cy="98" r="2" fill="#333333"/>
+                  
+                  <rect x="105" y="230" width="8" height="25" fill="#A89968" rx="2"/>
+                  <circle cx="109" cy="237" r="2" fill="#333333"/>
+                  <circle cx="109" cy="248" r="2" fill="#333333"/>
+                  
+                  <rect x="105" y="380" width="8" height="25" fill="#A89968" rx="2"/>
+                  <circle cx="109" cy="387" r="2" fill="#333333"/>
+                  <circle cx="109" cy="398" r="2" fill="#333333"/>
+                </g>
+                
+                <text x="200" y="480" text-anchor="middle" font-size="16" font-family="${defaultConfig.font_family}, cursive" fill="${defaultConfig.text_color}" opacity="0.7" font-style="italic">
+                  (แตะเพื่อเปิดประตู)
+                </text>
+              </svg>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function createRoomScene(roomType) {
+      const scenes = {
+        past: {
+          character: `
+            <ellipse cx="150" cy="180" rx="40" ry="60" fill="${defaultConfig.text_color}" opacity="0.8"/>
+            <circle cx="150" cy="150" r="25" fill="${defaultConfig.text_color}" opacity="0.8"/>
+            <ellipse cx="250" cy="200" rx="30" ry="20" fill="#FFFFFF" opacity="0.9"/>
+            <ellipse cx="250" cy="200" rx="20" ry="15" fill="#C7AF83" opacity="0.8"/>
+            <ellipse cx="245" cy="195" rx="5" ry="8" fill="${defaultConfig.text_color}" opacity="0.9"/>
+            <path d="M 230 210 Q 250 220 270 210" stroke="${defaultConfig.text_color}" stroke-width="2" fill="none" opacity="0.7"/>
+          `,
+          question: t('past_question'),
+          background: 'linear-gradient(135deg, #FDF3E9, #FFE5D9, #FFC8DD)',
+          dropletColor: '#FFB6C1'
+        },
+        present: {
+          character: `
+            <rect x="120" y="160" width="60" height="80" fill="${defaultConfig.text_color}" opacity="0.8" rx="5"/>
+            <circle cx="150" cy="140" r="30" fill="${defaultConfig.text_color}" opacity="0.8"/>
+            <rect x="100" y="200" width="100" height="60" fill="${defaultConfig.secondary_action_color}" opacity="0.4" rx="3"/>
+            <ellipse cx="270" cy="200" rx="25" ry="18" fill="#FFFFFF" opacity="0.9"/>
+            <ellipse cx="270" cy="200" rx="18" ry="13" fill="#C7AF83" opacity="0.8"/>
+            <circle cx="268" cy="198" r="4" fill="${defaultConfig.text_color}" opacity="0.9"/>
+          `,
+          question: t('present_question'),
+          background: 'linear-gradient(135deg, #8F9C8D, #7B8A92)',
+          dropletColor: '#B0C4B1'
+        },
+        future: {
+          character: `
+            <ellipse cx="150" cy="200" rx="45" ry="70" fill="${defaultConfig.text_color}" opacity="0.8"/>
+            <circle cx="150" cy="160" r="28" fill="${defaultConfig.text_color}" opacity="0.8"/>
+            <path d="M 130 155 Q 150 145 170 155" stroke="#FFFFFF" stroke-width="3" fill="none" opacity="0.6"/>
+            <ellipse cx="220" cy="210" rx="28" ry="20" fill="#FFFFFF" opacity="0.9"/>
+            <ellipse cx="220" cy="210" rx="20" ry="15" fill="#C7AF83" opacity="0.8"/>
+            <circle cx="218" cy="208" r="4" fill="${defaultConfig.text_color}" opacity="0.9"/>
+            <path d="M 150 230 L 220 210" stroke="${defaultConfig.text_color}" stroke-width="3" opacity="0.6"/>
+          `,
+          question: t('future_question'),
+          background: 'linear-gradient(135deg, #FDF3E9, #C7AF83)',
+          dropletColor: '#D4C4A0'
+        }
+      };
+
+      const scene = scenes[roomType];
+      
+      return `
+        <div class="relative w-full h-full flex flex-col items-center justify-center px-6" style="background: ${scene.background};">
+          ${createLanguageButtons()}
+          
+          <!-- Water droplets for room scene -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: 0.4;">
+            <circle cx="8%" cy="15%" r="3" fill="${scene.dropletColor}" opacity="0.7">
+              <animate attributeName="cy" values="15%;20%;15%" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="92%" cy="25%" r="4" fill="${scene.dropletColor}" opacity="0.6">
+              <animate attributeName="cy" values="25%;30%;25%" dur="4.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="15%" cy="40%" r="3" fill="${scene.dropletColor}" opacity="0.8">
+              <animate attributeName="cy" values="40%;45%;40%" dur="3.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="3.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="85%" cy="55%" r="4" fill="${scene.dropletColor}" opacity="0.7">
+              <animate attributeName="cy" values="55%;60%;55%" dur="4.2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.2;0.7" dur="4.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="25%" cy="70%" r="3" fill="${scene.dropletColor}" opacity="0.6">
+              <animate attributeName="cy" values="70%;75%;70%" dur="4.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="75%" cy="85%" r="4" fill="${scene.dropletColor}" opacity="0.8">
+              <animate attributeName="cy" values="85%;90%;85%" dur="3.9s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.9s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="50%" cy="10%" r="3" fill="${scene.dropletColor}" opacity="0.7">
+              <animate attributeName="cy" values="10%;15%;10%" dur="4.3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="4.3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="35%" cy="30%" r="4" fill="${scene.dropletColor}" opacity="0.6">
+              <animate attributeName="cy" values="30%;35%;30%" dur="4.7s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.7s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="65%" cy="50%" r="3" fill="${scene.dropletColor}" opacity="0.8">
+              <animate attributeName="cy" values="50%;55%;50%" dur="4.1s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.3;0.8" dur="4.1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="20%" cy="65%" r="4" fill="${scene.dropletColor}" opacity="0.7">
+              <animate attributeName="cy" values="65%;70%;65%" dur="4.4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.2;0.7" dur="4.4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="80%" cy="20%" r="3" fill="${scene.dropletColor}" opacity="0.6">
+              <animate attributeName="cy" values="20%;25%;20%" dur="4.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.3;0.6" dur="4.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="45%" cy="80%" r="4" fill="${scene.dropletColor}" opacity="0.8">
+              <animate attributeName="cy" values="80%;85%;80%" dur="3.7s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.7s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          
+          <div class="mb-8 fade-in flex justify-center">
+            <img
+              src="${roomType === 'past' ? 'past.gif' : roomType === 'present' ? 'present.gif' : 'future.gif'}"
+              alt=""
+              class="memory-gif"
+            />
+          </div>
+
+          
+          <div class="w-full max-w-2xl fade-in">
+            <h2 class="font-subtitle text-center mb-6" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.6}px; font-family: 'Playfair Display', serif;">
+              ${scene.question}
+            </h2>
+            
+            <textarea 
+              id="message-${roomType}" 
+              placeholder="${t('placeholder')}"
+              class="w-full p-4 rounded-lg font-body mb-4 resize-none"
+              style="background-color: #FFFFFF; color: ${defaultConfig.text_color}; border: 2px solid ${defaultConfig.secondary_action_color}; font-size: ${defaultConfig.font_size * 1.1}px; font-family: ${defaultConfig.font_family}, cursive; min-height: 120px;"
+            ></textarea>
+            <button 
+              onclick="submitMessage('${roomType}')"
+              class="px-8 py-2 rounded-full font-body transition-all hover:scale-105 mx-auto block"
+              style="background-color: ${defaultConfig.primary_action_color}; color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.1}px; font-family: ${defaultConfig.font_family}, cursive;"
+            >
+              ${t('send')}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function createFinalScene() {
+      return `
+        <div class="relative w-full h-full flex flex-col items-center justify-center px-6" style="background: linear-gradient(to bottom, ${defaultConfig.surface_color}, #E1AE7D);">
+          ${createLanguageButtons()}
+          
+          <!-- Water droplets for final scene -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" style="opacity: 0.3;">
+            <circle cx="12%" cy="18%" r="3" fill="#D4C4A0" opacity="0.6">
+              <animate attributeName="cy" values="18%;23%;18%" dur="4.1s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="88%" cy="28%" r="4" fill="#D4C4A0" opacity="0.5">
+              <animate attributeName="cy" values="28%;33%;28%" dur="4.7s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4.7s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="22%" cy="42%" r="3" fill="#D4C4A0" opacity="0.7">
+              <animate attributeName="cy" values="42%;47%;42%" dur="3.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="78%" cy="58%" r="4" fill="#D4C4A0" opacity="0.6">
+              <animate attributeName="cy" values="58%;63%;58%" dur="4.4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="32%" cy="72%" r="3" fill="#D4C4A0" opacity="0.5">
+              <animate attributeName="cy" values="72%;77%;72%" dur="4.9s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4.9s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="68%" cy="12%" r="4" fill="#D4C4A0" opacity="0.7">
+              <animate attributeName="cy" values="12%;17%;12%" dur="4s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="48%" cy="32%" r="3" fill="#D4C4A0" opacity="0.6">
+              <animate attributeName="cy" values="32%;37%;32%" dur="4.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="18%" cy="52%" r="4" fill="#D4C4A0" opacity="0.5">
+              <animate attributeName="cy" values="52%;57%;52%" dur="4.2s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="82%" cy="68%" r="3" fill="#D4C4A0" opacity="0.7">
+              <animate attributeName="cy" values="68%;73%;68%" dur="3.7s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.7s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="38%" cy="22%" r="4" fill="#D4C4A0" opacity="0.6">
+              <animate attributeName="cy" values="22%;27%;22%" dur="4.6s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.6s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="58%" cy="48%" r="3" fill="#D4C4A0" opacity="0.5">
+              <animate attributeName="cy" values="48%;53%;48%" dur="4.3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4.3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="28%" cy="82%" r="4" fill="#D4C4A0" opacity="0.7">
+              <animate attributeName="cy" values="82%;87%;82%" dur="3.9s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.7;0.3;0.7" dur="3.9s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="5%" cy="38%" r="3" fill="#D4C4A0" opacity="0.6">
+              <animate attributeName="cy" values="38%;43%;38%" dur="4.8s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.6;0.2;0.6" dur="4.8s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="95%" cy="45%" r="4" fill="#D4C4A0" opacity="0.5">
+              <animate attributeName="cy" values="45%;50%;45%" dur="4.1s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4.1s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          
+          <div class="three-doors mb-8 flex justify-center gap-6 px-6">
+            <!-- Past Door -->
+            <div class="door-summary flex flex-col items-center">
+              <svg width="160" height="220" viewBox="0 0 160 220" class="mb-3">
+                <defs>
+                  <linearGradient id="finalPastDoorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#FFB3D9;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#FFC8DD;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FFB3D9;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="finalPastFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#A0522D;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#8B4513;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="finalPastKnobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#FFD700;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#FF8C00;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                
+                <!-- Door frame -->
+                <rect x="10" y="5" width="140" height="210" fill="url(#finalPastFrameGrad)" rx="5"/>
+                
+                <!-- Main door panel -->
+                <rect x="20" y="15" width="120" height="190" fill="url(#finalPastDoorGrad)" stroke="#D8A7C3" stroke-width="2" rx="4"/>
+                
+                <!-- Sign inside door -->
+                <rect x="45" y="25" width="70" height="35" fill="${defaultConfig.surface_color}" stroke="${defaultConfig.text_color}" stroke-width="1.5" rx="3"/>
+                <text x="80" y="48" text-anchor="middle" font-size="18" font-family="'Playfair Display', serif" fill="${defaultConfig.text_color}" font-weight="bold">
+                  Past
+                </text>
+                
+                <!-- Door panels -->
+                <rect x="28" y="25" width="104" height="50" fill="none" stroke="#FFB3D9" stroke-width="2" rx="2" opacity="0.6"/>
+                <rect x="28" y="80" width="104" height="50" fill="none" stroke="#FFB3D9" stroke-width="2" rx="2" opacity="0.6"/>
+                <rect x="28" y="135" width="104" height="60" fill="none" stroke="#FFB3D9" stroke-width="2" rx="2" opacity="0.6"/>
+                
+                <!-- Inner panel details -->
+                <rect x="30" y="27" width="100" height="46" fill="#FFD6E8" opacity="0.3" rx="2"/>
+                <rect x="30" y="82" width="100" height="46" fill="#FFD6E8" opacity="0.3" rx="2"/>
+                <rect x="30" y="137" width="100" height="56" fill="#FFD6E8" opacity="0.3" rx="2"/>
+                
+                <!-- Rainbow in middle panel -->
+                <path d="M 35 90 Q 80 85 125 90" stroke="#FF6B9D" stroke-width="3" fill="none" opacity="0.8"/>
+                <path d="M 38 95 Q 80 91 122 95" stroke="#FFA07A" stroke-width="2.5" fill="none" opacity="0.8"/>
+                <path d="M 41 100 Q 80 97 119 100" stroke="#FFD700" stroke-width="2" fill="none" opacity="0.8"/>
+                
+                <!-- Stars -->
+                <path d="M 40 110 L 42 115 L 47 115 L 43 118 L 45 123 L 40 120 L 35 123 L 37 118 L 33 115 L 38 115 Z" fill="#FFD700" opacity="0.9"/>
+                <path d="M 120 108 L 122 113 L 127 113 L 123 116 L 125 121 L 120 118 L 115 121 L 117 116 L 113 113 L 118 113 Z" fill="#FFA07A" opacity="0.9"/>
+                
+                <!-- Decorative circles in bottom panel -->
+                <circle cx="50" cy="155" r="5" fill="#FFB6C1" opacity="0.7"/>
+                <circle cx="80" cy="165" r="6" fill="#DDA0DD" opacity="0.7"/>
+                <circle cx="110" cy="158" r="4.5" fill="#F0E68C" opacity="0.7"/>
+                
+                <!-- Door knob -->
+                <circle cx="120" cy="110" r="5" fill="url(#finalPastKnobGrad)"/>
+                <circle cx="118" cy="108" r="2" fill="#FFFACD" opacity="0.8"/>
+                
+                <!-- Keyhole -->
+                <ellipse cx="120" cy="118" rx="1.5" ry="2" fill="#333333" opacity="0.8"/>
+                
+                <!-- Hinges -->
+                <rect x="22" y="30" width="4" height="12" fill="#8B4513" rx="1"/>
+                <rect x="22" y="105" width="4" height="12" fill="#8B4513" rx="1"/>
+                <rect x="22" y="180" width="4" height="12" fill="#8B4513" rx="1"/>
+              </svg>
+              <div class="p-4 rounded-lg max-w-xs" style="background-color: rgba(255, 182, 193, 0.3);">
+                <p class="font-body text-center" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 0.95}px; font-family: ${defaultConfig.font_family}, cursive;">
+                  "${userMessages.past}"
+                </p>
+              </div>
+            </div>
+            
+            <!-- Present Door -->
+            <div class="door-summary flex flex-col items-center">
+              <svg width="160" height="220" viewBox="0 0 160 220" class="mb-3">
+                <defs>
+                  <linearGradient id="finalPresentDoorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#7B8A92;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#8F9C8D;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#7B8A92;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="finalPresentFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#5A6A6A;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#6B7A78;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#5A6A6A;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="finalPresentKnobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#C0C0C0;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#A8A8A8;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#909090;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                
+                <!-- Door frame -->
+                <rect x="10" y="5" width="140" height="210" fill="url(#finalPresentFrameGrad)" rx="5"/>
+                
+                <!-- Main door panel -->
+                <rect x="20" y="15" width="120" height="190" fill="url(#finalPresentDoorGrad)" stroke="#6B7A78" stroke-width="2" rx="4"/>
+                
+                <!-- Hanging sign -->
+                <line x1="65" y1="20" x2="65" y2="30" stroke="#5A6A6A" stroke-width="1.5"/>
+                <line x1="95" y1="20" x2="95" y2="30" stroke="#5A6A6A" stroke-width="1.5"/>
+                <rect x="45" y="30" width="70" height="35" fill="${defaultConfig.surface_color}" stroke="${defaultConfig.text_color}" stroke-width="1.5" rx="3"/>
+                <text x="80" y="52" text-anchor="middle" font-size="16" font-family="'Playfair Display', serif" fill="${defaultConfig.text_color}" font-weight="bold">
+                  Present
+                </text>
+                
+                <!-- Door panels -->
+                <rect x="28" y="70" width="104" height="50" fill="none" stroke="#8F9C8D" stroke-width="2" rx="2" opacity="0.6"/>
+                <rect x="28" y="125" width="104" height="70" fill="none" stroke="#8F9C8D" stroke-width="2" rx="2" opacity="0.6"/>
+                
+                <!-- Inner panel details -->
+                <rect x="30" y="72" width="100" height="46" fill="#A8B8B8" opacity="0.3" rx="2"/>
+                <rect x="30" y="127" width="100" height="66" fill="#A8B8B8" opacity="0.3" rx="2"/>
+                
+                <!-- Minimalist lines -->
+                <line x1="35" y1="85" x2="125" y2="85" stroke="#6B7A78" stroke-width="1.5" opacity="0.5"/>
+                <line x1="35" y1="95" x2="125" y2="95" stroke="#6B7A78" stroke-width="1.5" opacity="0.5"/>
+                <line x1="35" y1="105" x2="125" y2="105" stroke="#6B7A78" stroke-width="1.5" opacity="0.5"/>
+                
+                <!-- Geometric shapes -->
+                <circle cx="50" cy="150" r="8" fill="none" stroke="#6B7A78" stroke-width="1.5" opacity="0.6"/>
+                <rect x="68" y="142" width="16" height="16" fill="none" stroke="#6B7A78" stroke-width="1.5" opacity="0.6" rx="1"/>
+                <polygon points="102,142 110,158 94,158" fill="none" stroke="#6B7A78" stroke-width="1.5" opacity="0.6"/>
+                
+                <!-- Door knob -->
+                <circle cx="120" cy="110" r="5" fill="url(#finalPresentKnobGrad)"/>
+                <circle cx="118" cy="108" r="2" fill="#E0E0E0" opacity="0.8"/>
+                
+                <!-- Keyhole -->
+                <ellipse cx="120" cy="118" rx="1.5" ry="2" fill="#333333" opacity="0.8"/>
+                
+                <!-- Hinges -->
+                <rect x="22" y="30" width="4" height="12" fill="#5A6A6A" rx="1"/>
+                <rect x="22" y="105" width="4" height="12" fill="#5A6A6A" rx="1"/>
+                <rect x="22" y="180" width="4" height="12" fill="#5A6A6A" rx="1"/>
+              </svg>
+              <div class="p-4 rounded-lg max-w-xs" style="background-color: rgba(143, 156, 141, 0.3);">
+                <p class="font-body text-center" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 0.95}px; font-family: ${defaultConfig.font_family}, cursive;">
+                  "${userMessages.present}"
+                </p>
+              </div>
+            </div>
+            
+            <!-- Future Door -->
+            <div class="door-summary flex flex-col items-center">
+              <svg width="160" height="220" viewBox="0 0 160 220" class="mb-3">
+                <defs>
+                  <linearGradient id="finalFutureDoorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#C7AF83;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#D4C4A0;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#C7AF83;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="finalFutureFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#A89968;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#B8A978;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#A89968;stop-opacity:1" />
+                  </linearGradient>
+                  <linearGradient id="finalFutureKnobGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#D4AF37;stop-opacity:1" />
+                    <stop offset="50%" style="stop-color:#C5A028;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#B8941F;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                
+                <!-- Door frame -->
+                <rect x="10" y="5" width="140" height="210" fill="url(#finalFutureFrameGrad)" rx="5"/>
+                
+                <!-- Main door panel -->
+                <rect x="20" y="15" width="120" height="190" fill="url(#finalFutureDoorGrad)" stroke="#B8A978" stroke-width="2" rx="4"/>
+                
+                <!-- Hanging sign -->
+                <line x1="65" y1="20" x2="65" y2="30" stroke="#A89968" stroke-width="1.5"/>
+                <line x1="95" y1="20" x2="95" y2="30" stroke="#A89968" stroke-width="1.5"/>
+                <rect x="45" y="30" width="70" height="35" fill="${defaultConfig.surface_color}" stroke="${defaultConfig.text_color}" stroke-width="1.5" rx="3"/>
+                <text x="80" y="52" text-anchor="middle" font-size="17" font-family="'Playfair Display', serif" fill="${defaultConfig.text_color}" font-weight="bold">
+                  Future
+                </text>
+                
+                <!-- Door panels -->
+                <rect x="28" y="70" width="104" height="50" fill="none" stroke="#D4C4A0" stroke-width="2" rx="2" opacity="0.6"/>
+                <rect x="28" y="125" width="104" height="70" fill="none" stroke="#D4C4A0" stroke-width="2" rx="2" opacity="0.6"/>
+                
+                <!-- Inner panel details -->
+                <rect x="30" y="72" width="100" height="46" fill="#E8DCC0" opacity="0.3" rx="2"/>
+                <rect x="30" y="127" width="100" height="66" fill="#E8DCC0" opacity="0.3" rx="2"/>
+                
+                <!-- Elegant curves -->
+                <path d="M 35 85 Q 80 82 125 85" stroke="#A89968" stroke-width="1.5" fill="none" opacity="0.6"/>
+                <path d="M 35 95 Q 80 98 125 95" stroke="#A89968" stroke-width="1.5" fill="none" opacity="0.6"/>
+                <path d="M 35 105 Q 80 102 125 105" stroke="#A89968" stroke-width="1.5" fill="none" opacity="0.6"/>
+                
+                <!-- Stars and moon -->
+                <circle cx="50" cy="150" r="9" fill="none" stroke="#A89968" stroke-width="1.5" opacity="0.6"/>
+                <circle cx="50" cy="150" r="6" fill="#E8DCC0" opacity="0.4"/>
+                <path d="M 85 145 L 87 150 L 92 150 L 88 153 L 90 158 L 85 155 L 80 158 L 82 153 L 78 150 L 83 150 Z" fill="#A89968" opacity="0.7"/>
+                <path d="M 110 152 L 112 157 L 117 157 L 113 160 L 115 165 L 110 162 L 105 165 L 107 160 L 103 157 L 108 157 Z" fill="#A89968" opacity="0.7"/>
+                
+                <!-- Door knob -->
+                <circle cx="120" cy="110" r="5" fill="url(#finalFutureKnobGrad)"/>
+                <circle cx="118" cy="108" r="2" fill="#F4E4C0" opacity="0.8"/>
+                
+                <!-- Keyhole -->
+                <ellipse cx="120" cy="118" rx="1.5" ry="2" fill="#333333" opacity="0.8"/>
+                
+                <!-- Hinges -->
+                <rect x="22" y="30" width="4" height="12" fill="#A89968" rx="1"/>
+                <rect x="22" y="105" width="4" height="12" fill="#A89968" rx="1"/>
+                <rect x="22" y="180" width="4" height="12" fill="#A89968" rx="1"/>
+              </svg>
+              <div class="p-4 rounded-lg max-w-xs" style="background-color: rgba(199, 175, 131, 0.3);">
+                <p class="font-body text-center" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 0.95}px; font-family: ${defaultConfig.font_family}, cursive;">
+                  "${userMessages.future}"
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="final-message-container w-full max-w-3xl px-6">
+            <div class="flex justify-center mb-6">
+              <svg width="100" height="120" viewBox="0 0 100 120">
+                <ellipse cx="50" cy="70" rx="25" ry="40" fill="${defaultConfig.text_color}" opacity="0.6"/>
+                <circle cx="50" cy="40" r="18" fill="${defaultConfig.text_color}" opacity="0.6"/>
+              </svg>
+            </div>
+            
+            <div class="p-8 rounded-lg text-center" style="background-color: rgba(253, 243, 233, 0.5);">
+              <p class="font-body whitespace-pre-line" style="color: ${defaultConfig.text_color}; font-size: ${defaultConfig.font_size * 1.3}px; font-family: ${defaultConfig.font_family}, cursive; line-height: 1.8;">
+                ${t('final_message')}
+              </p>
+            </div>
+            
+            <button 
+              onclick="resetJourney()"
+              class="mt-6 px-8 py-2 rounded-full font-body transition-all hover:scale-105 mx-auto block"
+              style="background-color: ${defaultConfig.primary_action_color}; color: ${defaultConfig.surface_color}; font-size: ${defaultConfig.font_size * 1.1}px; font-family: ${defaultConfig.font_family}, cursive;"
+            >
+              ${t('start_again')}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+      
+      let content = '';
+      switch(currentScene) {
+        case 'intro':
+          content = createMirrorScene();
+          break;
+        case 'zoom':
+          content = createZoomScene();
+          break;
+        case 'intro-past':
+          content = createIntroPastScene();
+          break;
+        case 'intro-present':
+          content = createIntroPresentScene();
+          break;
+        case 'intro-future':
+          content = createIntroFutureScene();
+          break;
+        case 'door-past':
+          content = createDoorScene('past');
+          break;
+        case 'door-present':
+          content = createDoorScene('present');
+          break;
+        case 'door-future':
+          content = createDoorScene('future');
+          break;
+        case 'room-past':
+          content = createRoomScene('past');
+          break;
+        case 'room-present':
+          content = createRoomScene('present');
+          break;
+        case 'room-future':
+          content = createRoomScene('future');
+          break;
+        case 'final':
+          content = createFinalScene();
+          break;
+      }
+      
+      app.innerHTML = content;
+    }
+
+    function enterMirror() {
+      currentScene = 'zoom';
+      render();
+    }
+
+    function showDoorFromZoom() {
+      currentScene = 'door-past';
+      render();
+    }
+
+    function goToPastRoom() {
+      currentScene = 'door-past';
+      render();
+    }
+
+    function goToPresentRoom() {
+      currentScene = 'door-present';
+      render();
+    }
+
+    function goToFutureRoom() {
+      currentScene = 'door-future';
+      render();
+    }
+
+    function openPastDoor() {
+      const doorGroup = document.getElementById('past-door-group');
+      if (doorGroup) {
+        doorGroup.classList.add('door-swing');
+      }
+      setTimeout(() => {
+        currentScene = 'room-past';
+        render();
+      }, 1000);
+    }
+
+    function openPresentDoor() {
+      const doorGroup = document.getElementById('present-door-group');
+      if (doorGroup) {
+        doorGroup.classList.add('door-swing');
+      }
+      setTimeout(() => {
+        currentScene = 'room-present';
+        render();
+      }, 1000);
+    }
+
+    function openFutureDoor() {
+      const doorGroup = document.getElementById('future-door-group');
+      if (doorGroup) {
+        doorGroup.classList.add('door-swing');
+      }
+      setTimeout(() => {
+        currentScene = 'room-future';
+        render();
+      }, 1000);
+    }
+
+    function submitMessage(roomType) {
+      const textarea = document.getElementById(`message-${roomType}`);
+      const message = textarea.value.trim();
+      
+      if (!message) return;
+      
+      userMessages[roomType] = message;
+      
+      // Go directly to next scene
+      nextScene(roomType);
+    }
+
+    function nextScene(currentRoom) {
+      if (currentRoom === 'past') {
+        currentScene = 'intro-present';
+      } else if (currentRoom === 'present') {
+        currentScene = 'intro-future';
+      } else if (currentRoom === 'future') {
+        currentScene = 'final';
+      }
+      render();
+    }
+
+    function resetJourney() {
+      currentScene = 'intro';
+      userMessages = { past: '', present: '', future: '' };
+      render();
+    }
+
+    async function onConfigChange(config) {
+      Object.assign(defaultConfig, config);
+      currentLanguage = config.language || 'th';
+      render();
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [
+            {
+              get: () => config.background_color || defaultConfig.background_color,
+              set: (value) => {
+                defaultConfig.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            },
+            {
+              get: () => config.surface_color || defaultConfig.surface_color,
+              set: (value) => {
+                defaultConfig.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            },
+            {
+              get: () => config.text_color || defaultConfig.text_color,
+              set: (value) => {
+                defaultConfig.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            },
+            {
+              get: () => config.primary_action_color || defaultConfig.primary_action_color,
+              set: (value) => {
+                defaultConfig.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            },
+            {
+              get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+              set: (value) => {
+                defaultConfig.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => config.font_family || defaultConfig.font_family,
+            set: (value) => {
+              defaultConfig.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          },
+          fontSizeable: {
+            get: () => config.font_size || defaultConfig.font_size,
+            set: (value) => {
+              defaultConfig.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['intro_title', config.intro_title || defaultConfig.intro_title],
+          ['intro_text', config.intro_text || defaultConfig.intro_text],
+          ['past_question', config.past_question || defaultConfig.past_question],
+          ['present_question', config.present_question || defaultConfig.present_question],
+          ['future_question', config.future_question || defaultConfig.future_question],
+          ['final_message', config.final_message || defaultConfig.final_message]
+        ])
+      });
+    }
+
+    render();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b700f22c12587b1',t:'MTc2NzI0OTk4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
