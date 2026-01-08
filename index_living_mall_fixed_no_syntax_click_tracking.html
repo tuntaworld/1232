@@ -1,0 +1,1610 @@
+<!doctype html>
+<html lang="th">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mirror Self Talk</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;700&amp;display=swap" rel="stylesheet">
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+@font-face {
+  font-family: 'Madelyn Rough';
+  src: url('./Madelyn-Trial-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Cloud Loop';
+  src: url('./CloudLoop-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+    @font-face {
+      font-family: 'Cyrillic Bodoni';
+      src: url('https://fonts.cdnfonts.com/s/13317/BodoniCTT.woff') format('woff');
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'Cloud Loop', 'Georgia', serif;
+      background: #0a0a0a;
+      color: #FDF3E9;
+    }
+
+    body[data-lang="en"] {
+      font-family: 'Cyrillic Bodoni', 'Georgia', serif;
+    }
+
+    body[data-lang="th"] {
+      font-family: 'Cloud Loop', 'Georgia', serif;
+    }
+
+    .app-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: auto;
+    }
+
+    .language-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      padding: 10px;
+    }
+
+    .lang-switch {
+      position: relative;
+      width: 80px;
+      height: 36px;
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .lang-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 36px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 14px;
+      transition: all 0.3s;
+    }
+
+    .lang-switch.th .lang-slider {
+      transform: translateX(38px);
+    }
+
+    .lang-label {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      font-weight: bold;
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .lang-label.en {
+      left: 8px;
+      color: #0a0a0a;
+    }
+
+    .lang-label.th {
+      right: 8px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .lang-switch.th .lang-label.en {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .lang-switch.th .lang-label.th {
+      color: #0a0a0a;
+    }
+
+    .scene {
+      width: 100%;
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+    }
+
+    .scene.active {
+      opacity: 1;
+    }
+
+    .intro-scene {
+      background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+      position: relative;
+    }
+
+    /* Mist effect */
+    .mist {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      opacity: 0.15;
+      background: radial-gradient(ellipse at center, rgba(200, 200, 220, 0.1) 0%, transparent 70%);
+      animation: mistFloat 8s ease-in-out infinite;
+    }
+
+    @keyframes mistFloat {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.15; }
+      50% { transform: translateY(-20px) scale(1.05); opacity: 0.25; }
+    }
+
+    .intro-text {
+      font-family: 'Madelyn Rough', cursive;
+      font-size: 56px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #C8C8DC;
+      text-shadow: 0 0 20px rgba(200, 200, 220, 0.3);
+      z-index: 10;
+      position: relative;
+      transform: none;
+      animation: none;
+    }
+
+    .intro-subtitle {
+      font-size: 20px;
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.8;
+      color: #B8B8C8;
+      margin-bottom: 30px;
+      z-index: 10;
+      position: relative;
+      transform: none;
+      animation: none;
+    }
+
+    /* Mirror container */
+    .mirror-container {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: opacity 1.2s ease-in-out;
+      transform: none;
+      animation: none;
+    }
+
+    .mirror-container.fading {
+      opacity: 0;
+    }
+
+    .lake-surface {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(100, 120, 150, 0.6) 50%, transparent 100%);
+    }
+
+    /* Ripples */
+    .ripple {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      border: 2px solid rgba(150, 170, 200, 0.6);
+      animation: rippleExpand 4s ease-out infinite;
+    }
+
+    .ripple:nth-child(2) {
+      animation-delay: 1.3s;
+    }
+
+    .ripple:nth-child(3) {
+      animation-delay: 2.6s;
+    }
+
+    @keyframes rippleExpand {
+      0% {
+        width: 0px;
+        height: 0px;
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.8;
+      }
+      100% {
+        width: 500px;
+        height: 250px;
+        opacity: 0;
+      }
+    }
+
+    /* Mirror SVG */
+    .mirror-svg {
+      position: relative;
+      z-index: 5;
+      filter: drop-shadow(0 0 30px rgba(200, 200, 220, 0.2));
+      cursor: pointer;
+      transition: filter 0.3s;
+      transform: none;
+      animation: none;
+    }
+
+    .mirror-svg:hover {
+      filter: drop-shadow(0 0 40px rgba(200, 200, 220, 0.4));
+    }
+
+    /* Mirror reflection in water */
+    .mirror-reflection {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleY(-1);
+      opacity: 0.15;
+      filter: blur(3px);
+      z-index: 1;
+    }
+
+    /* Text on mirror */
+    .mirror-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 22px;
+      color: #E8E8F0;
+      text-shadow: 0 0 10px rgba(200, 200, 220, 0.3);
+      z-index: 20;
+      pointer-events: none;
+      transition: text-shadow 0.3s;
+      animation: none;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .mirror-svg:hover + .mirror-text {
+      text-shadow: 0 0 15px rgba(200, 200, 220, 0.5);
+    }
+
+    .transition-scene {
+      background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a2e 100%);
+      text-align: center;
+    }
+
+    .transition-text {
+      font-size: 22px;
+      line-height: 2;
+      max-width: 700px;
+      color: #B8B8C8;
+      margin: 40px auto;
+    }
+
+    .continue-btn {
+      margin-top: 40px;
+      padding: 14px 50px;
+      font-size: 20px;
+      background: rgba(225, 174, 125, 0.8);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(225, 174, 125, 0.3);
+    }
+
+    .continue-btn:hover {
+      background: rgba(211, 144, 111, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(225, 174, 125, 0.4);
+    }
+
+    .door-scene {
+      background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a2e 100%);
+    }
+
+    .door-container {
+      position: relative;
+      width: 280px;
+      height: 450px;
+      margin: 30px 0;
+      perspective: 1200px;
+      perspective-origin: center center;
+    }
+
+    .door {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transform-origin: left center;
+      transition: transform 1s ease-out;
+    }
+
+    .door.opening {
+      transform: perspective(1200px) rotateY(-95deg);
+    }
+
+    .door-front {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 15px 15px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bodoni Moda', serif;
+      font-size: 28px;
+      font-weight: bold;
+      box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.6),
+        inset -8px 0 20px rgba(0, 0, 0, 0.3),
+        inset 8px 0 20px rgba(255, 255, 255, 0.1);
+      transform-origin: left center;
+      position: relative;
+    }
+
+    .door.past .door-front {
+      background: 
+        linear-gradient(90deg, 
+          rgba(0, 0, 0, 0.2) 0%, 
+          transparent 10%, 
+          transparent 90%, 
+          rgba(255, 255, 255, 0.1) 100%),
+        linear-gradient(135deg, #8B6F47 0%, #A0826D 20%, #D3906F 50%, #C7AF83 80%, #8B7355 100%);
+      color: #FFFFFF;
+      border: 8px solid #6B5A3D;
+      border-left: 12px solid #5A4A2D;
+    }
+
+    .door.present .door-front {
+      background: 
+        linear-gradient(90deg, 
+          rgba(0, 0, 0, 0.2) 0%, 
+          transparent 10%, 
+          transparent 90%, 
+          rgba(255, 255, 255, 0.1) 100%),
+        linear-gradient(135deg, #5A5A5A 0%, #7B8A92 30%, #8F9C8D 70%, #6A6A6A 100%);
+      color: #FDF3E9;
+      border: 8px solid #4A4A4A;
+      border-left: 12px solid #3A3A3A;
+    }
+
+    .door.future .door-front {
+      background: 
+        linear-gradient(90deg, 
+          rgba(0, 0, 0, 0.2) 0%, 
+          transparent 10%, 
+          transparent 90%, 
+          rgba(255, 255, 255, 0.1) 100%),
+        linear-gradient(135deg, #8B7355 0%, #C7AF83 30%, #8F9C8D 70%, #7A6A5A 100%);
+      color: #FFFFFF;
+      border: 8px solid #6B5A3D;
+      border-left: 12px solid #5A4A2D;
+    }
+
+    /* Door frame */
+    .door-frame {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 12px solid #3a3a3a;
+      border-radius: 15px 15px 0 0;
+      pointer-events: none;
+      z-index: -1;
+      box-shadow: 
+        inset 0 0 30px rgba(0, 0, 0, 0.7),
+        inset 4px 4px 8px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(0, 0, 0, 0.5);
+      background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 50%, #2a2a2a 100%);
+    }
+
+    .door-frame::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border: 4px solid #4a4a4a;
+      border-radius: 15px 15px 0 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Door knob */
+    .door-knob {
+      position: absolute;
+      right: 25px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 45px;
+      height: 45px;
+      background: radial-gradient(circle at 35% 35%, #FFE55C, #FFD700 40%, #DAA520 70%, #B8860B);
+      border-radius: 50%;
+      box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.5),
+        inset -3px -3px 6px rgba(0, 0, 0, 0.4),
+        inset 3px 3px 6px rgba(255, 255, 255, 0.3);
+      z-index: 10;
+    }
+
+    .door-knob::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle at 40% 40%, #B8860B, #8B6914);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .door-knob::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 25px;
+      background: linear-gradient(90deg, #C0A050, #B8860B);
+      border-radius: 4px;
+      top: 50%;
+      left: -15px;
+      transform: translateY(-50%);
+      box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Door sign - 80s hanging style */
+    .door-sign {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #FFE5B4 0%, #FFDAB9 100%);
+      padding: 8px 20px;
+      border-radius: 3px;
+      font-size: 18px;
+      font-weight: bold;
+      box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      border: 3px solid #8B7355;
+      letter-spacing: 2px;
+      animation: signSwing 3s ease-in-out infinite;
+      transform-origin: top center;
+    }
+
+    @keyframes signSwing {
+      0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+      50% { transform: translateX(-50%) rotate(2deg); }
+    }
+
+    /* Hanging chain/string */
+    .door-sign::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 20px;
+      background: repeating-linear-gradient(
+        0deg,
+        #8B7355,
+        #8B7355 3px,
+        transparent 3px,
+        transparent 6px
+      );
+    }
+
+    /* Nail/hook at top */
+    .door-sign::after {
+      content: '';
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #C0C0C0, #808080);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .door.past .door-sign {
+      color: #8B4513;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .door.present .door-sign {
+      color: #2F4F4F;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    .door.future .door-sign {
+      color: #556B2F;
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    }
+
+    /* Door panels */
+    .door-panel {
+      position: absolute;
+      border: 4px solid rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      box-shadow: 
+        inset 2px 2px 8px rgba(0, 0, 0, 0.4),
+        inset -2px -2px 8px rgba(255, 255, 255, 0.1),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+      background: rgba(0, 0, 0, 0.05);
+    }
+
+    .door-panel.top {
+      top: 140px;
+      left: 30px;
+      right: 30px;
+      height: 120px;
+    }
+
+    .door-panel.bottom {
+      bottom: 30px;
+      left: 30px;
+      right: 30px;
+      height: 120px;
+    }
+
+    /* Wood grain texture */
+    .door-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      background: 
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.03) 2px,
+          rgba(0, 0, 0, 0.03) 4px
+        );
+    }
+
+    .character-scene {
+      background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a2e 100%);
+      text-align: center;
+    }
+
+    .character-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 30px auto;
+    }
+
+    .character {
+      width: 120px;
+      height: 180px;
+      background: #2a2a3a;
+      border-radius: 50% 50% 40% 40%;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .character.child {
+      animation: playful 2s infinite;
+    }
+
+    @keyframes playful {
+      0%, 100% { transform: translate(-50%, -50%) rotate(-5deg); }
+      50% { transform: translate(-50%, -55%) rotate(5deg); }
+    }
+
+    .character.adult {
+      border-radius: 40%;
+      animation: working 3s infinite;
+    }
+
+    @keyframes working {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.02); }
+    }
+
+    .character.elder {
+      border-radius: 50%;
+      animation: peaceful 4s infinite;
+    }
+
+    @keyframes peaceful {
+      0%, 100% { transform: translate(-50%, -50%); }
+      50% { transform: translate(-50%, -52%); }
+    }
+
+    .rabbit {
+      width: 60px;
+      height: 50px;
+      background: #3a3a4a;
+      border-radius: 50% 50% 40% 40%;
+      position: absolute;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
+    }
+
+    .rabbit.child-rabbit {
+      right: 20px;
+      bottom: 40px;
+      animation: hop 1.5s infinite;
+    }
+
+    @keyframes hop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    .rabbit.adult-rabbit {
+      right: 30px;
+      bottom: 60px;
+    }
+
+    .rabbit.elder-rabbit {
+      left: 30px;
+      bottom: 60px;
+    }
+
+    .rabbit-ears {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .ear {
+      width: 12px;
+      height: 30px;
+      background: #3a3a4a;
+      border-radius: 50% 50% 0 0;
+    }
+
+    .question-text {
+      font-size: 24px;
+      margin: 30px 0 20px;
+      color: #C8C8DC;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    .input-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 20px 0;
+    }
+
+    .message-input {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      font-size: 16px;
+      background: rgba(200, 200, 220, 0.05);
+      border: 2px solid rgba(200, 200, 220, 0.2);
+      border-radius: 10px;
+      color: #E8E8F0;
+      resize: vertical;
+    }
+
+    .message-input::placeholder {
+      color: rgba(200, 200, 220, 0.4);
+    }
+
+    .submit-btn {
+      margin-top: 15px;
+      padding: 12px 40px;
+      font-size: 18px;
+      background: rgba(225, 174, 125, 0.8);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(225, 174, 125, 0.3);
+    }
+
+    .submit-btn:hover {
+      background: rgba(211, 144, 111, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(225, 174, 125, 0.4);
+    }
+
+    .comfort-scene {
+      background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a2e 100%);
+      text-align: center;
+    }
+
+    .comfort-message {
+      font-size: 20px;
+      line-height: 1.8;
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 30px;
+      background: rgba(143, 156, 141, 0.15);
+      border-radius: 15px;
+      border-left: 4px solid rgba(143, 156, 141, 0.5);
+      animation: fadeIn 0.8s;
+      color: #B8B8C8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .next-btn {
+      margin-top: 30px;
+      padding: 12px 40px;
+      font-size: 18px;
+      background: rgba(143, 156, 141, 0.8);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .next-btn:hover {
+      background: rgba(123, 138, 146, 0.9);
+      transform: translateY(-2px);
+    }
+
+    .final-scene {
+      background: linear-gradient(to bottom, #0a0a0a 0%, #1a1a2e 100%);
+    }
+
+    .three-doors {
+      display: flex;
+      gap: 30px;
+      margin: 40px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .door-summary {
+      width: 200px;
+      height: 300px;
+      border-radius: 15px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .door-summary.past {
+      background: linear-gradient(135deg, #E1AE7D 0%, #D3906F 100%);
+    }
+
+    .door-summary.present {
+      background: linear-gradient(135deg, #8F9C8D 0%, #7B8A92 100%);
+    }
+
+    .door-summary.future {
+      background: linear-gradient(135deg, #C7AF83 0%, #8F9C8D 100%);
+    }
+
+    .door-label {
+      font-size: 24px;
+      font-weight: bold;
+      color: #FFFFFF;
+      margin-bottom: 15px;
+    }
+
+    .door-message {
+      font-size: 14px;
+      color: #FFFFFF;
+      line-height: 1.5;
+      text-align: center;
+      overflow-y: auto;
+      max-height: 200px;
+      padding: 15px;
+      flex: 1;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .final-message-container {
+      position: relative;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 40px;
+      background: rgba(200, 200, 220, 0.1);
+      border-radius: 20px;
+      text-align: center;
+    }
+
+    .silhouette {
+      width: 100px;
+      height: 150px;
+      background: #2a2a3a;
+      border-radius: 50% 50% 40% 40%;
+      margin: 0 auto 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .final-text {
+      font-size: 20px;
+      line-height: 1.8;
+      color: #B8B8C8;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }
+
+    /* Character GIF images */
+    .character-image-wrapper {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .character-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 16px;
+    }
+
+    /* Final bunny image */
+    .final-bunny-wrapper {
+      width: 160px;
+      max-width: 60%;
+      margin: 0 auto 24px;
+    }
+
+    .final-bunny {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+/* Force door label to use Madelyn Rough */
+.door-sign span {
+  font-family: 'Madelyn Rough', cursive;
+}
+</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="app-container">
+   <div class="language-toggle">
+    <div class="lang-switch th" id="lang-switch">
+     <div class="lang-slider"></div><span class="lang-label en">EN</span> <span class="lang-label th">TH</span>
+    </div>
+   </div><!-- Intro Scene -->
+   <div class="scene intro-scene active" id="intro-scene">
+    <div class="mist"></div>
+    <h1 class="intro-text" data-en="Mirror Self Talk" data-th="Mirror Self Talk">Mirror Self Talk</h1>
+        <p class="intro-subtitle"
+       data-en="Beyond this mirror<br>is the space of the self that has always been with you.<br>The one whose voice you may sometimes forget to listen to.<br>And today, we'll guide you back to hearing them again."
+       data-th="หลังกระจกบานนี้..คือพื้นที่ของตัวตนที่อยู่กับคุณมาตลอดชีวิต<br>คนที่บางครั้ง…คุณอาจลืมฟังเสียงเขา<br>และวันนี้ เราจะพาคุณกลับไปฟังเขาอีกครั้ง">
+      หลังกระจกบานนี้..คือพื้นที่ของตัวตนที่อยู่กับคุณมาตลอดชีวิต<br>
+      คนที่บางครั้ง…คุณอาจลืมฟังเสียงเขา<br>
+      และวันนี้ เราจะพาคุณกลับไปฟังเขาอีกครั้ง
+    </p>
+    <div class="mirror-container"><!-- Ripples -->
+     <div class="ripple"></div>
+     <div class="ripple"></div>
+     <div class="ripple"></div><!-- Lake surface line -->
+     <div class="lake-surface"></div><!-- Mirror SVG -->
+     <svg class="mirror-svg" width="200" height="500" viewbox="0 0 200 500" style="max-width: 100%; height: auto;"><defs><!-- Vintage gold frame gradient -->
+       <lineargradient id="frameGold" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#8B7355;stop-opacity:1" />
+        <stop offset="50%" style="stop-color:#A0826D;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#8B7355;stop-opacity:1" />
+       </lineargradient> <!-- Mirror surface - silver -->
+       <lineargradient id="mirrorGlass" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#E8E8E8;stop-opacity:0.4" />
+        <stop offset="30%" style="stop-color:#D0D0D0;stop-opacity:0.5" />
+        <stop offset="50%" style="stop-color:#C0C0C0;stop-opacity:0.6" />
+        <stop offset="70%" style="stop-color:#D0D0D0;stop-opacity:0.5" />
+        <stop offset="100%" style="stop-color:#E0E0E0;stop-opacity:0.4" />
+       </lineargradient>
+      </defs> <!-- Ornate vintage frame --> <rect x="10" y="20" width="180" height="460" fill="url(#frameGold)" rx="8" stroke="#6B5A3D" stroke-width="3" /> <!-- Inner frame detail --> <rect x="18" y="28" width="164" height="444" fill="none" stroke="#6B5A3D" stroke-width="2" rx="6" /> <!-- Mirror glass surface - silver --> <rect x="25" y="35" width="150" height="430" fill="url(#mirrorGlass)" rx="4">
+       <animate attributename="opacity" values="0.8;1;0.8" dur="4s" repeatcount="indefinite" />
+      </rect> <!-- Decorative frame corners --> <circle cx="25" cy="35" r="8" fill="#A0826D" opacity="0.8" /> <circle cx="175" cy="35" r="8" fill="#A0826D" opacity="0.8" /> <circle cx="25" cy="465" r="8" fill="#A0826D" opacity="0.8" /> <circle cx="175" cy="465" r="8" fill="#A0826D" opacity="0.8" /> <!-- Mirror stand legs --> <!-- Left leg --> <rect x="35" y="470" width="8" height="25" fill="url(#frameGold)" rx="2" /> <ellipse cx="39" cy="495" rx="22" ry="5" fill="#8B7355" opacity="0.8" /> <!-- Right leg --> <rect x="157" y="470" width="8" height="25" fill="url(#frameGold)" rx="2" /> <ellipse cx="161" cy="495" rx="22" ry="5" fill="#8B7355" opacity="0.8" /> <!-- Support bar connecting legs --> <rect x="39" y="483" width="122" height="3" fill="#9B8B7E" opacity="0.7" rx="1.5" />
+     </svg><!-- Mirror reflection in water -->
+     <svg class="mirror-reflection" width="200" height="250" viewbox="0 0 200 500" style="max-width: 100%; height: auto;"><rect x="10" y="20" width="180" height="460" fill="url(#frameGold)" rx="8" opacity="0.3" /> <rect x="25" y="35" width="150" height="430" fill="url(#mirrorGlass)" rx="4" opacity="0.2">
+       <animate attributename="opacity" values="0.2;0.3;0.2" dur="4s" repeatcount="indefinite" />
+      </rect>
+     </svg><!-- Text on mirror -->
+     <div class="mirror-text" id="mirror-talk-text"><span data-en="Tap to<br>step inside" data-th="แตะเพื่อเข้าไป">แตะเพื่อเข้าไป</span>
+     </div>
+    </div>
+   </div><!-- Past Intro Scene -->
+   <div class="scene transition-scene hidden" id="past-intro-scene">
+        <p class="transition-text"
+       data-en="This world of the child<br>is filled with beliefs, dreams, and courage<br>that you may have forgotten while growing up.<br>And today… you have come back to them again."
+       data-th="โลกของเด็กคนนี้<br>เต็มไปด้วยความเชื่อ ความฝัน และความกล้า<br>ที่คุณอาจหลงลืมไป<br>และวันนี้…คุณได้กลับไปหาเขาอีกครั้ง">
+      โลกของเด็กคนนี้<br>
+      เต็มไปด้วยความเชื่อ ความฝัน และความกล้า<br>
+      ที่คุณอาจหลงลืมไป<br>
+      และวันนี้…คุณได้กลับไปหาเขาอีกครั้ง
+    </p><button class="continue-btn" id="past-intro-btn" data-en="Continue" data-th="ต่อไป">ต่อไป</button>
+   </div><!-- Past Door Scene -->
+   <div class="scene door-scene hidden" id="past-door-scene">
+    <div class="door-container">
+     <div class="door-frame"></div>
+     <div class="door past" id="past-door">
+      <div class="door-front">
+       <div class="door-sign"><span data-en="Past" data-th="Past">Past</span>
+       </div>
+       <div class="door-panel top"></div>
+       <div class="door-panel bottom"></div>
+       <div class="door-knob"></div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Past Character Scene -->
+   <div class="scene character-scene hidden" id="past-character-scene">
+    <div class="character-image-wrapper">
+      <img src="past.gif" alt="เด็กกับกระต่าย (อดีต)" class="character-image">
+    </div>
+    <p class="question-text"
+       data-en="If you were that child, what would you like to tell yourself today?"
+       data-th="ถ้าคุณคือเด็กคนนั้น คุณอยากบอกอะไรกับตัวคุณในวันนี้">
+      ถ้าคุณคือเด็กคนนั้น คุณอยากบอกอะไรกับตัวคุณในวันนี้
+    </p>
+    <div class="input-container">
+     <label for="past-input" class="hidden">Past message</label>
+     <textarea class="message-input" id="past-input"
+      data-placeholder-en="Write your message to your younger self..."
+      data-placeholder-th="เขียนข้อความถึงตัวเองในวัยเด็ก..."
+      placeholder="เขียนข้อความถึงตัวเองในวัยเด็ก..."></textarea>
+     <button class="submit-btn" id="past-submit" data-en="Send" data-th="ส่ง">ส่ง</button>
+    </div>
+   </div>
+<!-- Past Comfort Scene -->
+   <div class="scene comfort-scene hidden" id="past-comfort-scene">
+    <div class="comfort-message" id="past-comfort-text"></div><button class="next-btn" id="past-next" data-en="Continue" data-th="ต่อไป">ต่อไป</button>
+   </div><!-- Present Intro Scene -->
+   <div class="scene transition-scene hidden" id="present-intro-scene">
+        <p class="transition-text"
+       data-en="Here… is the place where you stand today.<br>The place where you have to handle so many things<br>and keep trying in ways no one can see.<br><br>Try speaking to yourself gently,<br>to the person who is standing here… right now."
+       data-th="นี่คือพื้นที่ที่คุณยืนอยู่ในวันนี้<br>พื้นที่ที่คุณต้องรับมือกับเรื่องมากมาย<br>และใช้ความพยายามที่ไม่มีใครเห็น<br><br>ลองพูดกับตัวเอง<br>กับคนที่ยืนอยู่ตรงนี้..ในตอนนี้">
+      นี่คือพื้นที่ที่คุณยืนอยู่ในวันนี้<br>
+      พื้นที่ที่คุณต้องรับมือกับเรื่องมากมาย<br>
+      และใช้ความพยายามที่ไม่มีใครเห็น<br><br>
+      ลองพูดกับตัวเอง<br>
+      กับคนที่ยืนอยู่ตรงนี้..ในตอนนี้
+    </p><button class="continue-btn" id="present-intro-btn" data-en="Continue" data-th="ต่อไป">ต่อไป</button>
+   </div><!-- Present Door Scene -->
+   <div class="scene door-scene hidden" id="present-door-scene">
+    <div class="door-container">
+     <div class="door-frame"></div>
+     <div class="door present" id="present-door">
+      <div class="door-front">
+       <div class="door-sign"><span data-en="Present" data-th="Present">Present</span>
+       </div>
+       <div class="door-panel top"></div>
+       <div class="door-panel bottom"></div>
+       <div class="door-knob"></div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Present Character Scene -->
+   <div class="scene character-scene hidden" id="present-character-scene">
+    <div class="character-image-wrapper">
+      <img src="present.gif" alt="ตัวเราในวันนี้กับกระต่าย (ปัจจุบัน)" class="character-image">
+    </div>
+    <p class="question-text"
+       data-en="What would you like to say to yourself in this moment?"
+       data-th="คุณอยากบอกอะไรกับตัวเองในตอนนี้">
+      คุณอยากบอกอะไรกับตัวเองในตอนนี้
+    </p>
+    <div class="input-container">
+     <label for="present-input" class="hidden">Present message</label>
+     <textarea class="message-input" id="present-input"
+      data-placeholder-en="Write your message to your present self..."
+      data-placeholder-th="เขียนข้อความถึงตัวเองในปัจจุบัน..."
+      placeholder="เขียนข้อความถึงตัวเองในปัจจุบัน..."></textarea>
+     <button class="submit-btn" id="present-submit" data-en="Send" data-th="ส่ง">ส่ง</button>
+    </div>
+   </div>
+<!-- Present Comfort Scene -->
+   <div class="scene comfort-scene hidden" id="present-comfort-scene">
+    <div class="comfort-message" id="present-comfort-text"></div><button class="next-btn" id="present-next" data-en="Continue" data-th="ต่อไป">ต่อไป</button>
+   </div><!-- Future Intro Scene -->
+   <div class="scene transition-scene hidden" id="future-intro-scene">
+        <p class="transition-text"
+       data-en="Your future self<br>has already walked through paths you cannot yet see.<br>And they know… that you are already doing your very best.<br><br>Shall we listen to what they want to tell you today?"
+       data-th="คุณในอนาคต<br>ได้เดินผ่านเส้นทางที่คุณยังมองไม่เห็น<br>และเขารู้…ว่าคุณกำลังพยายามอย่างดีที่สุดแล้ว<br><br>ลองฟังสิ่งที่เขาอยากบอกคุณ…ในวันนี้">
+      คุณในอนาคต<br>
+      ได้เดินผ่านเส้นทางที่คุณยังมองไม่เห็น<br>
+      และเขารู้…ว่าคุณกำลังพยายามอย่างดีที่สุดแล้ว<br><br>
+      ลองฟังสิ่งที่เขาอยากบอกคุณ…ในวันนี้ไหม
+    </p><button class="continue-btn" id="future-intro-btn" data-en="Continue" data-th="ต่อไป">ต่อไป</button>
+   </div><!-- Future Door Scene -->
+   <div class="scene door-scene hidden" id="future-door-scene">
+    <div class="door-container">
+     <div class="door-frame"></div>
+     <div class="door future" id="future-door">
+      <div class="door-front">
+       <div class="door-sign"><span data-en="Future" data-th="Future">Future</span>
+       </div>
+       <div class="door-panel top"></div>
+       <div class="door-panel bottom"></div>
+       <div class="door-knob"></div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Future Character Scene -->
+   <div class="scene character-scene hidden" id="future-character-scene">
+    <div class="character-image-wrapper">
+      <img src="future.gif" alt="ตัวเราในอนาคตกับกระต่าย (อนาคต)" class="character-image">
+    </div>
+    <p class="question-text"
+       data-en="If you were your future self, what would you like to tell yourself today?"
+       data-th="ถ้าคุณคือตัวเองในอนาคต คุณอยากบอกอะไรกับตัวคุณในวันนี้">
+      ถ้าคุณคือตัวเองในอนาคต คุณอยากบอกอะไรกับตัวคุณในวันนี้
+    </p>
+    <div class="input-container">
+     <label for="future-input" class="hidden">Future message</label>
+     <textarea class="message-input" id="future-input"
+      data-placeholder-en="Write your message from your future self..."
+      data-placeholder-th="เขียนข้อความจากตัวเองในอนาคต..."
+      placeholder="เขียนข้อความจากตัวเองในอนาคต..."></textarea>
+     <button class="submit-btn" id="future-submit" data-en="Send" data-th="ส่ง">ส่ง</button>
+    </div>
+   </div>
+<!-- Future Comfort Scene -->
+   <div class="scene comfort-scene hidden" id="future-comfort-scene">
+    <div class="comfort-message" id="future-comfort-text"></div>
+    <button class="next-btn" id="future-next" data-en="Continue" data-th="ต่อไป">ต่อไป</button>
+   </div><!-- Final Scene -->
+   <div class="scene final-scene hidden" id="final-scene">
+    <div class="three-doors">
+     <div class="door-summary past">
+      <div class="door-label">
+       PAST
+      </div>
+      <div class="door-message" id="past-summary"></div>
+     </div>
+     <div class="door-summary present">
+      <div class="door-label">
+       PRESENT
+      </div>
+      <div class="door-message" id="present-summary"></div>
+     </div>
+     <div class="door-summary future">
+      <div class="door-label">
+       FUTURE
+      </div>
+      <div class="door-message" id="future-summary"></div>
+     </div>
+    </div>
+        <div class="final-message-container">
+      <div class="final-bunny-wrapper">
+        <img src="bunny.png" alt="กระต่ายนั่งอยู่กับคุณ" class="final-bunny">
+      </div>
+      <p class="final-text"
+         data-en="See? You're not alone. You have us!<br>All the parts of you, living quietly inside your heart.<br>Thank you for all you do for us.<br>When you're tired, come back to us whenever you need.<br>We're here. xoxo."
+         data-th="เห็นมั้ย เธอไม่ได้อยู่คนเดียวนะ เธอยังมีพวกเรา!<br>ทุกช่วงเวลาของเธอ..อยู่ตรงนี้ อยู่ด้านในจิตใจของเธอนี่แหละ<br>ขอบคุณที่ทำทุกอย่างเพื่อเรานะ<br>ถ้าเธอเหนื่อย ก็กลับมาหาเราได้เสมอเลย<br>พวกเราอยู่ตรงนี้ อยู่ที่นี่ รักเธอนะ">
+        เห็นมั้ย เธอไม่ได้อยู่คนเดียวนะ เธอยังมีพวกเรา!<br>
+        ทุกช่วงเวลาของเธอ..อยู่ตรงนี้ อยู่ด้านในจิตใจของเธอนี่แหละ<br>
+        ขอบคุณที่ทำทุกอย่างเพื่อเรานะ<br>
+        ถ้าเธอเหนื่อย ก็กลับมาหาเราได้เสมอเลย<br>
+        พวกเราอยู่ตรงนี้ อยู่ที่นี่ รักเธอนะ
+      </p>
+    </div>
+
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      intro_text: "Beyond this mirror<br>is a space for the self who has always been with you<br>the one whose voice you may sometimes forget to listen to.<br>And today, we'll guide you back to hearing them again.",
+      intro_text_th: "หลังกระจกบานนี้..<br>คือพื้นที่ของตัวตนที่อยู่กับคุณมาตลอดชีวิต<br>คนที่บางครั้ง…คุณอาจลืมฟังเสียงเขา<br>และวันนี้ เราจะพาคุณกลับไปฟังเขาอีกครั้ง",
+      past_question: "If you were that child, what would you like to tell yourself today?",
+      past_question_th: "ถ้าคุณคือเด็กคนนั้น คุณอยากบอกอะไรกับตัวคุณในวันนี้",
+      present_question: "What would you like to say to yourself in this moment?",
+      present_question_th: "คุณอยากบอกอะไรกับตัวเองในตอนนี้",
+      future_question: "If you were your future self, what would you like to tell yourself today?",
+      future_question_th: "ถ้าคุณคือตัวเองในอนาคต คุณอยากบอกอะไรกับตัวคุณในวันนี้",
+      final_message: "See? You're not alone. You have us!<br>All the parts of you, living quietly inside your heart.<br>Thank you for all you do for us.<br>When you're tired, come back to us whenever you need.<br>We're here. xoxo.",
+      final_message_th: "เห็นมั้ย เธอไม่ได้อยู่คนเดียวนะ เธอยังมีพวกเรา!<br>ทุกช่วงเวลาของเธอ..อยู่ตรงนี้ อยู่ด้านในจิตใจของเธอนี่แหละ<br>ขอบคุณที่ทำทุกอย่างเพื่อเรานะ<br>ถ้าเธอเหนื่อย ก็กลับมาหาเราได้เสมอเลย<br>พวกเราอยู่ตรงนี้ อยู่ที่นี่ รักเธอนะ"
+    };
+
+    let currentLang = 'th';
+    let userMessages = {
+      past: '',
+      present: '',
+      future: ''
+    };
+
+    async function sendSessionLog() {
+  // Backward-compat: final submission now handled by sendProgress/markStep.
+  try { sendProgress({ finalSubmit: true }); } catch(e) {}
+}
+
+        
+
+const comfortMessages = {
+      past: {
+        th: [
+          "คำพูดของเขาเดินทางมาถึงคุณแล้วนะ และตอนนี้…คุณก็ได้ฟังมันแล้ว",
+          "สิ่งที่เขาพูดอาจจะเรียบง่าย แต่สำหรับเขามันสำคัญมากนะ และวันนี้คุณได้ฟังมันแล้ว",
+          "สิ่งที่เขาแบ่งปันอาจจะเล็กน้อย แต่นั่นคือความจริงของเขา และวันนี้คุณก็ได้ฟังมันแล้ว",
+          "สำหรับเขา การที่คุณกลับมาหา…มันมีความหมายกับเขามากจริงๆ"
+        ],
+        en: [
+          "The words they wanted to share have reached you — and now… you've heard them.",
+          "What they said may sound simple, but to them, it matters deeply — and today, you've listened to it.",
+          "What they shared may be small, but it is real for them — and today, you've heard it.",
+          "For them, the fact that you came back… means more than any perfect words."
+        ]
+      },
+      present: {
+        th: [
+          "สิ่งที่คุณพูดกับตัวเองวันนี้…แค่ได้พูดออกมา มันก็มีความหมายแล้ว",
+          "คำพูดของคุณในวันนี้ถูกเก็บไว้ด้วยความอ่อนโยน และนั่นทำให้คุณได้รับรู้ตัวเอง",
+          "ข้อความนี้ ถึงมันไม่สมบูรณ์แบบ แต่มันซื่อตรงกับหัวใจของคุณมากเลย",
+          "วันนี้…คุณได้ยินตัวเองแล้วนะ และนั่นคือก้าวที่สำคัญที่สุด"
+        ],
+        en: [
+          "What you said to yourself today… simply by existing, already has meaning.",
+          "Your words today have been held with gentleness — and in that moment, you heard yourself.",
+          "This message may not be perfect, but it is honest to your heart — and that is enough.",
+          "Today… you heard your own voice — and that, is the most important step."
+        ]
+      },
+      future: {
+        th: [
+          "ข้อความนี้อาจจะเรียบง่าย แต่เต็มไปด้วยน้ำหนักของเวลาที่ตัวคุณในอนาคตอยากฝากถึงคุณ",
+          "ข้อความนี้ไม่ได้เร่งให้คุณก้าวไปไกลกว่าเดิม มันเป็นหลักฐานว่าเขายังยืนอยู่ \"ข้างคุณ\"",
+          "สิ่งที่คุณในอนาคตอยากส่งถึงคุณในวันนี้…มันได้เดินทางมาถึงแล้วนะ และเขายังอยู่เคียงข้างคุณเสมอ",
+          "สิ่งที่เขาบอกไม่ได้เร่งให้คุณต้อง \"เข้มแข็ง\" กว่านี้ แค่มันเตือนว่า \"คุณไม่ได้เดินเส้นทางนี้ตามลำพังนะ\""
+        ],
+        en: [
+          "This message may be quiet and simple, but it carries the weight of time — from your future self to you.",
+          "This message doesn't push you to go further — it simply reminds you that they're still standing beside you.",
+          "What your future self wished to send to you today… has arrived — and they are still here, right next to you.",
+          "What they said doesn't ask you to be \"stronger\" — it simply reminds you that you're not walking this path alone."
+        ]
+      }
+    };
+
+    function getRandomMessage(category) {
+      const messages = comfortMessages[category][currentLang];
+      return messages[Math.floor(Math.random() * messages.length)];
+    }
+
+    function updateLanguage(lang) {
+      currentLang = lang;
+      document.body.setAttribute('data-lang', lang);
+      document.querySelectorAll('[data-en]').forEach(el => {
+        if (el.tagName === 'TEXTAREA') {
+          el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
+        } else {
+          const text = el.getAttribute(`data-${lang}`);
+          if (text) {
+            el.innerHTML = text;
+          }
+        }
+      });
+
+      // Update all textarea placeholders
+      const pastInput = document.getElementById('past-input');
+      const presentInput = document.getElementById('present-input');
+      const futureInput = document.getElementById('future-input');
+      
+      if (pastInput) {
+        pastInput.placeholder = lang === 'th' ? 'เขียนข้อความถึงตัวเองในวัยเด็ก...' : 'Write your message to your younger self...';
+      }
+      if (presentInput) {
+        presentInput.placeholder = lang === 'th' ? 'เขียนข้อความถึงตัวเองในปัจจุบัน...' : 'Write your message to your present self...';
+      }
+      if (futureInput) {
+        futureInput.placeholder = lang === 'th' ? 'เขียนข้อความจากตัวเองในอนาคต...' : 'Write your message from your future self...';
+      }
+
+      const langSwitch = document.getElementById('lang-switch');
+      if (langSwitch) {
+        if (lang === 'th') {
+          langSwitch.classList.add('th');
+        } else {
+          langSwitch.classList.remove('th');
+        }
+      }
+    }
+
+    function switchScene(fromId, toId) {
+      const fromScene = document.getElementById(fromId);
+      const toScene = document.getElementById(toId);
+      
+      fromScene.classList.remove('active');
+      setTimeout(() => {
+        fromScene.classList.add('hidden');
+        toScene.classList.remove('hidden');
+        setTimeout(() => {
+          toScene.classList.add('active');
+          toScene.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      }, 800);
+
+    // ---- TRACKING: mark progress whenever a scene becomes active ----
+    try { window.__trackScene?.(toId); } catch(e) {}
+
+    }
+
+// =====================
+// PROGRESS TRACKING -> Google Sheets (Web App)
+// 1) Deploy Apps Script as Web App and paste its /exec URL below.
+// =====================
+
+// ✅ Paste your Web App URL here (must end with /exec)
+const SHEET_ENDPOINT = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+// Store one play session in localStorage so we can update the same row until they finish.
+const TRACK_KEY = 'mst_session_v1';
+
+function getSession() {
+  try { return JSON.parse(localStorage.getItem(TRACK_KEY) || 'null'); } catch(e) { return null; }
+}
+function setSession(obj) {
+  localStorage.setItem(TRACK_KEY, JSON.stringify(obj));
+}
+
+function getCountryCode() {
+  // Best-effort: use browser locale region (e.g. "th-TH" -> "TH").
+  // This is NOT guaranteed to be the real physical country, but it's the simplest without an IP geo API.
+  const lang = (navigator.language || '').trim();
+  const parts = lang.split('-');
+  return (parts[1] || '').toUpperCase();
+}
+
+function ensureSession() {
+  let s = getSession();
+  if (!s || !s.sessionId) {
+    s = {
+      sessionId: (crypto?.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(16).slice(2))),
+      startedAtMs: Date.now(),
+      lastStep: 'intro-scene',
+      intro: false,
+      past: false,
+      present: false,
+      future: false,
+      final: false,
+      country: getCountryCode()
+    };
+    setSession(s);
+  } else {
+    // backfill country if missing
+    if (!s.country) { s.country = getCountryCode(); setSession(s); }
+    if (!s.startedAtMs) { s.startedAtMs = Date.now(); setSession(s); }
+  }
+  return s;
+}
+
+async function sendProgress(extra = {}) {
+  const s = ensureSession();
+
+  // If user hasn't pasted endpoint yet, silently skip
+  if (!SHEET_ENDPOINT || SHEET_ENDPOINT.includes('PASTE_YOUR_WEB_APP_URL_HERE')) return;
+
+  const payload = new URLSearchParams({
+    sessionId: s.sessionId,
+    startedAtMs: String(s.startedAtMs || ''),
+    endedAtMs: s.final ? String(Date.now()) : '', // only set when finished
+    lastStep: s.lastStep || '',
+    intro: String(!!s.intro),
+    past: String(!!s.past),
+    present: String(!!s.present),
+    future: String(!!s.future),
+    finalStep: String(!!s.final),
+    country: String(s.country || ''),
+    ...Object.fromEntries(Object.entries(extra).map(([k,v]) => [k, String(v)]))
+  });
+
+  // Prefer sendBeacon for reliability on navigation/unload
+  try {
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload.toString()], { type: 'application/x-www-form-urlencoded' });
+      navigator.sendBeacon(SHEET_ENDPOINT, blob);
+      return;
+    }
+  } catch(e) {}
+
+  // Fallback fetch
+  try {
+    await fetch(SHEET_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: payload.toString()
+    });
+  } catch(e) {}
+}
+
+// Mark progress by scene id (called from switchScene)
+window.__trackScene = function(sceneId) {
+  const s = ensureSession();
+  s.lastStep = sceneId;
+
+  // Map scenes -> milestone flags (sticky ✓)
+  if (sceneId === 'intro-scene') s.intro = true;
+
+  if (sceneId.startsWith('past-')) s.past = true;
+  if (sceneId.startsWith('present-')) s.present = true;
+  if (sceneId.startsWith('future-')) s.future = true;
+
+  if (sceneId === 'final-scene') s.final = true;
+
+  setSession(s);
+  sendProgress();
+};
+
+// Compatibility: your existing code calls markStep('intro'/'past'/...)
+function markStep(step) {
+  const s = ensureSession();
+  if (step === 'intro') { s.intro = true; s.lastStep = 'intro-scene'; }
+  if (step === 'past') { s.past = true; s.lastStep = 'past-character-scene'; }
+  if (step === 'present') { s.present = true; s.lastStep = 'present-character-scene'; }
+  if (step === 'future') { s.future = true; s.lastStep = 'future-character-scene'; }
+  if (step === 'final') { s.final = true; s.lastStep = 'final-scene'; }
+  setSession(s);
+  sendProgress();
+}
+
+// Heartbeat: every 15s keep lastStep updated (so you know where user stuck)
+setInterval(() => {
+  const s = ensureSession();
+  if (!s.final) sendProgress({ heartbeat: true });
+}, 15000);
+
+// Also try to send on leaving the page
+window.addEventListener('beforeunload', () => {
+  try { sendProgress({ unload: true }); } catch(e) {}
+});
+
+
+
+    // Language toggle
+    const langSwitch = document.getElementById('lang-switch');
+    if (langSwitch) {
+      langSwitch.addEventListener('click', () => {
+        const newLang = currentLang === 'en' ? 'th' : 'en';
+        updateLanguage(newLang);
+      });
+    }
+
+    // Initialize with Thai
+    updateLanguage('th');
+
+    // Mirror SVG click - ทำให้กระจกทั้งหมดกดได้
+    const mirrorSvg = document.querySelector('.mirror-svg');
+    if (mirrorSvg) {
+      mirrorSvg.addEventListener('click', () => {
+        markStep('intro');
+        const mirrorContainer = document.querySelector('.mirror-container');
+        mirrorContainer.classList.add('fading');
+        
+        setTimeout(() => {
+          switchScene('intro-scene', 'past-intro-scene');
+          mirrorContainer.classList.remove('fading');
+        }, 1200);
+      });
+    }
+
+    // Past intro button
+    const pastIntroBtn = document.getElementById('past-intro-btn');
+    if (pastIntroBtn) {
+      pastIntroBtn.addEventListener('click', () => {
+        switchScene('past-intro-scene', 'past-door-scene');
+      });
+    }
+
+    // Past door click
+    const pastDoor = document.getElementById('past-door');
+    if (pastDoor) {
+      pastDoor.addEventListener('click', () => {
+        pastDoor.classList.add('opening');
+        setTimeout(() => {
+          switchScene('past-door-scene', 'past-character-scene');
+          pastDoor.classList.remove('opening');
+        }, 800);
+      });
+    }
+
+    // Past submit - แสดงข้อความสุ่มตามภาษา
+    document.getElementById('past-submit').addEventListener('click', () => {
+      const input = document.getElementById('past-input');
+      if (input.value.trim()) {
+        markStep('past');
+        userMessages.past = input.value.trim();
+        const comfortText = document.getElementById('past-comfort-text');
+        comfortText.textContent = getRandomMessage('past');
+        switchScene('past-character-scene', 'past-comfort-scene');
+      }
+    });
+
+    // Past next
+    document.getElementById('past-next').addEventListener('click', () => {
+      switchScene('past-comfort-scene', 'present-intro-scene');
+    });
+
+    // Present intro button
+    const presentIntroBtn = document.getElementById('present-intro-btn');
+    if (presentIntroBtn) {
+      presentIntroBtn.addEventListener('click', () => {
+        switchScene('present-intro-scene', 'present-door-scene');
+      });
+    }
+
+    // Present door click
+    const presentDoor = document.getElementById('present-door');
+    if (presentDoor) {
+      presentDoor.addEventListener('click', () => {
+        presentDoor.classList.add('opening');
+        setTimeout(() => {
+          switchScene('present-door-scene', 'present-character-scene');
+          presentDoor.classList.remove('opening');
+        }, 800);
+      });
+    }
+
+    // Present submit - แสดงข้อความสุ่มตามภาษา
+    document.getElementById('present-submit').addEventListener('click', () => {
+      const input = document.getElementById('present-input');
+      if (input.value.trim()) {
+        markStep('present');
+        userMessages.present = input.value.trim();
+        const comfortText = document.getElementById('present-comfort-text');
+        comfortText.textContent = getRandomMessage('present');
+        switchScene('present-character-scene', 'present-comfort-scene');
+      }
+    });
+
+    // Present next
+    document.getElementById('present-next').addEventListener('click', () => {
+      switchScene('present-comfort-scene', 'future-intro-scene');
+    });
+
+    // Future intro button
+    const futureIntroBtn = document.getElementById('future-intro-btn');
+    if (futureIntroBtn) {
+      futureIntroBtn.addEventListener('click', () => {
+        switchScene('future-intro-scene', 'future-door-scene');
+      });
+    }
+
+    // Future door click
+    const futureDoor = document.getElementById('future-door');
+    if (futureDoor) {
+      futureDoor.addEventListener('click', () => {
+        futureDoor.classList.add('opening');
+        setTimeout(() => {
+          switchScene('future-door-scene', 'future-character-scene');
+          futureDoor.classList.remove('opening');
+        }, 800);
+      });
+    }
+
+    // Future submit - แสดงข้อความสุ่มตามภาษา
+    document.getElementById('future-submit').addEventListener('click', () => {
+      const input = document.getElementById('future-input');
+      if (input.value.trim()) {
+        markStep('future');
+        userMessages.future = input.value.trim();
+        const comfortText = document.getElementById('future-comfort-text');
+        comfortText.textContent = getRandomMessage('future');
+        switchScene('future-character-scene', 'future-comfort-scene');
+      }
+    });
+
+    // Future next
+    document.getElementById('future-next').addEventListener('click', () => {
+      document.getElementById('past-summary').textContent = userMessages.past;
+      document.getElementById('present-summary').textContent = userMessages.present;
+      document.getElementById('future-summary').textContent = userMessages.future;
+
+      markStep('final');
+      sendSessionLog();
+
+      switchScene('future-comfort-scene', 'final-scene');
+    });
+
+    async function onConfigChange(config) {
+      const introSubtitle = document.querySelector('.intro-subtitle');
+      introSubtitle.setAttribute('data-en', config.intro_text || defaultConfig.intro_text);
+      introSubtitle.setAttribute('data-th', config.intro_text_th || defaultConfig.intro_text_th);
+
+      const pastQuestion = document.querySelectorAll('.question-text')[0];
+      pastQuestion.setAttribute('data-en', config.past_question || defaultConfig.past_question);
+      pastQuestion.setAttribute('data-th', config.past_question_th || defaultConfig.past_question_th);
+
+      const presentQuestion = document.querySelectorAll('.question-text')[1];
+      presentQuestion.setAttribute('data-en', config.present_question || defaultConfig.present_question);
+      presentQuestion.setAttribute('data-th', config.present_question_th || defaultConfig.present_question_th);
+
+      const futureQuestion = document.querySelectorAll('.question-text')[2];
+      futureQuestion.setAttribute('data-en', config.future_question || defaultConfig.future_question);
+      futureQuestion.setAttribute('data-th', config.future_question_th || defaultConfig.future_question_th);
+
+      const finalText = document.querySelector('.final-text');
+      finalText.setAttribute('data-en', config.final_message || defaultConfig.final_message);
+      finalText.setAttribute('data-th', config.final_message_th || defaultConfig.final_message_th);
+
+      updateLanguage(currentLang);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["intro_text", config.intro_text || defaultConfig.intro_text],
+          ["intro_text_th", config.intro_text_th || defaultConfig.intro_text_th],
+          ["past_question", config.past_question || defaultConfig.past_question],
+          ["past_question_th", config.past_question_th || defaultConfig.past_question_th],
+          ["present_question", config.present_question || defaultConfig.present_question],
+          ["present_question_th", config.present_question_th || defaultConfig.present_question_th],
+          ["future_question", config.future_question || defaultConfig.future_question],
+          ["future_question_th", config.future_question_th || defaultConfig.future_question_th],
+          ["final_message", config.final_message || defaultConfig.final_message],
+          ["final_message_th", config.final_message_th || defaultConfig.final_message_th]
+        ])
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b886c0963d7d338',t:'MTc2NzUwNTQ0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
